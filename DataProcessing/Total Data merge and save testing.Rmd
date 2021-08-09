@@ -1,0 +1,218 @@
+---
+title: "Master Spreadsheet and Data Plots"
+author: "Nicole Hellessey"
+date: "09/04/2021"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+```{r}
+#rm(list=ls(all=TRUE))
+krill <- read.csv("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\.csv files\\MASTER XYZ FACTOR FILE (April 9 2021).csv")
+head(krill)
+str(krill)
+krill$Krill.Track <- as.factor(krill$Krill.Track)
+krill$Date <- as.factor(krill$Date)
+krill$View <- as.factor(krill$View)
+krill$Flow.Rate <- as.factor(krill$Flow.Rate)
+krill$Chla <- as.factor(krill$Chla)
+krill$D_V_T <- paste(krill$Date, krill$View, krill$Krill.Track, sep='_') ## Date_view_track factor created
+krill$D_V_T <- as.factor(krill$D_V_T)
+krill$D_V <- paste(krill$Date, krill$View, sep='_') ## Date_view factor created
+krill$D_V <- as.factor(krill$D_V)
+krill <- na.omit(krill)
+str(krill)
+tail(krill)
+```
+
+
+```{r}
+#### Second master spreadsheet loaded in due to row limit
+p2krill <- read.csv("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\.csv files\\MASTER XYZ FACTOR FILE (April 9 2021) Part 2.csv")
+head(p2krill)
+str(p2krill)
+p2krill$Krill.Track <- as.factor(p2krill$Krill.Track)
+p2krill$Date <- as.factor(p2krill$Date)
+p2krill$View <- as.factor(p2krill$View)
+p2krill$Flow.Rate <- as.factor(p2krill$Flow.Rate)
+p2krill$Chla <- as.factor(p2krill$Chla)
+p2krill$D_V_T <- paste(p2krill$Date, p2krill$View, p2krill$Krill.Track, sep='_') ## Date_view_track factor created
+p2krill$D_V_T <- as.factor(p2krill$D_V_T)
+p2krill$D_V <- paste(p2krill$Date, p2krill$View, sep='_') ## Date_view factor created
+p2krill$D_V <- as.factor(p2krill$D_V)
+p2krill <- na.omit(p2krill)
+str(p2krill)
+tail(p2krill)
+```
+
+```{r}
+#### row bind krill and p2krill
+
+TotalData <- rbind(krill, p2krill)
+head(TotalData)
+str(TotalData)
+```
+
+
+```{r}
+#### add d and v values
+
+x1 <- TotalData$x[1:(nrow(TotalData)-1)]
+x2 <- TotalData$x[2:nrow(TotalData)]
+TotalData$dx[1:(nrow(TotalData)-1)] <- x2-x1
+
+y1 <- TotalData$y[1:(nrow(TotalData)-1)]
+y2 <- TotalData$y[2:nrow(TotalData)]
+TotalData$dy[1:(nrow(TotalData)-1)] <- y2-y1
+
+z1 <- TotalData$z[1:(nrow(TotalData)-1)]
+z2 <- TotalData$z[2:nrow(TotalData)]
+TotalData$dz[1:(nrow(TotalData)-1)] <- z2-z1
+
+TotalData$d <- sqrt(TotalData$dx^2 + TotalData$dy^2 + TotalData$dz^2)
+
+
+TotalData$vx <- TotalData$dx/(1/30)  ## velocity on the x axis
+TotalData$vy <- TotalData$dy/(1/30)  ## velocity on the y axis
+TotalData$vz <- TotalData$dz/(1/30)  ## velocity on the z axis
+TotalData$v <- TotalData$d/(1/30) ## total velocity
+```
+
+
+```{r}
+##### Heading and pitch
+
+TotalData$heading <- atan(TotalData$dx/TotalData$dy)
+TotalData$pitch <- atan(TotalData$dz/(sqrt(TotalData$dx^2 + TotalData$dy^2)))
+
+
+hist(TotalData$pitch/(2*pi)*360)
+hist(TotalData$heading/(2*pi)*360)
+
+hist(TotalData$dz[abs(TotalData$dz)<.01],breaks = 100)
+hist(TotalData$dy[abs(TotalData$dy)<.01],breaks = 100)
+hist(TotalData$dx[abs(TotalData$dx)<.01],breaks = 100)
+
+
+
+TotalData[is.na(TotalData)] <- 0
+tail(TotalData)
+head(TotalData)
+
+levels(DVT_AGG$Chla)
+DVT_AGG$Chla <- ordered(DVT_AGG$Chla, levels = c("0", "4.3", "4.6", "6.1", "7.6", "19"))
+
+levels(TotalData$Flow.Rate)
+TotalData$Flow.Rate<- ordered(TotalData$Flow.Rate, levels = c("0", "0.6", "5.9", "8.9"))
+layout(matrix(c(1,2,3,4),2,2))
+
+hist(TotalData$heading[TotalData$Flow.Rate == "0"], breaks = 30, main = "Heading Histogram in Flow rate '0'", xlab = "Heading")
+hist(TotalData$pitch[TotalData$Flow.Rate == "0"], breaks = 30, main = "Pitch Histogram in Flow rate '0'", xlab = "Pitch")
+hist(TotalData$z[TotalData$Flow.Rate == "0"], breaks = 40, main = " z Histogram in Flow rate '0'", xlab = "z")
+hist(TotalData$y[TotalData$Flow.Rate == "0"], breaks = 40, main = " y Histogram in Flow rate '0'", xlab = "y")
+
+```
+
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+#### save Dataframe as a .csv file
+
+head(TotalData)
+tail (TotalData)
+str (TotalData)
+
+write.table(TotalData, file = "C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\.csv files\\TotalData_with_d_V_Heading_Pitch.csv", sep = ",", row.names = FALSE, col.names = TRUE, )
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+## look at some basic diagnostic plots
+library(lattice)
+xyplot(x ~ Chla|Flow.Rate, data = TotalData)  ## creates a scatterplot of data against 2 factored variables
+bwplot((x/10) ~ Chla|Flow.Rate, data = TotalData, xlab = "Chlorophyll level", ylab = "Depth (cm)", main = "Flow rate")  ##same but as a box and whisker plot
+```
+
+
+```{r}
+### aggregate by D_V_T to get means per animal
+DVT_AGG <- aggregate(. ~ D_V_T+Chla+Flow.Rate+Light+Guano+Date+View+D_V+Krill.Track, data = TotalData, mean)
+head(DVT_AGG)
+tail(DVT_AGG)
+str(DVT_AGG)
+
+
+### aggregate by D_V_T to get means per animal
+DV_AGG <- aggregate(. ~ D_V+Chla+Flow.Rate+Light+Guano+Date+View, data = TotalData, mean)
+head(DV_AGG)
+tail(DV_AGG)
+str(DV_AGG)
+```
+
+
+
+```{r}
+## Basic one-way ANOVA, this example only looks at Chlorophyll and not Flow rate or their interaction
+fit <- aov(x ~ Chla, data=DVT_AGG) ## This is the ANOVA model (make it y~A*B for multiple comparison)
+layout(matrix(c(1,2,3,4),2,2)) # optional layout 
+plot(fit)  ## tests for normality and homogeneity (can square root or log transform if needed)
+summary(fit) ## display Type I ANOVA table (with p-value at right hand side)
+drop1(fit,~.,test="F") ## type III SS and F Tests
+TukeyHSD(fit) ## Post-hoc test where fit comes from aov()
+
+##can run again with DV_AGG for means of each treatment per day rather than per animal
+```
+ 
+
+```{r}
+##### standard multifactorial ANOVA (after first line, same as above) 
+fit <- aov(x ~ Chla*Flow.Rate, data = DVT_AGG)
+layout(matrix(c(1,2,3,4),2,2)) # optional layout 
+plot(fit)  ## tests for normality and homogeneity (can square root or log transform if needed)
+summary(fit) ## display Type I ANOVA table (with p-value at right hand side)
+drop1(fit,~.,test="F") ## type III SS and F Tests
+TukeyHSD(fit) ## Post-hoc test where fit comes from aov()
+
+library("ggpubr")
+ggboxplot(DVT_AGG, x = "Chla", y = "z", color = "Chla", xlab = "Chlorophyll a concentration (mg/L)", ylab = "Average Forward Velocity (cm/s^2)/animal")
+ggboxplot(DVT_AGG, x = "D_V", y = "x", color = "D_V", label = "D_V_T")
+ggboxplot(DVT_AGG, x = "D_V", y = "dx", color = "D_V", label = "D_V_T")
+
+```
+
+
+```{r}
+### look at outliers from previous ggplots
+out <- subset(TotalData, D_V_T == "20191120_2_4")
+out <- na.omit(out)
+str(out)
+
+plot(out$Frame, out$dx)
+
+```
+
+
+
+```{r}
+
+
+```
+
