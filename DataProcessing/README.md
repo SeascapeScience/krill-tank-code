@@ -8,6 +8,10 @@ To get a copy of the repo:
 
 ```git clone https://github.com/SeascapeScience/krill-tank-code.git```
 
+To pull any new changes from the web to your local copy:
+
+```git pull```
+
 To see the status of the repo (locally):
 
 ```git status```
