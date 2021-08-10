@@ -1,0 +1,60 @@
+---
+title: "Merging Files"
+output: html_notebook
+---
+
+Load in all of the files by setting the working directory and making a list of filenames to grab
+Add the Date and View of the trail to seperate columns using the character string of the filename
+
+
+```{r}
+rm(list=ls(all=TRUE))
+setwd("~/Post-doc/Data/Processed MatLab Files")
+path <- "C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Processed MatLab Files\\"
+files <- list.files(path=path, pattern="*.csv")
+
+ldf = lapply(files, function(x) {
+      dat = read.table(x, header=T, sep=",")
+      # Add column names
+      names(dat) = c('X', 'Y', 'Z', 'Track')
+      # Add a column with the Date of the trial
+      dat$Date = substr(x,1,8)
+      # Add a column with the View of the trial
+      dat$View = substr(x,14,14)
+      # Add a column with the filename
+      dat$File.name = substr(x,1,15)
+      return(dat)
+})
+
+library(dplyr)
+df <- do.call("rbind", ldf)
+## Date_view_track factor created
+df$D_V_T <- paste(df$Date, df$View, df$Track, sep='_')
+df$D_V_T <- as.factor(df$D_V_T)
+## Date_view factor created
+df$D_V <- paste(df$Date, df$View, sep='_') 
+df$D_V <- as.factor(df$D_V)
+
+head(df)
+tail(df)
+```
+
+Add columns of metadata based on the D_V of each row
+
+```{r}
+metadata <- read.csv("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Metadata flat file 2021.08.10.csv", header = T)
+head(metadata)
+tail(metadata)
+
+alldata <- merge(df, metadata)
+
+head(alldata)
+tail(alldata)
+
+alldata <- na.omit(alldata)
+
+```
+
+
+
+
