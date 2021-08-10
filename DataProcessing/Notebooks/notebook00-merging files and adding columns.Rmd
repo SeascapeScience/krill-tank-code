@@ -73,6 +73,22 @@ TotalData$d <- sqrt(TotalData$dx^2 + TotalData$dy^2 + TotalData$dz^2)
 
 head(TotalData)
 
+
+TotalData$vx <- TotalData$dx/(1/30)  ## velocity on the x axis
+TotalData$vy <- TotalData$dy/(1/30)  ## velocity on the y axis
+TotalData$vz <- TotalData$dz/(1/30)  ## velocity on the z axis
+TotalData$v <- TotalData$d/(1/30) ## total velocity
+
+TotalData$heading <- atan(TotalData$dx/TotalData$dy)
+TotalData$pitch <- atan(TotalData$dz/(sqrt(TotalData$dx^2 + TotalData$dy^2)))
+
+hist(TotalData$pitch/(2*pi)*360)
+hist(TotalData$heading/(2*pi)*360)
+
+hist(TotalData$dz[abs(TotalData$dz)<.01],breaks = 100)
+hist(TotalData$dy[abs(TotalData$dy)<.01],breaks = 100)
+hist(TotalData$dx[abs(TotalData$dx)<.01],breaks = 100)
+
 ```
 
 
