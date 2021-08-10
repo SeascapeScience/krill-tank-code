@@ -72,8 +72,9 @@ TotalData$dz[1:(nrow(TotalData)-1)] <- z2-z1
 TotalData$d <- sqrt(TotalData$dx^2 + TotalData$dy^2 + TotalData$dz^2)
 
 head(TotalData)
+```
 
-
+```{r}
 TotalData$vx <- TotalData$dx/(1/30)  ## velocity on the x axis
 TotalData$vy <- TotalData$dy/(1/30)  ## velocity on the y axis
 TotalData$vz <- TotalData$dz/(1/30)  ## velocity on the z axis
@@ -91,16 +92,11 @@ hist(TotalData$dx[abs(TotalData$dx)<.01],breaks = 100)
 
 ```
 
-
-
-
 ```{r}
-save(alldata,file="Total Data Merged File.Rda")
-write.table(alldata, file = "Total Data Merged File.csv", sep = ",", col.names = T)
-
-load("Total Data Merged File.Rda")
+save.image("~/Post-doc/Data/Total Merged Data File.RData")
 
 ```
+
 
 
 
