@@ -7,7 +7,7 @@ Plot and fit distributions of variables
 
 ```{r}
 
-load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Scripts\\Total Data Merged File.RData")
+load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\krill-tank-code\\Total Data Merged File.Rda")
 
 hist(log10(TotalData$v),
      xlab = "Velocity (Log^10 mm/s)")
@@ -41,10 +41,13 @@ Testing for log distributions in individual krill
 
 ```{r}
 for (i in length(ind)){
-
+  qqnorm(log10(TotalData$v[TotalData$v>0]))
 }
 
 
 ```
+Skewed log distribution
+
+
 
 

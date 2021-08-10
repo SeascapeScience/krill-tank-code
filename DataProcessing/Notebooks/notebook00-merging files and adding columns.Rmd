@@ -55,6 +55,13 @@ alldata <- na.omit(alldata)
 
 ```
 
+```{r}
+save(alldata,file="Total Data Merged File.Rda")
+write.table(alldata, file = "Total Data Merged File.csv", sep = ",", col.names = T)
+
+load("Total Data Merged File.Rda")
+
+```
 
 
 
