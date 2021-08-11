@@ -100,7 +100,6 @@ hist(acos(dd)/pi*180)
 TotalData$turn.angle <- c(NA, acos(D/d1/d2))/pi*180
 
 
-
 for (i in 1:length(ind)){
 hist(TotalData$turn.angle[TotalData$D_V_T==ind[i]],
        breaks = 50,
