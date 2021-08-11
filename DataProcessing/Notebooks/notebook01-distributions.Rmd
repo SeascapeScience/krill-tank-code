@@ -23,30 +23,36 @@ Log distribution, 0's make up 2% of all data
 sd(log10(TotalData$v[TotalData$v>0]))
 
 ```
-Now we're going to plot 5 unique krill
+Now we're going to plot each unique krill and their bimodality with a dip test (less than 0.05 is multimodality)
+
 
 ```{r}
 ind <- unique(TotalData$D_V_T)
 length(ind)
+library(diptest)
+library(DescTools)
 
 for (i in 1:length(ind)){
+  
+vels <- (TotalData$v[TotalData$D_V_T==ind[i]])
+vels <- log10(vels[vels>0])
+d <- dip.test(vels)
+
+s <- Skew(vels)
+
+
   hist(log10(TotalData$v[TotalData$D_V_T==ind[i]]),
        breaks = 50,
      xlab = "Velocity (Log^10 mm/s)",
-     main = "")
+     main = s)  ## change to d$p.value to print the p-value as the title instead
 }
 ```
-Testing for log distributions in individual krill
+Now we'll make a table of d$pavlue, skew, means and sd, and compare amongst treatments
+
 
 ```{r}
-for (i in length(ind)){
-  qqnorm(log10(TotalData$v[TotalData$v>0]))
-}
 
 
 ```
-Skewed log distribution
-
-
 
 
