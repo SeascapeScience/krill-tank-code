@@ -93,6 +93,10 @@ D <- (dx1*dx2)+(dy1*dy2)+(dz1*dz2)
 d1 <- sqrt(dx1^2 + dy1^2 +dz1^2)
 d2 <- sqrt(dx2^2 + dy2^2 +dz2^2)
 
+dd <- D/d1/d2
+hist(acos(dd)/pi*180)
+
+
 TotalData$turn.angle <- c(NA, acos(D/d1/d2))/pi*180
 
 
@@ -118,6 +122,8 @@ plot(TotalData$turn.angle[TotalData$D_V_T==ind[i]], log10(TotalData$v[TotalData$
 }
 
 ```
+
+
 
 
 
