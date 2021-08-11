@@ -12,8 +12,6 @@ load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\krill-tank-code\\Total Data Merg
 hist(log10(TotalData$v),
      xlab = "Velocity (Log^10 mm/s)")
 
-
-
 ```
 
 Histogram of Velocity of all data blah blah blah
@@ -33,6 +31,7 @@ length(ind)
 
 for (i in 1:length(ind)){
   hist(log10(TotalData$v[TotalData$D_V_T==ind[i]]),
+       breaks = 50,
      xlab = "Velocity (Log^10 mm/s)",
      main = "")
 }
