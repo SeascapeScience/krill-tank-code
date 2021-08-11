@@ -1884,23 +1884,15 @@ alldata &lt;- na.omit(alldata)
 <p>Add heading, pitch and d and v values</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueDEgPC0gVG90YWxEYXRhJFhbMToobnJvdyhUb3RhbERhdGEpLTEpXVxueDIgPC0gVG90YWxEYXRhJFhbMjpucm93KFRvdGFsRGF0YSldXG5Ub3RhbERhdGEkZHhbMToobnJvdyhUb3RhbERhdGEpLTEpXSA8LSB4Mi14MVxuXG55MSA8LSBUb3RhbERhdGEkWVsxOihucm93KFRvdGFsRGF0YSktMSldXG55MiA8LSBUb3RhbERhdGEkWVsyOm5yb3coVG90YWxEYXRhKV1cblRvdGFsRGF0YSRkeVsxOihucm93KFRvdGFsRGF0YSktMSldIDwtIHkyLXkxXG5cbnoxIDwtIFRvdGFsRGF0YSRaWzE6KG5yb3coVG90YWxEYXRhKS0xKV1cbnoyIDwtIFRvdGFsRGF0YSRaWzI6bnJvdyhUb3RhbERhdGEpXVxuVG90YWxEYXRhJGR6WzE6KG5yb3coVG90YWxEYXRhKS0xKV0gPC0gejItejFcblxuVG90YWxEYXRhJGQgPC0gc3FydChUb3RhbERhdGEkZHheMiArIFRvdGFsRGF0YSRkeV4yICsgVG90YWxEYXRhJGR6XjIpXG5cbmhlYWQoVG90YWxEYXRhKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueDEgPC0gVG90YWxEYXRhJFhbMToobnJvdyhUb3RhbERhdGEpLTEpXVxueDIgPC0gVG90YWxEYXRhJFhbMjpucm93KFRvdGFsRGF0YSldXG5Ub3RhbERhdGEkZHhbMToobnJvdyhUb3RhbERhdGEpLTEpXSA8LSB4Mi14MVxuYGBgIn0= -->
 <pre class="r"><code>x1 &lt;- TotalData$X[1:(nrow(TotalData)-1)]
 x2 &lt;- TotalData$X[2:nrow(TotalData)]
-TotalData$dx[1:(nrow(TotalData)-1)] &lt;- x2-x1
-
-y1 &lt;- TotalData$Y[1:(nrow(TotalData)-1)]
-y2 &lt;- TotalData$Y[2:nrow(TotalData)]
-TotalData$dy[1:(nrow(TotalData)-1)] &lt;- y2-y1
-
-z1 &lt;- TotalData$Z[1:(nrow(TotalData)-1)]
-z2 &lt;- TotalData$Z[2:nrow(TotalData)]
-TotalData$dz[1:(nrow(TotalData)-1)] &lt;- z2-z1
-
-TotalData$d &lt;- sqrt(TotalData$dx^2 + TotalData$dy^2 + TotalData$dz^2)
-
-head(TotalData)</code></pre>
+TotalData$dx[1:(nrow(TotalData)-1)] &lt;- x2-x1</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gYCQ8LS5kYXRhLmZyYW1lYChgKnRtcCpgLCBkeCwgdmFsdWUgPSBjKC0wLjA0NjI0LCAtMC4wMzAwNSwgLTAuMDQ1MDgsICA6IFxuICByZXBsYWNlbWVudCBoYXMgODA4Njk3IHJvd3MsIGRhdGEgaGFzIDgwODY5OFxuIn0= -->
+<pre><code>Error in `$&lt;-.data.frame`(`*tmp*`, dx, value = c(-0.04624, -0.03005, -0.04508,  : 
+  replacement has 808697 rows, data has 808698</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->

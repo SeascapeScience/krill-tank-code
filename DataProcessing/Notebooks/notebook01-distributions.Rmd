@@ -7,16 +7,16 @@ Plot and fit distributions of variables
 
 ```{r}
 
-load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\krill-tank-code\\Total Data Merged File.Rda")
+load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Total Data Merged File.Rda")
 
 hist(log10(TotalData$v),
      xlab = "Velocity (Log^10 mm/s)")
 
 ```
 
-Histogram of Velocity of all data blah blah blah
+Histogram of Velocity of all
 
-Log distribution, 0's make up 2% of all data
+Log distribution, 0's make up 3% of all data
 
 ```{r}
 10^mean(log10(TotalData$v[TotalData$v>0]))
@@ -25,34 +25,99 @@ sd(log10(TotalData$v[TotalData$v>0]))
 ```
 Now we're going to plot each unique krill and their bimodality with a dip test (less than 0.05 is multimodality)
 
-
 ```{r}
 ind <- unique(TotalData$D_V_T)
 length(ind)
 library(diptest)
 library(DescTools)
 
+tab <- matrix(data = NA, nrow = 75, ncol =5, byrow = T)
+colnames(tab) <- c('dip.test', 'skew', 'mean.velocity', 'sd.velocity', 'Ind')
+rownames(tab) <- c(ind)
+
+tab <- as.data.frame(tab)
+tab$Ind <- ind
+mean.vel <- NULL
+sd.vel <- NULL
+d.v <- NULL
+s.v <- NULL
+
 for (i in 1:length(ind)){
-  
+mean.v <- mean(TotalData$v[TotalData$D_V_T==ind[i]])
+sd.v <- sd(TotalData$v[TotalData$D_V_T==ind[i]])
+
+mean.vel <- rbind(mean.vel, mean.v)
+sd.vel <- rbind(sd.vel, sd.v)
+
+
 vels <- (TotalData$v[TotalData$D_V_T==ind[i]])
 vels <- log10(vels[vels>0])
 d <- dip.test(vels)
+d.p <- d$p.value
+d.v <- rbind(d.v, d.p)
 
 s <- Skew(vels)
-
+s.v <- rbind(s.v, s)
 
   hist(log10(TotalData$v[TotalData$D_V_T==ind[i]]),
        breaks = 50,
      xlab = "Velocity (Log^10 mm/s)",
      main = s)  ## change to d$p.value to print the p-value as the title instead
 }
+
+tab$skew <- s.v
+tab$dip.test <- d.v
+tab$mean.velocity <- (log10(mean.vel))
+tab$sd.velocity <- (log10(sd.vel))
+tab
+
+plot(tab)
+
 ```
-Now we'll make a table of d$pavlue, skew, means and sd, and compare amongst treatments
+
+Now looking at turning angles
+
+```{r}
+TotalData$turn.anglexy <- atan2(TotalData$X, TotalData$Y)
+TotalData$turn.angleyz <- atan2(TotalData$Y, TotalData$Z)
+
+
+lth <- dim(TotalData)[1]
+dx1 <- TotalData$dx[1:(lth-1)]
+dx2 <- TotalData$dx[2:lth]
+dy1 <- TotalData$dy[1:(lth-1)]
+dy2 <- TotalData$dy[2:lth]
+dz1 <- TotalData$dz[1:(lth-1)]
+dz2 <- TotalData$dz[2:lth]
+D <- (dx1*dx2)+(dy1*dy2)+(dz1*dz2)
+d1 <- sqrt(dx1^2 + dy1^2 +dz1^2)
+d2 <- sqrt(dx2^2 + dy2^2 +dz2^2)
+
+TotalData$turn.angle <- c(NA, acos(D/d1/d2))/pi*180
+
+
+
+for (i in 1:length(ind)){
+hist(TotalData$turn.angle[TotalData$D_V_T==ind[i]],
+       breaks = 50,
+     xlab = "Turn Angles",
+     main = "") 
+}
+
+
+```
+
 
 
 ```{r}
-
+for (i in 1:length(ind)){
+plot(TotalData$turn.angle[TotalData$D_V_T==ind[i]], log10(TotalData$v[TotalData$D_V_T==ind[i]]),
+            xlab = "Turn Angles",
+     ylab = "Velocity",
+          main = "") 
+}
 
 ```
+
 
 
