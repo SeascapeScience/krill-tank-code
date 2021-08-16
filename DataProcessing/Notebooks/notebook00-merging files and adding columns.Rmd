@@ -20,7 +20,7 @@ ldf = lapply(files, function(x) {
       # Add a column with the Date of the trial
       dat$Date = substr(x,1,8)
       # Add a column with the View of the trial
-      dat$View = substr(x,14,14)
+      dat$View = substr(x,14,15)
       # Add a column with the filename
       dat$File.name = substr(x,1,15)
       return(dat)

@@ -31,9 +31,8 @@ length(ind)
 library(diptest)
 library(DescTools)
 
-tab <- matrix(data = NA, nrow = 75, ncol =5, byrow = T)
+tab <- matrix(data = NA, nrow = 87, ncol =5, byrow = T)
 colnames(tab) <- c('dip.test', 'skew', 'mean.velocity', 'sd.velocity', 'Ind')
-rownames(tab) <- c(ind)
 
 tab <- as.data.frame(tab)
 tab$Ind <- ind
@@ -123,6 +122,10 @@ plot(TotalData$turn.angle[TotalData$D_V_T==ind[i]], log10(TotalData$v[TotalData$
 ```
 
 
+```{r}
+save.image("~/Post-doc/Data/Total Merged Data File.RData")
+
+```
 
 
 
