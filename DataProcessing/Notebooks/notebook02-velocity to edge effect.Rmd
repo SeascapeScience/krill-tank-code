@@ -3,12 +3,66 @@ title: "Velocity in relation to distance from edge"
 output: html_notebook
 ---
 
+Looking at relationship between velocity and the Y axis
 
 ```{r}
+load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Scripts\\Total Data Merged File.RData") 
 
+library(ggplot2)
+ind <- unique(TotalData$D_V_T)
+length(ind)
 
+str(TotalData)
 
+for (i in 1:length(ind)){
+plot(TotalData$v[TotalData$D_V_T==ind[i]],
+     TotalData$Y[TotalData$D_V_T==ind[i]],
+     xlab = "Velocity (m/s)",
+     ylab = "Y Axis (cm)",
+     main = "") 
+}
 
 
 
 ```
+
+
+Looking at relationship between velocity and the X axis
+
+```{r}
+
+for (i in 1:length(ind)){
+plot(TotalData$v[TotalData$D_V_T==ind[i]],
+     TotalData$X[TotalData$D_V_T==ind[i]],
+     xlab = "Velocity (m/s)",
+     ylab = "X Axis (cm)",
+     main = "") 
+}
+
+
+
+```
+
+Looking at relationship between velocity and the Z axis
+
+```{r}
+
+
+for (i in 1:length(ind)){
+plot(TotalData$v[TotalData$D_V_T==ind[i]],
+     TotalData$Z[TotalData$D_V_T==ind[i]],
+     xlab = "Velocity (m/s)",
+     ylab = "Z Axis (cm)",
+     main = "") 
+}
+
+
+
+```
+
+```{r}
+
+
+```
+
+
