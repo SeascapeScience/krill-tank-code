@@ -17,7 +17,7 @@ str(TotalData)
 for (i in 1:length(ind)){
 plot(TotalData$v[TotalData$D_V_T==ind[i]],
      TotalData$Y[TotalData$D_V_T==ind[i]],
-     xlab = "Velocity (m/s)",
+     xlab = "Velocity (cm/s)",
      ylab = "Y Axis (cm)",
      main = "") 
 }
@@ -34,7 +34,7 @@ Looking at relationship between velocity and the X axis
 for (i in 1:length(ind)){
 plot(TotalData$v[TotalData$D_V_T==ind[i]],
      TotalData$X[TotalData$D_V_T==ind[i]],
-     xlab = "Velocity (m/s)",
+     xlab = "Velocity (cm/s)",
      ylab = "X Axis (cm)",
      main = "") 
 }
@@ -51,7 +51,7 @@ Looking at relationship between velocity and the Z axis
 for (i in 1:length(ind)){
 plot(TotalData$v[TotalData$D_V_T==ind[i]],
      TotalData$Z[TotalData$D_V_T==ind[i]],
-     xlab = "Velocity (m/s)",
+     xlab = "Velocity (cm/s)",
      ylab = "Z Axis (cm)",
      main = "") 
 }

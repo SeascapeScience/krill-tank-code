@@ -7,7 +7,7 @@ Plot and fit distributions of variables
 
 ```{r}
 
-load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Total Data Merged File.Rda")
+load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Total Data Merged File (Sep 7 2021).Rda")
 
 hist(log10(TotalData$v),
      xlab = "Velocity (Log^10 mm/s)")
@@ -31,7 +31,7 @@ length(ind)
 library(diptest)
 library(DescTools)
 
-tab <- matrix(data = NA, nrow = 100, ncol =5, byrow = T)
+tab <- matrix(data = NA, nrow = 113, ncol =5, byrow = T)
 colnames(tab) <- c('dip.test', 'skew', 'mean.velocity', 'sd.velocity', 'Ind')
 
 tab <- as.data.frame(tab)
@@ -61,7 +61,7 @@ s.v <- rbind(s.v, s)
   hist(log10(TotalData$v[TotalData$D_V_T==ind[i]]),
        breaks = 50,
      xlab = "Velocity (Log^10 mm/s)",
-     main = s)  ## change to d$p.value to print the p-value as the title instead
+     main = d.p)  ## change to d$p.value to print the p-value as the title instead
 }
 
 tab$skew <- s.v
