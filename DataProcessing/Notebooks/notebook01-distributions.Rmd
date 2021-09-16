@@ -71,6 +71,37 @@ tab$sd.velocity <- (log10(sd.vel))
 tab
 
 plot(tab)
+```
+
+
+Starting to look at bimodality in the variables by merging the TotalData frame with the "tab" table
+```{r}
+##agregating TotalData so we can merge it with tab data
+
+AGG_TD <- aggregate(TotalData, by = list(TotalData$D_V_T), FUN = mean)
+head(AGG_TD)
+AGG_TD <- AGG_TD[ -c(2:3, 8:10, 13:14) ]
+colnames(AGG_TD) <- c("Ind", "X", "Y", "Z", "Track", "Flow.Rate", "Chlorophyll", "dx", "dy", "dz", "d", "vx", "vy", "vz", "v", "heading", "pitch", "turn.anglexy", "turn.angleyz", "turn.angle")
+head(AGG_TD)
+tail(AGG_TD)
+
+
+tab_AGG <- merge(AGG_TD, tab, by = "Ind")
+head(tab_AGG)
+str(tab_AGG)
+tab_AGG$Flow.Rate <- as.factor(tab_AGG$Flow.Rate)
+tab_AGG$Chlorophyll <- as.factor(tab_AGG$Chlorophyll)
+
+freq <- table(tab_AGG$Flow.Rate, tab_AGG$Chlorophyll)
+print(freq)
+prob <- prop.table(freq) ##Relative Frequency Table
+print (prob)
+
+ ##starting to plot the dip test and skew in the variables
+plot(tab_AGG$Flow.Rate, tab_AGG$dip.test, xlab = "Flow Rate (cm/s)", ylab = "Dip Test (p.value)")
+plot(tab_AGG$Flow.Rate, tab_AGG$skew, xlab = "Flow Rate (cm/s)", ylab = "Skew Test (p.value)")
+plot(tab_AGG$Chlorophyll, tab_AGG$dip.test, xlab = "Chlorophyll (mg/L)", ylab = "Dip Test (p.value)")
+plot(tab_AGG$Chlorophyll, tab_AGG$skew, xlab = "Chlorophyll (mg/L)", ylab = "Skew Test (p.value)")
 
 ```
 
