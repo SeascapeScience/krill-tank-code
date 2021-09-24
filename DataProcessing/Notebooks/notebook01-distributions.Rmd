@@ -7,7 +7,7 @@ Plot and fit distributions of variables
 
 ```{r}
 
-load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Total Data Merged File (Sep 7 2021).Rda")
+load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Total Data Merged File (Sep 24 2021).Rda")
 
 hist(log10(TotalData$v),
      xlab = "Velocity (Log^10 mm/s)")
@@ -31,7 +31,7 @@ length(ind)
 library(diptest)
 library(DescTools)
 
-tab <- matrix(data = NA, nrow = 113, ncol =5, byrow = T)
+tab <- matrix(data = NA, nrow = 127, ncol =5, byrow = T)
 colnames(tab) <- c('dip.test', 'skew', 'mean.velocity', 'sd.velocity', 'Ind')
 
 tab <- as.data.frame(tab)
@@ -81,7 +81,7 @@ Starting to look at bimodality in the variables by merging the TotalData frame w
 AGG_TD <- aggregate(TotalData, by = list(TotalData$D_V_T), FUN = mean)
 head(AGG_TD)
 AGG_TD <- AGG_TD[ -c(2:3, 8:10, 13:14) ]
-colnames(AGG_TD) <- c("Ind", "X", "Y", "Z", "Track", "Flow.Rate", "Chlorophyll", "dx", "dy", "dz", "d", "vx", "vy", "vz", "v", "heading", "pitch", "turn.anglexy", "turn.angleyz", "turn.angle")
+colnames(AGG_TD) <- c("Ind", "X", "Y", "Z", "Track", "Flow.Rate", "Chlorophyll", "dx", "dy", "dz", "d", "vx", "vy", "vz", "v", "heading", "pitch")
 head(AGG_TD)
 tail(AGG_TD)
 
