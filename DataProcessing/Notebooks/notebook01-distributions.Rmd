@@ -7,7 +7,7 @@ Plot and fit distributions of variables
 
 ```{r}
 
-load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Total Data Merged File (Sep 24 2021).Rda")
+load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Total Data Merged File (Sep 27 2021).Rda")
 
 hist(log10(TotalData$v),
      xlab = "Velocity (Log^10 mm/s)")
@@ -19,19 +19,22 @@ Histogram of Velocity of all
 Log distribution, 0's make up 3% of all data
 
 ```{r}
-10^mean(log10(TotalData$v[TotalData$v>0]))
-sd(log10(TotalData$v[TotalData$v>0]))
+CC.TotalData <- na.omit(TotalData)
+head(CC.TotalData)
+10^mean(log10(CC.TotalData$v[CC.TotalData$v>0]))
+sd(log10(CC.TotalData$v[CC.TotalData$v>0]))
 
 ```
 Now we're going to plot each unique krill and their bimodality with a dip test (less than 0.05 is multimodality)
 
 ```{r}
 ind <- unique(TotalData$D_V_T)
+print(ind)
 length(ind)
 library(diptest)
 library(DescTools)
 
-tab <- matrix(data = NA, nrow = 127, ncol =5, byrow = T)
+tab <- matrix(data = NA, nrow = 135, ncol =5, byrow = T)
 colnames(tab) <- c('dip.test', 'skew', 'mean.velocity', 'sd.velocity', 'Ind')
 
 tab <- as.data.frame(tab)
@@ -42,14 +45,14 @@ d.v <- NULL
 s.v <- NULL
 
 for (i in 1:length(ind)){
-mean.v <- mean(TotalData$v[TotalData$D_V_T==ind[i]])
-sd.v <- sd(TotalData$v[TotalData$D_V_T==ind[i]])
+mean.v <- mean(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]])
+sd.v <- sd(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]])
 
 mean.vel <- rbind(mean.vel, mean.v)
 sd.vel <- rbind(sd.vel, sd.v)
 
 
-vels <- (TotalData$v[TotalData$D_V_T==ind[i]])
+vels <- (CC.TotalData$v[CC.TotalData$D_V_T==ind[i]])
 vels <- log10(vels[vels>0])
 d <- dip.test(vels)
 d.p <- d$p.value
@@ -57,11 +60,15 @@ d.v <- rbind(d.v, d.p)
 
 s <- Skew(vels)
 s.v <- rbind(s.v, s)
+}
 
-  hist(log10(TotalData$v[TotalData$D_V_T==ind[i]]),
-       breaks = 50,
+ind <- unique(CC.TotalData$D_V_T)
+
+for (i in 1:length(ind)){
+ hist(log10(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]]),
+     breaks = 50,
      xlab = "Velocity (Log^10 mm/s)",
-     main = d.p)  ## change to d$p.value to print the p-value as the title instead
+     main = d.p)  ## change to s" to print the skew-value as the title instead
 }
 
 tab$skew <- s.v
@@ -69,6 +76,7 @@ tab$dip.test <- d.v
 tab$mean.velocity <- (log10(mean.vel))
 tab$sd.velocity <- (log10(sd.vel))
 tab
+write.table(tab, file = "~/Post-doc/Data/dip.test.skew.vels.csv", sep = ",", col.names = TRUE)
 
 plot(tab)
 ```
@@ -76,7 +84,7 @@ plot(tab)
 
 Starting to look at bimodality in the variables by merging the TotalData frame with the "tab" table
 ```{r}
-##agregating TotalData so we can merge it with tab data
+##agregating Complete cases of TotalData so we can merge it with tab data
 
 AGG_TD <- aggregate(TotalData, by = list(TotalData$D_V_T), FUN = mean)
 head(AGG_TD)
@@ -126,17 +134,25 @@ d2 <- sqrt(dx2^2 + dy2^2 +dz2^2)
 dd <- D/d1/d2
 hist(acos(dd)/pi*180)
 
-
 TotalData$turn.angle <- c(NA, acos(D/d1/d2))/pi*180
+CC.TotalData <- na.omit(TotalData)
+head(CC.TotalData)
+tail(CC.TotalData)
+str(CC.TotalData)
+CC.TotalData$Flow.rate <- as.factor(CC.TotalData$Flow.rate)
+CC.TotalData$Chlorophyll<- as.factor(CC.TotalData$Chlorophyll)
 
+ind <- unique(CC.TotalData$D_V_T)
 
 for (i in 1:length(ind)){
-hist(TotalData$turn.angle[TotalData$D_V_T==ind[i]],
+hist(CC.TotalData$turn.angle[CC.TotalData$D_V_T==ind[i]],
        breaks = 50,
      xlab = "Turn Angles",
      main = "") 
 }
 
+plot(CC.TotalData$Flow.rate, CC.TotalData$turn.angle, main = "", xlab = "Flow Rate (cm/s)", ylab = "Turn angle (degrees)")
+plot(CC.TotalData$Chlorophyll, CC.TotalData$turn.angle, main = "", xlab = "Chlorophyll (mg/L)", ylab = "Turn angle (degrees)")
 
 ```
 
@@ -144,7 +160,7 @@ hist(TotalData$turn.angle[TotalData$D_V_T==ind[i]],
 
 ```{r}
 for (i in 1:length(ind)){
-plot(TotalData$turn.angle[TotalData$D_V_T==ind[i]], log10(TotalData$v[TotalData$D_V_T==ind[i]]),
+plot(CC.TotalData$turn.angle[CC.TotalData$D_V_T==ind[i]], log10(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]]),
             xlab = "Turn Angles",
      ylab = "Velocity",
           main = "") 

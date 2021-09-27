@@ -37,6 +37,7 @@ df$D_V <- as.factor(df$D_V)
 
 head(df)
 tail(df)
+str(df)
 ```
 
 Add columns of metadata based on the D_V of each row
@@ -50,9 +51,15 @@ alldata <- merge(df, metadata)
 
 head(alldata)
 tail(alldata)
+str(alldata)
 
-TotalData <- na.omit(alldata)
+delete.na <- function(DF, n=0) {
+  DF[rowSums(is.na(DF)) <= n,]
+}
+
+TotalData <- delete.na(alldata, 2)
 head(TotalData)
+tail(TotalData)
 
 ```
 
@@ -73,6 +80,7 @@ TotalData$dz[1:(nrow(TotalData)-1)] <- z2-z1
 TotalData$d <- sqrt(TotalData$dx^2 + TotalData$dy^2 + TotalData$dz^2)
 
 head(TotalData)
+tail(TotalData)
 ```
 
 ```{r}
@@ -94,7 +102,7 @@ hist(TotalData$dx[abs(TotalData$dx)<.01],breaks = 100)
 ```
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (Sep 24 2021).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (Sep 27 2021).RData")
 
 ```
 
