@@ -1,0 +1,34 @@
+---
+title: "Velocity in relation to flow"
+output: html_notebook
+---
+
+
+```{r}
+rm(list=ls(all=TRUE))
+load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Total Merged Data File.Rdata")
+
+
+## Flow happens in the Y direction
+
+## So, vy - flow = vel.flow (velocity in relation to flow)
+
+head(TotalData) ## all TotalData rows
+str(TotalData)
+TotalData$vel.flow <- TotalData$vy-TotalData$Flow.rate
+TotalData$Flow.rate <- as.factor(TotalData$Flow.rate)
+
+head(CC.TotalData) ##only complete cases of TotalData 
+str(CC.TotalData)
+## Looking at velocity in relation to flow, need to use Flow.rate as a number (change to character THEN numeric)
+CC.TotalData$Flow.rate <- as.numeric(CC.TotalData$Flow.rate)
+CC.TotalData$vel.flow <- CC.TotalData$vy-CC.TotalData$Flow.rate
+
+## Basic plot of vy vs Flow Rate
+plot(TotalData$Flow.rate, TotalData$vy, xlab = "Flow Rate (cm/s)", ylab = "Velocity in Y direction (vy, cm/s)")
+## Basic plot of vel.flow vs Flow Rate (should be different to above)
+plot(TotalData$Flow.rate, TotalData$vel.flow, xlab = "Flow Rate (cm/s)", ylab = "Velocity in Y direction minus flow (vel.flow, cm/s)")
+
+```
+
+

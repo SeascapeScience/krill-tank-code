@@ -1,0 +1,17 @@
+---
+title: "Autocorrelation and Cross-correlation"
+output: html_notebook
+---
+
+
+```{r}
+rm(list=ls(all=TRUE))
+load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Total Merged Data File.Rdata")
+
+head(TotalData) ## all rows of data from TotalData
+head(CC.TotalData) ## ONLY complete cases of TotalData
+
+
+```
+
+
