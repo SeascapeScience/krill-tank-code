@@ -7,7 +7,7 @@ Plot and fit distributions of variables
 
 ```{r}
 
-load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Total Data Merged File (Sep 27 2021).Rda")
+load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Total Data Merged File (Nov 2 2021).Rda")
 
 hist(log10(TotalData$v),
      xlab = "Velocity (Log^10 mm/s)")
@@ -28,13 +28,13 @@ sd(log10(CC.TotalData$v[CC.TotalData$v>0]))
 Now we're going to plot each unique krill and their bimodality with a dip test (less than 0.05 is multimodality)
 
 ```{r}
-ind <- unique(TotalData$D_V_T)
+ind <- unique(CC.TotalData$D_V_T)
 print(ind)
 length(ind)
 library(diptest)
 library(DescTools)
 
-tab <- matrix(data = NA, nrow = 135, ncol =5, byrow = T)
+tab <- matrix(data = NA, nrow = 129, ncol =5, byrow = T)
 colnames(tab) <- c('dip.test', 'skew', 'mean.velocity', 'sd.velocity', 'Ind')
 
 tab <- as.data.frame(tab)
@@ -87,63 +87,8 @@ str(TotalData)
 TotalData$Flow.rate <- as.factor(TotalData$Flow.rate)
 TotalData$Chlorophyll <- as.factor(TotalData$Chlorophyll)
 
-library(ggplot2)
-ggplot(TotalData,aes(x=Flow.rate, y=turn.angle, fill=Chlorophyll))+
-  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
-  theme(axis.text=element_text(color="black"))+
-  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
-  theme(panel.grid.minor=element_blank())+
-  labs(size= "",x = "Flow Rate (cm/s)", y = "Turn angle (degrees)", title = "               Light")+
-  scale_fill_manual(values=c("greenyellow", "green","green1", "green2", "green3", "green4"),name = "Chlorophyll (mg/L)",
-                    labels=c("0", "4.6", "6.1", "7.6", "13.5", "19"))+
-  facet_grid(~Light, scales = "free_x", space = "free")
 ```
 
-
-Starting to look at bimodality in the variables by merging the TotalData frame with the "tab" table
-```{r}
-##agregating Complete cases of TotalData so we can merge it with tab data
-
-AGG_TD <- aggregate(TotalData, by = list(TotalData$D_V_T), FUN = mean)
-head(AGG_TD)
-AGG_TD <- AGG_TD[ -c(2:3, 8:10) ]
-colnames(AGG_TD) <- c("Ind", "X", "Y", "Z", "Track", "Flow.Rate", "Chlorophyll", "Guano", "Light", "dx", "dy", "dz", "d", "vx", "vy", "vz", "v", "heading", "pitch", "turnangle.xy", "turnangle.yz", "turn.angle")
-head(AGG_TD)
-tail(AGG_TD)
-
-
-tab_AGG <- merge(AGG_TD, tab, by = "Ind")
-head(tab_AGG)
-str(tab_AGG)
-tab_AGG$Flow.Rate <- as.factor(tab_AGG$Flow.Rate)
-tab_AGG$Chlorophyll <- as.factor(tab_AGG$Chlorophyll)
-tab_AGG$Guano <- as.factor(tab_AGG$Guano)
-tab_AGG$Light <- as.factor(tab_AGG$Light)
-
-
-freq <- table(tab_AGG$Flow.Rate, tab_AGG$Chlorophyll)
-print(freq)
-prob <- prop.table(freq) ##Relative Frequency Table
-print (prob)
-
- ##starting to plot the dip test and skew in the variables
-plot(tab_AGG$Flow.Rate, tab_AGG$dip.test, xlab = "Flow Rate (cm/s)", ylab = "Dip Test (p.value)")
-plot(tab_AGG$Flow.Rate, tab_AGG$skew, xlab = "Flow Rate (cm/s)", ylab = "Skew Test (p.value)")
-plot(tab_AGG$Chlorophyll, tab_AGG$dip.test, xlab = "Chlorophyll (mg/L)", ylab = "Dip Test (p.value)")
-plot(tab_AGG$Chlorophyll, tab_AGG$skew, xlab = "Chlorophyll (mg/L)", ylab = "Skew Test (p.value)")
-
-library(ggplot2)
-ggplot(tab_AGG,aes(x=Flow.Rate, y=skew, fill=Chlorophyll))+
-  geom_boxplot(notch=F, notchwidth=0.5,outlier.shape=1,outlier.size=2, coef=1.5)+
-  theme(axis.text=element_text(color="black"))+
-  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
-  theme(panel.grid.minor=element_blank())+
-  labs(size= "",x = "Flow Rate (cm/s)", y = "Skew (p value)", title = "")+
-  scale_fill_manual(values=c("greenyellow", "green","green1", "green2", "green3", "green4"),name = "Chlorophyll (mg/L)",
-                    labels=c("0", "4.6", "6.1", "7.6", "13.5", "19"))  
- ## + facet_grid(~Light, scales = "free_x", space = "free")
-
-```
 
 Now looking at turning angles
 
@@ -167,12 +112,21 @@ dd <- D/d1/d2
 hist(acos(dd)/pi*180)
 
 TotalData$turn.angle <- c(NA, acos(D/d1/d2))/pi*180
+head(TotalData)
 CC.TotalData <- na.omit(TotalData)
 head(CC.TotalData)
 tail(CC.TotalData)
 str(CC.TotalData)
-CC.TotalData$Flow.rate <- as.factor(CC.TotalData$Flow.rate)
-CC.TotalData$Chlorophyll<- as.factor(CC.TotalData$Chlorophyll)
+CC.TotalData$Flow.rate <- as.character(CC.TotalData$Flow.rate)
+CC.TotalData$Chlorophyll<- as.character(CC.TotalData$Chlorophyll)
+CC.TotalData$Guano <- as.character(CC.TotalData$Guano)
+CC.TotalData$Light <- as.character(CC.TotalData$Light)
+
+
+CC.TotalData$Flow.rate <- as.numeric(CC.TotalData$Flow.rate)
+CC.TotalData$Chlorophyll<- as.numeric(CC.TotalData$Chlorophyll)
+
+head(CC.TotalData)
 
 ind <- unique(CC.TotalData$D_V_T)
 
@@ -186,11 +140,64 @@ hist(CC.TotalData$turn.angle[CC.TotalData$D_V_T==ind[i]],
 plot(CC.TotalData$Flow.rate, CC.TotalData$turn.angle, main = "", xlab = "Flow Rate (cm/s)", ylab = "Turn angle (degrees)")
 plot(CC.TotalData$Chlorophyll, CC.TotalData$turn.angle, main = "", xlab = "Chlorophyll (mg/L)", ylab = "Turn angle (degrees)")
 
+library(ggplot2)
+ggplot(TotalData,aes(x=Flow.rate, y=log10(v), fill=Chlorophyll))+
+  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  labs(size= "",x = "Flow Rate (cm/s)", y = "Velocity (Log transformed)(cm/s)", title = "Light") +
+  scale_fill_manual(values=c("greenyellow", "yellowgreen","lightgreen", "green", "green3", "green4", "darkgreen"),name = "Chlorophyll (mg/L)",
+                    labels=c("0", "4.3", "4.6", "6.1", "7.6", "13.5", "19"))+
+  facet_grid(~Light, scales = "free_x", space = "free")
+
+ggplot(TotalData,aes(x=Flow.rate, y=turn.angle, fill=Chlorophyll))+
+  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  labs(size= "",x = "Flow Rate (cm/s)", y = "Turn Angle (degrees)", title = "Light") +
+  scale_fill_manual(values=c("greenyellow", "yellowgreen","lightgreen", "green", "green3", "green4", "darkgreen"),name = "Chlorophyll (mg/L)",
+                    labels=c("0", "4.3", "4.6", "6.1", "7.6", "13.5", "19"))+
+  facet_grid(~Light, scales = "free_x", space = "free")
+
 ```
 
 
 
+
+
+
+Starting to look at bimodality in the variables by merging the TotalData frame with the "tab" table
 ```{r}
+##aggregating Complete cases of TotalData so we can merge it with tab data
+
+AGG_TD <- aggregate(CC.TotalData, by = list(CC.TotalData$D_V_T), FUN = mean)
+head(AGG_TD)
+AGG_TD <- AGG_TD[ -c(2:3, 8:10) ]
+colnames(AGG_TD) <- c("Ind", "X", "Y", "Z", "Track", "Flow.Rate", "Chlorophyll", "Guano", "Light", "dx", "dy", "dz", "d", "vx", "vy", "vz", "v", "heading", "pitch", "turn.anglexy", "turn.angleyz", "turn.angle")
+head(AGG_TD)
+tail(AGG_TD)
+
+
+tab_AGG <- merge(AGG_TD, tab, by = "Ind")
+head(tab_AGG)
+str(tab_AGG)
+tab_AGG$Flow.Rate <- as.factor(tab_AGG$Flow.Rate)
+tab_AGG$Chlorophyll <- as.factor(tab_AGG$Chlorophyll)
+
+freq <- table(tab_AGG$Flow.Rate, tab_AGG$Chlorophyll)
+print(freq)
+prob <- prop.table(freq) ##Relative Frequency Table
+print (prob)
+
+ ##starting to plot the dip test and skew in the variables
+plot(tab_AGG$Flow.Rate, tab_AGG$dip.test, xlab = "Flow Rate (cm/s)", ylab = "Dip Test (p.value)")
+plot(tab_AGG$Flow.Rate, tab_AGG$skew, xlab = "Flow Rate (cm/s)", ylab = "Skew Test (p.value)")
+plot(tab_AGG$Chlorophyll, tab_AGG$dip.test, xlab = "Chlorophyll (mg/L)", ylab = "Dip Test (p.value)")
+plot(tab_AGG$Chlorophyll, tab_AGG$skew, xlab = "Chlorophyll (mg/L)", ylab = "Skew Test (p.value)")
+
+
 for (i in 1:length(ind)){
 plot(CC.TotalData$turn.angle[CC.TotalData$D_V_T==ind[i]], log10(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]]),
             xlab = "Turn Angles",
