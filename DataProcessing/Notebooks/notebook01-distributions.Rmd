@@ -7,7 +7,7 @@ Plot and fit distributions of variables
 
 ```{r}
 
-load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Total Data Merged File (Nov 2 2021).Rda")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Data Merged File (Nov 2 2021).Rda")
 
 hist(log10(TotalData$v),
      xlab = "Velocity (Log^10 mm/s)")
