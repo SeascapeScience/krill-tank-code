@@ -10,7 +10,7 @@ Add the Date and View of the trail to seperate columns using the character strin
 ```{r}
 rm(list=ls(all=TRUE))
 setwd("~/Post-doc/Data/Processed MatLab Files")
-path <- "C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Processed MatLab Files\\"
+path <- "C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Processed MatLab Files\\"
 files <- list.files(path=path, pattern="*.csv")
 
 ldf = lapply(files, function(x) {
@@ -43,7 +43,7 @@ str(df)
 Add columns of metadata based on the D_V of each row
 
 ```{r}
-metadata <- read.csv("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Metadata flat file 2021.08.10.csv", header = T)
+metadata <- read.csv("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Metadata flat file 2021.08.10.csv", header = T)
 head(metadata)
 tail(metadata)
 
@@ -102,7 +102,7 @@ hist(TotalData$dx[abs(TotalData$dx)<.01],breaks = 100)
 ```
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (Nov 2 2021).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (Nov 8 2021).RData")
 
 ```
 
