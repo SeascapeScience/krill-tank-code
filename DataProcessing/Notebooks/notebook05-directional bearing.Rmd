@@ -7,7 +7,7 @@ output: html_notebook
 ```{r}
 
 rm(list=ls(all=TRUE))
-load("C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Total Merged Data File.Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File.Rdata")
 
 ## Need to use turn angles and a point of reference (e.g. inlet valve) to determine directional bearing
 
