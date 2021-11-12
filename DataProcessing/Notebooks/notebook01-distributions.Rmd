@@ -34,7 +34,7 @@ length(ind)
 library(diptest)
 library(DescTools)
 
-tab <- matrix(data = NA, nrow = 129, ncol =5, byrow = T)
+tab <- matrix(data = NA, nrow = 133, ncol =5, byrow = T)
 colnames(tab) <- c('dip.test', 'skew', 'mean.velocity', 'sd.velocity', 'Ind')
 
 tab <- as.data.frame(tab)
