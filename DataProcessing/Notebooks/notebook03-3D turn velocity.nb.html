@@ -217,23 +217,22 @@ pre code {
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxucm0obGlzdD1scyhhbGw9VFJVRSkpXG5sb2FkKFxcQzpcXFxcVXNlcnNcXFxcbmljb2xlaDNcXFxcRG9jdW1lbnRzXFxcXFBvc3QtZG9jXFxcXERhdGFcXFxcVG90YWwgTWVyZ2VkIERhdGEgRmlsZS5SZGFcXClcblxuaGVhZChUb3RhbERhdGEpICMjIGFsbCBUb3RhbERhdGEgcm93c1xuaGVhZChDQy5Ub3RhbERhdGEpICMjb25seSBjb21wbGV0ZSBjYXNlcyBvZiBUb3RhbERhdGEgXG5cbiMjIExvb2tpbmcgYXQgdngsIHZ5LCB2eiwgdiBhbmQgY2FsY3VsYXRpbmcgM0QgdHVybiB2ZWxvY2l0aWVzXG5cblxuYGBgXG5gYGAifQ== -->
-<pre class="r"><code>```r
-rm(list=ls(all=TRUE))
-load(\C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Total Merged Data File.Rda\)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucm0obGlzdD1scyhhbGw9VFJVRSkpXG5sb2FkKFwiQzpcXFxcVXNlcnNcXFxcYWV2YXNcXFxcRG9jdW1lbnRzXFxcXEtyaWxsIENvZGVcXFxcVG90YWwgTWVyZ2VkIERhdGEgRmlsZS5SZGF0YVwiKVxuXG5oZWFkKFRvdGFsRGF0YSkgIyMgYWxsIFRvdGFsRGF0YSByb3dzXG5oZWFkKENDLlRvdGFsRGF0YSkgIyNvbmx5IGNvbXBsZXRlIGNhc2VzIG9mIFRvdGFsRGF0YSBcblxuIyMgTG9va2luZyBhdCB2eCwgdnksIHZ6LCB2IGFuZCBjYWxjdWxhdGluZyAzRCB0dXJuIHZlbG9jaXRpZXNcbiMjZG8gd2UgcmVwb3J0IGFuZ2xlcz8gaG93IGlzIDNkIHZlbCBkaWZmIGZyb20gZHgvZHkvZHpcblxuXG5gYGAifQ== -->
+<pre class="r"><code>rm(list=ls(all=TRUE))
+load(&quot;C:\\Users\\aevas\\Documents\\Krill Code\\Total Merged Data File.Rdata&quot;)
 
 head(TotalData) ## all TotalData rows
 head(CC.TotalData) ##only complete cases of TotalData 
 
 ## Looking at vx, vy, vz, v and calculating 3D turn velocities
+##do we report angles? how is 3d vel diff from dx/dy/dz
 </code></pre>
-<p>```</p>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIjNEIFR1cm4gdmVsb2NpdHkiDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQoNCmBgYHtyfQ0Kcm0obGlzdD1scyhhbGw9VFJVRSkpDQpsb2FkKCJDOlxcVXNlcnNcXE5pY29sZSBIZWxsZXNzZXlcXERvY3VtZW50c1xcUG9zdC1kb2NcXERhdGFcXFRvdGFsIE1lcmdlZCBEYXRhIEZpbGUuUmRhIikNCg0KaGVhZChUb3RhbERhdGEpICMjIGFsbCBUb3RhbERhdGEgcm93cw0KaGVhZChDQy5Ub3RhbERhdGEpICMjb25seSBjb21wbGV0ZSBjYXNlcyBvZiBUb3RhbERhdGEgDQoNCiMjIExvb2tpbmcgYXQgdngsIHZ5LCB2eiwgdiBhbmQgY2FsY3VsYXRpbmcgM0QgdHVybiB2ZWxvY2l0aWVzDQoNCg0KYGBgDQoNCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIjNEIFR1cm4gdmVsb2NpdHkiDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQoNCmBgYHtyfQ0Kcm0obGlzdD1scyhhbGw9VFJVRSkpDQpsb2FkKCJDOlxcVXNlcnNcXGFldmFzXFxEb2N1bWVudHNcXEtyaWxsIENvZGVcXFRvdGFsIE1lcmdlZCBEYXRhIEZpbGUuUmRhdGEiKQ0KDQpoZWFkKFRvdGFsRGF0YSkgIyMgYWxsIFRvdGFsRGF0YSByb3dzDQpoZWFkKENDLlRvdGFsRGF0YSkgIyNvbmx5IGNvbXBsZXRlIGNhc2VzIG9mIFRvdGFsRGF0YSANCg0KIyMgTG9va2luZyBhdCB2eCwgdnksIHZ6LCB2IGFuZCBjYWxjdWxhdGluZyAzRCB0dXJuIHZlbG9jaXRpZXMNCiMjZG8gd2UgcmVwb3J0IGFuZ2xlcz8gaG93IGlzIDNkIHZlbCBkaWZmIGZyb20gZHgvZHkvZHoNCg0KDQpgYGANCg0K</div>
 
 
 

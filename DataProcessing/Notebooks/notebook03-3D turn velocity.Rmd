@@ -6,12 +6,13 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File.Rda")
+load("C:\\Users\\aevas\\Documents\\Krill Code\\Total Merged Data File.Rdata")
 
 head(TotalData) ## all TotalData rows
 head(CC.TotalData) ##only complete cases of TotalData 
 
 ## Looking at vx, vy, vz, v and calculating 3D turn velocities
+##do we report angles? how is 3d vel diff from dx/dy/dz
 
 
 ```
