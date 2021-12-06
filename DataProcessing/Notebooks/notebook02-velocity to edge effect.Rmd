@@ -6,17 +6,17 @@ output: html_notebook
 Looking at relationship between velocity and the Y axis
 
 ```{r}
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Scripts\\Total Data Merged File.RData") 
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Data Merged File (Dec 6 2021).RData") 
 
 library(ggplot2)
-ind <- unique(TotalData$D_V_T)
+ind <- unique(CC.TotalData$D_V_T)
 length(ind)
 
-str(TotalData)
+str(CC.TotalData)
 
 for (i in 1:length(ind)){
-plot(TotalData$v[TotalData$D_V_T==ind[i]],
-     TotalData$Y[TotalData$D_V_T==ind[i]],
+plot(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]],
+     CC.TotalData$Y[CC.TotalData$D_V_T==ind[i]],
      xlab = "Velocity (cm/s)",
      ylab = "Y Axis (cm)",
      main = "") 
@@ -32,8 +32,8 @@ Looking at relationship between velocity and the X axis
 ```{r}
 
 for (i in 1:length(ind)){
-plot(TotalData$v[TotalData$D_V_T==ind[i]],
-     TotalData$X[TotalData$D_V_T==ind[i]],
+plot(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]],
+     CC.TotalData$X[CC.TotalData$D_V_T==ind[i]],
      xlab = "Velocity (cm/s)",
      ylab = "X Axis (cm)",
      main = "") 
@@ -46,11 +46,9 @@ plot(TotalData$v[TotalData$D_V_T==ind[i]],
 Looking at relationship between velocity and the Z axis
 
 ```{r}
-
-
 for (i in 1:length(ind)){
-plot(TotalData$v[TotalData$D_V_T==ind[i]],
-     TotalData$Z[TotalData$D_V_T==ind[i]],
+plot(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]],
+     CC.TotalData$Z[CC.TotalData$D_V_T==ind[i]],
      xlab = "Velocity (cm/s)",
      ylab = "Z Axis (cm)",
      main = "") 

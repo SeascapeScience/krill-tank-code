@@ -6,12 +6,14 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File.Rda")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Dec 6 2021).Rda")
 
 head(TotalData) ## all TotalData rows
 head(CC.TotalData) ##only complete cases of TotalData 
 
-## Looking at vx, vy, vz, v and calculating 3D turn velocities
+## Looking at vx, vy, vz, v and turn angles in xy, yz and total turn angles to calculate 3D turn velocities
+
+## need to account for the fact that pivetting makes velocity different in the 3D rather than the 2 x 2D planes
 
 
 ```
