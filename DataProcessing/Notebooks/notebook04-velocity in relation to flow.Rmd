@@ -13,7 +13,9 @@ load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data 
 
 ## So, vy - flow = vel.flow (velocity in relation to flow)
 
+
 ## Need to make flow rate numeric first
+str(TotalData)
 TotalData$Flow.rate <- as.character(TotalData$Flow.rate)
 TotalData$Flow.rate <- as.numeric(TotalData$Flow.rate)
 
@@ -22,18 +24,26 @@ str(TotalData)
 TotalData$vel.flow <- TotalData$vy-TotalData$Flow.rate
 TotalData$Flow.rate <- as.factor(TotalData$Flow.rate)
 
+
+##remake complete cases dataframe with vel.flow included
+CC.TotalData <- na.omit(TotalData)
 head(CC.TotalData) ##only complete cases of TotalData 
 str(CC.TotalData)
-## Looking at velocity in relation to flow, need to use Flow.rate as a number (change to character THEN numeric)
-CC.TotalData$Flow.rate <- as.numeric(CC.TotalData$Flow.rate)
-CC.TotalData$vel.flow <- CC.TotalData$vy-CC.TotalData$Flow.rate
-CC.TotalData$Flow.rate <- as.factor(CC.TotalData$Flow.rate)
+
 
 ## Basic plot of vy vs Flow Rate
 plot(CC.TotalData$Flow.rate, CC.TotalData$vy, xlab = "Flow Rate (cm/s)", ylab = "Velocity in Y direction (vy, cm/s)")
 ## Basic plot of vel.flow vs Flow Rate (should be different to above)
 plot(CC.TotalData$Flow.rate, CC.TotalData$vel.flow, xlab = "Flow Rate (cm/s)", ylab = "Velocity in Y direction minus flow (vel.flow, cm/s)")
 
+
+## Plotting turn angles in relation to swim velocity (accounting for flow rate)
+for (i in 1:length(ind)){
+plot(CC.TotalData$turn.angle[CC.TotalData$D_V_T==ind[i]], CC.TotalData$vel.flow[CC.TotalData$D_V_T==ind[i]],
+            xlab = "Turn Angles",
+     ylab = "Velocity in relation to flow (cm/s)",
+          main = ind[i]) 
+}
 ```
 
 

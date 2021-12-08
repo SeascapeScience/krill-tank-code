@@ -134,7 +134,7 @@ for (i in 1:length(ind)){
 hist(CC.TotalData$turn.angle[CC.TotalData$D_V_T==ind[i]],
        breaks = 50,
      xlab = "Turn Angles",
-     main = "") 
+     main = ind[i]) 
 }
 
 plot(CC.TotalData$Flow.rate, CC.TotalData$turn.angle, main = "", xlab = "Flow Rate (cm/s)", ylab = "Turn angle (degrees)")
@@ -198,13 +198,13 @@ plot(tab_AGG$Chlorophyll, tab_AGG$dip.test, xlab = "Chlorophyll (mg/L)", ylab = 
 plot(tab_AGG$Chlorophyll, tab_AGG$skew, xlab = "Chlorophyll (mg/L)", ylab = "Skew Test (p.value)")
 
 
+
 for (i in 1:length(ind)){
 plot(CC.TotalData$turn.angle[CC.TotalData$D_V_T==ind[i]], log10(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]]),
             xlab = "Turn Angles",
      ylab = "Velocity",
-          main = "") 
+          main = ind[i]) 
 }
-
 ```
 
 
