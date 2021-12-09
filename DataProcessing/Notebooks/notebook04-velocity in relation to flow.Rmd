@@ -95,6 +95,49 @@ ggplot(CC.TotalData,aes(x=turn.angle, y=vel.flow))+
  
 ```
 
+
+```{r}
+## xy plot of means and variance of swimming speed and chlorophyll and turn angle, heading relative to flow
+## still need to make Guano and Light factors in tab_AGG  ############################################################################
+
+    ######## velocity means and SD  ######
+plot(tab_AGG$Chlorophyll, tab_AGG$mean.velocity, xlab = "Chlorophyll (mg/L)", ylab = "Velocity (Aggregate mean, mm/s)")
+plot(tab_AGG$Chlorophyll, tab_AGG$sd.velocity, xlab = "Chlorophyll (mg/L)", ylab = "Velocity (Aggregate SD, mm/s)")
+plot(tab_AGG$Flow.Rate, tab_AGG$mean.velocity, xlab = "Flow Rate (cm/s)", ylab = "Velocity (Aggregate mean, mm/s)")
+plot(tab_AGG$Flow.Rate, tab_AGG$sd.velocity, xlab = "Flow Rate (cm/s)", ylab = "Velocity (Aggregate SD, mm/s)")
+#plot(tab_AGG$Guano, tab_AGG$mean.velocity, xlab = "Guano", ylab = "Velocity (Aggregate mean, mm/s)")           ################# Guano and Light still not factors 
+#plot(tab_AGG$Guano, tab_AGG$sd.velocity, xlab = "Guano", ylab = "Velocity (Aggregate SD, mm/s)")
+#plot(tab_AGG$Light, tab_AGG$mean.velocity, xlab = "Light", ylab = "Velocity (Aggregate mean, mm/s)")           ################# Guano and Light still not factors 
+#plot(tab_AGG$Light, tab_AGG$sd.velocity, xlab = "Light", ylab = "Velocity (Aggregate SD, mm/s)")
+
+    ######## turn angle means and SD  ######
+plot(tab_AGG$Chlorophyll, tab_AGG$turn.angle, xlab = "Chlorophyll (mg/L)", ylab = "Turn Angle (degrees)")
+plot(tab_AGG$Flow.Rate, tab_AGG$turn.angle, xlab = "Flow Rate (cm/s)", ylab = "Turn Angle (degrees)")
+#plot(tab_AGG$Guano, tab_AGG$turn.angle, xlab = "Guano", ylab = "Turn Angle (degrees)")           ################# Guano and Light still not factors 
+#plot(tab_AGG$Light, tab_AGG$turn.angle, xlab = "Light", ylab = "Turn Angle (degrees)")
+
+    ######## heading means and SD  ######
+plot(tab_AGG$Chlorophyll, tab_AGG$heading/(2*pi)*360, xlab = "Chlorophyll (mg/L)", ylab = "Heading (degrees)")
+plot(tab_AGG$Flow.Rate, tab_AGG$heading/(2*pi)*360, xlab = "Flow Rate (cm/s)", ylab = "Heading (degrees)")
+#plot(tab_AGG$Guano, tab_AGG$heading, xlab = "Guano", ylab = "Heading (degrees)")           ################# Guano and Light still not factors 
+#plot(tab_AGG$Light, tab_AGG$heading, xlab = "Light", ylab = "Heading (degrees)") 
+
+## plus mean of total tracks for turn angle and heading, and pathwise velocity
+
+## aggregate distribution of all angles and headings, not just pathwise
+plot(CC.TotalData$Chlorophyll, log10(CC.TotalData$v), xlab = "Chlorophyll (mg/L)", ylab = "Velocity (Log^10, mm/s)")
+plot(CC.TotalData$Flow.rate, log10(CC.TotalData$v), xlab = "Flow Rate (cm/s)", ylab = "Velocity (Log^10, mm/s)")
+#plot(CC.TotalData$Guano, log10(CC.TotalData$v), xlab = "Guano", ylab = "Velocity (Log^10, mm/s)")           ################# Guano and Light still not factors
+#plot(CC.TotalData$Light, log10(CC.TotalData$v), xlab = "Light", ylab = "Velocity (Log^10, mm/s)")           ################# Guano and Light still not factors
+
+     ###### velocity in relation to flow, aggregates of total data  ######
+plot(CC.TotalData$Chlorophyll, log10(CC.TotalData$vel.flow), xlab = "Chlorophyll (mg/L)", ylab = "Velocity  in relation to flow (Log^10, mm/s)")
+plot(CC.TotalData$Flow.rate, log10(CC.TotalData$vel.flow), xlab = "Flow Rate (cm/s)", ylab = "Velocity  in relation to flow (Log^10, mm/s)")
+#plot(CC.TotalData$Guano, log10(CC.TotalData$vel.flow), xlab = "Guano", ylab = "Velocity in relation to flow (Log^10, mm/s)")     ################# Guano and Light still not factors
+#plot(CC.TotalData$Light, log10(CC.TotalData$vel.flow), xlab = "Light", ylab = "Velocity in relation to flow (Log^10, mm/s)")  
+```
+
+
 ```{r}
 save.image("~/Post-doc/Data/Total Merged Data File (Dec 6 2021).RData")
 
