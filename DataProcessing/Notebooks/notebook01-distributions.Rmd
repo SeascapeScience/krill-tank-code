@@ -72,6 +72,16 @@ s.v <- rbind(s.v, s)
      sub = d.p)  ## change to d.p or s to print the dip test or skew value as the title instead
 }
 
+## to save each ind graph to working directory
+for (i in 1:length(ind)){
+  jpeg(filename=paste(ind[i], '.jpeg', sep = ''), width = 480, height = 480)
+ hist(log10(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]]),
+     breaks = 50,
+     xlab = "Velocity (Log^10 mm/s)",
+     main = ind[i])
+dev.off()
+}
+
 tab$skew <- s.v
 tab$dip.test <- d.v
 tab$mean.velocity <- (log10(mean.vel))
@@ -130,14 +140,18 @@ head(CC.TotalData)
 
 ind <- unique(CC.TotalData$D_V_T)
 
+## to save ind histogram plots
 for (i in 1:length(ind)){
+jpeg(filename=paste(ind[i], '.jpeg', sep = ''), width = 480, height = 480)
 hist(CC.TotalData$turn.angle[CC.TotalData$D_V_T==ind[i]],
-       breaks = 50,
-     xlab = "Turn Angles",
+     breaks = 50,
+     xlab = "Turn Angles (degrees)",
      main = ind[i]) 
+dev.off()
 }
 
 plot(CC.TotalData$Flow.rate, CC.TotalData$turn.angle, main = "", xlab = "Flow Rate (cm/s)", ylab = "Turn angle (degrees)")
+
 plot(CC.TotalData$Chlorophyll, CC.TotalData$turn.angle, main = "", xlab = "Chlorophyll (mg/L)", ylab = "Turn angle (degrees)")
 
 library(ggplot2)
@@ -146,7 +160,7 @@ ggplot(TotalData,aes(x=Flow.rate, y=log10(v), fill=Chlorophyll))+
   theme(axis.text=element_text(color="black"))+
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
   theme(panel.grid.minor=element_blank())+
-  labs(size= "",x = "Flow Rate (cm/s)", y = "Velocity (Log transformed)(cm/s)", title = "Light") +
+  labs(size= "",x = "Flow Rate (cm/s)", y = "Velocity (Log transformed)(mm/s)", title = "Light") +
   scale_fill_manual(values=c("greenyellow", "yellowgreen","lightgreen", "green", "green3", "green4", "darkgreen"),name = "Chlorophyll (mg/L)",
                     labels=c("0", "4.3", "4.6", "6.1", "7.6", "13.5", "19"))+
   facet_grid(~Light, scales = "free_x", space = "free")
@@ -198,12 +212,14 @@ plot(tab_AGG$Chlorophyll, tab_AGG$dip.test, xlab = "Chlorophyll (mg/L)", ylab = 
 plot(tab_AGG$Chlorophyll, tab_AGG$skew, xlab = "Chlorophyll (mg/L)", ylab = "Skew Test (p.value)")
 
 
-
+## to save each ind graph
 for (i in 1:length(ind)){
+  jpeg(filename=paste(ind[i], '.jpeg', sep = ''), width = 480, height = 480)
 plot(CC.TotalData$turn.angle[CC.TotalData$D_V_T==ind[i]], log10(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]]),
-            xlab = "Turn Angles",
-     ylab = "Velocity",
+            xlab = "Turn Angles (degrees)",
+     ylab = "Velocity (LOg^10, mm/s)",
           main = ind[i]) 
+dev.off()
 }
 ```
 

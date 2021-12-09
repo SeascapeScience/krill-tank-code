@@ -14,15 +14,16 @@ length(ind)
 
 str(CC.TotalData)
 
+## to save ind graphs of velocity by Y axis
 for (i in 1:length(ind)){
-plot(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]],
+jpeg(filename=paste(ind[i], '.jpeg', sep = ''), width = 480, height = 480)
+plot(log10(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]]),
      CC.TotalData$Y[CC.TotalData$D_V_T==ind[i]],
-     xlab = "Velocity (cm/s)",
+     xlab = "Velocity (Log^10, mm/s)",
      ylab = "Y Axis (cm)",
-     main = "") 
+     main = ind[i]) 
+dev.off()
 }
-
-
 
 ```
 
@@ -30,31 +31,32 @@ plot(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]],
 Looking at relationship between velocity and the X axis
 
 ```{r}
-
+## to save individual graphs of X axis by velocity
 for (i in 1:length(ind)){
-plot(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]],
+  jpeg(filename=paste(ind[i], '.jpeg', sep = ''), width = 480, height = 480)
+plot(log10(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]]),
      CC.TotalData$X[CC.TotalData$D_V_T==ind[i]],
-     xlab = "Velocity (cm/s)",
+     xlab = "Velocity (Log^10, mm/s)",
      ylab = "X Axis (cm)",
-     main = "") 
+     main = ind[i])
+dev.off()
 }
-
-
 
 ```
 
 Looking at relationship between velocity and the Z axis
 
 ```{r}
+## to save individual graphs of z axis by velocity
 for (i in 1:length(ind)){
-plot(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]],
+  jpeg(filename=paste(ind[i], '.jpeg', sep = ''), width = 480, height = 480)
+plot(log10(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]]),
      CC.TotalData$Z[CC.TotalData$D_V_T==ind[i]],
-     xlab = "Velocity (cm/s)",
+     xlab = "Velocity (Log^10, mm/s)",
      ylab = "Z Axis (cm)",
-     main = "") 
+     main = ind[i])
+dev.off()
 }
-
-
 
 ```
 

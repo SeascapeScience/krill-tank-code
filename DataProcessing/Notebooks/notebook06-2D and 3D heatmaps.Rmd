@@ -21,10 +21,12 @@ scatterplot3d(TotalData$X, TotalData$Y, TotalData$Z, color = TotalData$Flow.rate
 ##  Will subset Totaldata into each set of variables and try plotting this again
 
 
-## scatterplots for individuals
+## scatterplots for individuals (saves to working directory)
 library(scatterplot3d)
 for (i in 1:length(ind)){
-scatterplot3d(TotalData$X[TotalData$D_V_T==ind[i]], TotalData$Y[TotalData$D_V_T==ind[i]], TotalData$Z[TotalData$D_V_T==ind[i]], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = ind[i], cex.symbols = 0.5, )
+jpeg(filename=paste(ind[i], '.jpeg', sep = ''), width = 960, height = 960)
+scatterplot3d(TotalData$X[TotalData$D_V_T==ind[i]], TotalData$Y[TotalData$D_V_T==ind[i]], TotalData$Z[TotalData$D_V_T==ind[i]], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = ind[i], cex.symbols = 0.5)
+dev.off()
 }
 
 

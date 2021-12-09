@@ -33,16 +33,19 @@ str(CC.TotalData)
 
 ## Basic plot of vy vs Flow Rate
 plot(CC.TotalData$Flow.rate, CC.TotalData$vy, xlab = "Flow Rate (cm/s)", ylab = "Velocity in Y direction (vy, cm/s)")
+
 ## Basic plot of vel.flow vs Flow Rate (should be different to above)
 plot(CC.TotalData$Flow.rate, CC.TotalData$vel.flow, xlab = "Flow Rate (cm/s)", ylab = "Velocity in Y direction minus flow (vel.flow, cm/s)")
 
 
-## Plotting turn angles in relation to swim velocity (accounting for flow rate)
+## Plotting turn angles in relation to swim velocity (accounting for flow rate) for every individual
 for (i in 1:length(ind)){
+jpeg(filename=paste(ind[i], '.jpeg', sep = ''), width = 480, height = 480)
 plot(CC.TotalData$turn.angle[CC.TotalData$D_V_T==ind[i]], CC.TotalData$vel.flow[CC.TotalData$D_V_T==ind[i]],
             xlab = "Turn Angles",
      ylab = "Velocity in relation to flow (cm/s)",
           main = ind[i]) 
+dev.off()
 }
 
 library(ggplot2)
@@ -92,4 +95,9 @@ ggplot(CC.TotalData,aes(x=turn.angle, y=vel.flow))+
  
 ```
 
+```{r}
+save.image("~/Post-doc/Data/Total Merged Data File (Dec 6 2021).RData")
+
+
+```
 
