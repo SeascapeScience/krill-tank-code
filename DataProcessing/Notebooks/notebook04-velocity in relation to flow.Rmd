@@ -123,18 +123,34 @@ plot(tab_AGG$Flow.Rate, tab_AGG$heading/(2*pi)*360, xlab = "Flow Rate (cm/s)", y
 #plot(tab_AGG$Light, tab_AGG$heading, xlab = "Light", ylab = "Heading (degrees)") 
 
 ## plus mean of total tracks for turn angle and heading, and pathwise velocity
+str(CC.TotalData)
+CC.TotalData$Guano <- as.factor(CC.TotalData$Guano)
+CC.TotalData$Light <- as.factor(CC.TotalData$Light)
 
 ## aggregate distribution of all angles and headings, not just pathwise
 plot(CC.TotalData$Chlorophyll, log10(CC.TotalData$v), xlab = "Chlorophyll (mg/L)", ylab = "Velocity (Log^10, mm/s)")
 plot(CC.TotalData$Flow.rate, log10(CC.TotalData$v), xlab = "Flow Rate (cm/s)", ylab = "Velocity (Log^10, mm/s)")
-#plot(CC.TotalData$Guano, log10(CC.TotalData$v), xlab = "Guano", ylab = "Velocity (Log^10, mm/s)")           ################# Guano and Light still not factors
-#plot(CC.TotalData$Light, log10(CC.TotalData$v), xlab = "Light", ylab = "Velocity (Log^10, mm/s)")           ################# Guano and Light still not factors
+plot(CC.TotalData$Guano, log10(CC.TotalData$v), xlab = "Guano", ylab = "Velocity (Log^10, mm/s)")           
+plot(CC.TotalData$Light, log10(CC.TotalData$v), xlab = "Light", ylab = "Velocity (Log^10, mm/s)")           
 
      ###### velocity in relation to flow, aggregates of total data  ######
 plot(CC.TotalData$Chlorophyll, log10(CC.TotalData$vel.flow), xlab = "Chlorophyll (mg/L)", ylab = "Velocity  in relation to flow (Log^10, mm/s)")
 plot(CC.TotalData$Flow.rate, log10(CC.TotalData$vel.flow), xlab = "Flow Rate (cm/s)", ylab = "Velocity  in relation to flow (Log^10, mm/s)")
-#plot(CC.TotalData$Guano, log10(CC.TotalData$vel.flow), xlab = "Guano", ylab = "Velocity in relation to flow (Log^10, mm/s)")     ################# Guano and Light still not factors
-#plot(CC.TotalData$Light, log10(CC.TotalData$vel.flow), xlab = "Light", ylab = "Velocity in relation to flow (Log^10, mm/s)")  
+plot(CC.TotalData$Guano, log10(CC.TotalData$vel.flow), xlab = "Guano", ylab = "Velocity in relation to flow (Log^10, mm/s)")     
+plot(CC.TotalData$Light, log10(CC.TotalData$vel.flow), xlab = "Light", ylab = "Velocity in relation to flow (Log^10, mm/s)")  
+
+    ######## turn angle means and SD  ######
+plot(CC.TotalData$Chlorophyll, CC.TotalData$turn.angle, xlab = "Chlorophyll (mg/L)", ylab = "Turn Angle (degrees)")
+plot(CC.TotalData$Flow.rate, CC.TotalData$turn.angle, xlab = "Flow Rate (cm/s)", ylab = "Turn Angle (degrees)")
+plot(CC.TotalData$Guano, CC.TotalData$turn.angle, xlab = "Guano", ylab = "Turn Angle (degrees)")
+plot(CC.TotalData$Light, CC.TotalData$turn.angle, xlab = "Light", ylab = "Turn Angle (degrees)")
+
+    ######## heading means and SD  ######
+plot(CC.TotalData$Chlorophyll, CC.TotalData$heading/(2*pi)*360, xlab = "Chlorophyll (mg/L)", ylab = "Heading (degrees)")
+plot(CC.TotalData$Flow.rate, CC.TotalData$heading/(2*pi)*360, xlab = "Flow Rate (cm/s)", ylab = "Heading (degrees)")
+plot(CC.TotalData$Guano, CC.TotalData$heading/(2*pi)*360, xlab = "Guano", ylab = "Heading (degrees)")         
+plot(CC.TotalData$Light, CC.TotalData$heading/(2*pi)*360, xlab = "Light", ylab = "Heading (degrees)") 
+
 ```
 
 
