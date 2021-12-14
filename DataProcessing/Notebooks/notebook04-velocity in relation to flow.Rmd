@@ -11,7 +11,7 @@ load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data 
 
 ## Flow happens in the Y direction
 
-## So, vy - flow = vel.flow (velocity in relation to flow)
+## So, flow + vy = vel.flow (velocity in relation to flow)
 
 
 ## Need to make flow rate numeric first
@@ -21,7 +21,7 @@ TotalData$Flow.rate <- as.numeric(TotalData$Flow.rate)
 
 head(TotalData) ## all TotalData rows
 str(TotalData)
-TotalData$vel.flow <- TotalData$vy-TotalData$Flow.rate
+TotalData$vel.flow <- TotalData$Flow.rate+TotalData$vy
 TotalData$Flow.rate <- as.factor(TotalData$Flow.rate)
 
 
@@ -47,6 +47,8 @@ plot(CC.TotalData$turn.angle[CC.TotalData$D_V_T==ind[i]], CC.TotalData$vel.flow[
           main = ind[i]) 
 dev.off()
 }
+
+## Up to heere done
 
 library(ggplot2)
 

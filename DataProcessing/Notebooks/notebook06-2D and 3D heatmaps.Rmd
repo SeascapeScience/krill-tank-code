@@ -19,6 +19,17 @@ library(scatterplot3d)
 scatterplot3d(TotalData$X, TotalData$Y, TotalData$Z, color = TotalData$Flow.rate, pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", cex.symbols = 0.5, )
 
 ##  Will subset Totaldata into each set of variables and try plotting this again
+ChlA0 <- CC.TotalData[CC.TotalData$Chlorophyll == "0",]  ##subsets CC.TotalData by Chlorophyll but only selects rows where Chlorophyll = 0
+head(ChlA0)
+tail(ChlA0)
+
+## 3D scatterplot, coloured by Flow.Rate BUT only points with 0 Chlorophyll
+library(scatterplot3d)
+scatterplot3d(ChlA0$X, ChlA0$Y, ChlA0$Z, color = ChlA0$Flow.rate, pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 0, colour = Flow Rate", cex.symbols = 0.5, )
+
+
+
+
 
 
 ## scatterplots for individuals (saves to working directory)
