@@ -6,14 +6,16 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File.Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Dec 6 2021).Rdata")
 
 
 ## Flow happens in the Y direction
 
 ## So, vy - flow = vel.flow (velocity in relation to flow)
 
+
 ## Need to make flow rate numeric first
+str(TotalData)
 TotalData$Flow.rate <- as.character(TotalData$Flow.rate)
 TotalData$Flow.rate <- as.numeric(TotalData$Flow.rate)
 
@@ -22,18 +24,139 @@ str(TotalData)
 TotalData$vel.flow <- TotalData$vy-TotalData$Flow.rate
 TotalData$Flow.rate <- as.factor(TotalData$Flow.rate)
 
+
+##remake complete cases dataframe with vel.flow included
+CC.TotalData <- na.omit(TotalData)
 head(CC.TotalData) ##only complete cases of TotalData 
 str(CC.TotalData)
-## Looking at velocity in relation to flow, need to use Flow.rate as a number (change to character THEN numeric)
-CC.TotalData$Flow.rate <- as.numeric(CC.TotalData$Flow.rate)
-CC.TotalData$vel.flow <- CC.TotalData$vy-CC.TotalData$Flow.rate
-CC.TotalData$Flow.rate <- as.factor(CC.TotalData$Flow.rate)
+
 
 ## Basic plot of vy vs Flow Rate
 plot(CC.TotalData$Flow.rate, CC.TotalData$vy, xlab = "Flow Rate (cm/s)", ylab = "Velocity in Y direction (vy, cm/s)")
+
 ## Basic plot of vel.flow vs Flow Rate (should be different to above)
 plot(CC.TotalData$Flow.rate, CC.TotalData$vel.flow, xlab = "Flow Rate (cm/s)", ylab = "Velocity in Y direction minus flow (vel.flow, cm/s)")
 
+
+## Plotting turn angles in relation to swim velocity (accounting for flow rate) for every individual
+for (i in 1:length(ind)){
+jpeg(filename=paste(ind[i], '.jpeg', sep = ''), width = 480, height = 480)
+plot(CC.TotalData$turn.angle[CC.TotalData$D_V_T==ind[i]], CC.TotalData$vel.flow[CC.TotalData$D_V_T==ind[i]],
+            xlab = "Turn Angles",
+     ylab = "Velocity in relation to flow (cm/s)",
+          main = ind[i]) 
+dev.off()
+}
+
+library(ggplot2)
+
+## plot Flow Rate by Vel.flow filled by Chla faceted by light
+ggplot(CC.TotalData,aes(x=Flow.rate, y=vel.flow, fill=Chlorophyll))+
+  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  labs(size= "",x = "Flow Rate (cm/s)", y = "Velocity in relation to flow (cm/s)", title = "Light") +
+  scale_fill_manual(values=c("greenyellow", "yellowgreen","lightgreen", "green", "green3", "green4", "darkgreen"),name = "Chlorophyll (mg/L)",
+                    labels=c("0", "4.3", "4.6", "6.1", "7.6", "13.5", "19"))+
+  facet_grid(~Light, scales = "free_x", space = "free")
+
+## plot Chlorophyll by vel.flow filled by flow rate faceted by light
+ggplot(CC.TotalData,aes(x=Chlorophyll, y=vel.flow, fill=Flow.rate))+
+  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  labs(size= "",x = "Chlorophyll (mg/L)", y = "Velocity in realtion to flow (cm/s)", title = "Light") +
+  scale_fill_manual(values=c("white", "beige", "yellow", "orange", "red"), name = "Flow Rate (cm/s)",
+                    labels=c("0", "0.6", "3", "5.9", "8"))+
+  facet_grid(~Light, scales = "free_x", space = "free")
+
+## plot Chlorophyll by turn angle filled by flow rate facted by light
+ggplot(CC.TotalData,aes(x=Chlorophyll, y=turn.angle, fill=Flow.rate))+
+  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  labs(size= "",x = "Chlorophyll (mg/L)", y = "Turn angle (degrees)", title = "Light") +
+  scale_fill_manual(values=c("white", "beige", "yellow", "orange", "red"), name = "Flow Rate (cm/s)",
+                    labels=c("0", "0.6", "3", "5.9", "8"))+
+  facet_grid(~Light, scales = "free_x", space = "free")
+
+## plot turn angle by vel.flow filled by chla, faceted by flow rate
+ggplot(CC.TotalData,aes(x=turn.angle, y=vel.flow))+
+  geom_point(aes(colour=Chlorophyll))+
+  facet_grid(~Flow.rate, scales = "free_x", space = "free")+
+  labs(size= "",x = "Turn angle (degrees)", y = "Velocity in relation to flow (cm/s)", title = "Flow Rate (cm/s)")+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  scale_colour_manual(values=c("greenyellow", "yellowgreen","lightgreen", "green", "green3", "green4", "darkgreen"),name = "Chlorophyll (mg/L)", labels=c("0", "4.3", "4.6", "6.1", "7.6", "13.5", "19"))
+ 
 ```
 
+
+```{r}
+## xy plot of means and variance of swimming speed and chlorophyll and turn angle, heading relative to flow
+## still need to make Guano and Light factors in tab_AGG  ############################################################################
+
+    ######## velocity means and SD  ######
+plot(tab_AGG$Chlorophyll, tab_AGG$mean.velocity, xlab = "Chlorophyll (mg/L)", ylab = "Velocity (Aggregate mean, mm/s)")
+plot(tab_AGG$Chlorophyll, tab_AGG$sd.velocity, xlab = "Chlorophyll (mg/L)", ylab = "Velocity (Aggregate SD, mm/s)")
+plot(tab_AGG$Flow.Rate, tab_AGG$mean.velocity, xlab = "Flow Rate (cm/s)", ylab = "Velocity (Aggregate mean, mm/s)")
+plot(tab_AGG$Flow.Rate, tab_AGG$sd.velocity, xlab = "Flow Rate (cm/s)", ylab = "Velocity (Aggregate SD, mm/s)")
+#plot(tab_AGG$Guano, tab_AGG$mean.velocity, xlab = "Guano", ylab = "Velocity (Aggregate mean, mm/s)")           ################# Guano and Light still not factors 
+#plot(tab_AGG$Guano, tab_AGG$sd.velocity, xlab = "Guano", ylab = "Velocity (Aggregate SD, mm/s)")
+#plot(tab_AGG$Light, tab_AGG$mean.velocity, xlab = "Light", ylab = "Velocity (Aggregate mean, mm/s)")           ################# Guano and Light still not factors 
+#plot(tab_AGG$Light, tab_AGG$sd.velocity, xlab = "Light", ylab = "Velocity (Aggregate SD, mm/s)")
+
+    ######## turn angle means and SD  ######
+plot(tab_AGG$Chlorophyll, tab_AGG$turn.angle, xlab = "Chlorophyll (mg/L)", ylab = "Turn Angle (degrees)")
+plot(tab_AGG$Flow.Rate, tab_AGG$turn.angle, xlab = "Flow Rate (cm/s)", ylab = "Turn Angle (degrees)")
+#plot(tab_AGG$Guano, tab_AGG$turn.angle, xlab = "Guano", ylab = "Turn Angle (degrees)")           ################# Guano and Light still not factors 
+#plot(tab_AGG$Light, tab_AGG$turn.angle, xlab = "Light", ylab = "Turn Angle (degrees)")
+
+    ######## heading means and SD  ######
+plot(tab_AGG$Chlorophyll, tab_AGG$heading/(2*pi)*360, xlab = "Chlorophyll (mg/L)", ylab = "Heading (degrees)")
+plot(tab_AGG$Flow.Rate, tab_AGG$heading/(2*pi)*360, xlab = "Flow Rate (cm/s)", ylab = "Heading (degrees)")
+#plot(tab_AGG$Guano, tab_AGG$heading, xlab = "Guano", ylab = "Heading (degrees)")           ################# Guano and Light still not factors 
+#plot(tab_AGG$Light, tab_AGG$heading, xlab = "Light", ylab = "Heading (degrees)") 
+
+## plus mean of total tracks for turn angle and heading, and pathwise velocity
+str(CC.TotalData)
+CC.TotalData$Guano <- as.factor(CC.TotalData$Guano)
+CC.TotalData$Light <- as.factor(CC.TotalData$Light)
+
+## aggregate distribution of all angles and headings, not just pathwise
+plot(CC.TotalData$Chlorophyll, log10(CC.TotalData$v), xlab = "Chlorophyll (mg/L)", ylab = "Velocity (Log^10, mm/s)")
+plot(CC.TotalData$Flow.rate, log10(CC.TotalData$v), xlab = "Flow Rate (cm/s)", ylab = "Velocity (Log^10, mm/s)")
+plot(CC.TotalData$Guano, log10(CC.TotalData$v), xlab = "Guano", ylab = "Velocity (Log^10, mm/s)")           
+plot(CC.TotalData$Light, log10(CC.TotalData$v), xlab = "Light", ylab = "Velocity (Log^10, mm/s)")           
+
+     ###### velocity in relation to flow, aggregates of total data  ######
+plot(CC.TotalData$Chlorophyll, log10(CC.TotalData$vel.flow), xlab = "Chlorophyll (mg/L)", ylab = "Velocity  in relation to flow (Log^10, mm/s)")
+plot(CC.TotalData$Flow.rate, log10(CC.TotalData$vel.flow), xlab = "Flow Rate (cm/s)", ylab = "Velocity  in relation to flow (Log^10, mm/s)")
+plot(CC.TotalData$Guano, log10(CC.TotalData$vel.flow), xlab = "Guano", ylab = "Velocity in relation to flow (Log^10, mm/s)")     
+plot(CC.TotalData$Light, log10(CC.TotalData$vel.flow), xlab = "Light", ylab = "Velocity in relation to flow (Log^10, mm/s)")  
+
+    ######## turn angle means and SD  ######
+plot(CC.TotalData$Chlorophyll, CC.TotalData$turn.angle, xlab = "Chlorophyll (mg/L)", ylab = "Turn Angle (degrees)")
+plot(CC.TotalData$Flow.rate, CC.TotalData$turn.angle, xlab = "Flow Rate (cm/s)", ylab = "Turn Angle (degrees)")
+plot(CC.TotalData$Guano, CC.TotalData$turn.angle, xlab = "Guano", ylab = "Turn Angle (degrees)")
+plot(CC.TotalData$Light, CC.TotalData$turn.angle, xlab = "Light", ylab = "Turn Angle (degrees)")
+
+    ######## heading means and SD  ######
+plot(CC.TotalData$Chlorophyll, CC.TotalData$heading/(2*pi)*360, xlab = "Chlorophyll (mg/L)", ylab = "Heading (degrees)")
+plot(CC.TotalData$Flow.rate, CC.TotalData$heading/(2*pi)*360, xlab = "Flow Rate (cm/s)", ylab = "Heading (degrees)")
+plot(CC.TotalData$Guano, CC.TotalData$heading/(2*pi)*360, xlab = "Guano", ylab = "Heading (degrees)")         
+plot(CC.TotalData$Light, CC.TotalData$heading/(2*pi)*360, xlab = "Light", ylab = "Heading (degrees)") 
+
+```
+
+
+```{r}
+save.image("~/Post-doc/Data/Total Merged Data File (Dec 6 2021).RData")
+
+
+```
 

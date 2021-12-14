@@ -10,14 +10,26 @@ load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data 
 
 head(TotalData) ## all rows of data from TotalData
 head(CC.TotalData) ## ONLY complete cases of TotalData
-library(scatterplot3d)
 
 ##  2D heatmaps of time spent in locations
 ## Looking at differences by treatment
+
 ## start by plotting scatterplot colour by denisty of points
+library(scatterplot3d)
 scatterplot3d(TotalData$X, TotalData$Y, TotalData$Z, color = TotalData$Flow.rate, pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", cex.symbols = 0.5, )
 
 ##  Will subset Totaldata into each set of variables and try plotting this again
+
+
+## scatterplots for individuals (saves to working directory)
+library(scatterplot3d)
+for (i in 1:length(ind)){
+jpeg(filename=paste(ind[i], '.jpeg', sep = ''), width = 960, height = 960)
+scatterplot3d(TotalData$X[TotalData$D_V_T==ind[i]], TotalData$Y[TotalData$D_V_T==ind[i]], TotalData$Z[TotalData$D_V_T==ind[i]], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = ind[i], cex.symbols = 0.5)
+dev.off()
+}
+
+
 
 ```
 

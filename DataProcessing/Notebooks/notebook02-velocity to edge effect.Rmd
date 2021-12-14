@@ -6,23 +6,24 @@ output: html_notebook
 Looking at relationship between velocity and the Y axis
 
 ```{r}
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Scripts\\Total Data Merged File.RData") 
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Data Merged File (Dec 6 2021).RData") 
 
 library(ggplot2)
-ind <- unique(TotalData$D_V_T)
+ind <- unique(CC.TotalData$D_V_T)
 length(ind)
 
-str(TotalData)
+str(CC.TotalData)
 
+## to save ind graphs of velocity by Y axis
 for (i in 1:length(ind)){
-plot(TotalData$v[TotalData$D_V_T==ind[i]],
-     TotalData$Y[TotalData$D_V_T==ind[i]],
-     xlab = "Velocity (cm/s)",
+jpeg(filename=paste(ind[i], '.jpeg', sep = ''), width = 480, height = 480)
+plot(log10(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]]),
+     CC.TotalData$Y[CC.TotalData$D_V_T==ind[i]],
+     xlab = "Velocity (Log^10, mm/s)",
      ylab = "Y Axis (cm)",
-     main = "") 
+     main = ind[i]) 
+dev.off()
 }
-
-
 
 ```
 
@@ -30,33 +31,32 @@ plot(TotalData$v[TotalData$D_V_T==ind[i]],
 Looking at relationship between velocity and the X axis
 
 ```{r}
-
+## to save individual graphs of X axis by velocity
 for (i in 1:length(ind)){
-plot(TotalData$v[TotalData$D_V_T==ind[i]],
-     TotalData$X[TotalData$D_V_T==ind[i]],
-     xlab = "Velocity (cm/s)",
+  jpeg(filename=paste(ind[i], '.jpeg', sep = ''), width = 480, height = 480)
+plot(log10(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]]),
+     CC.TotalData$X[CC.TotalData$D_V_T==ind[i]],
+     xlab = "Velocity (Log^10, mm/s)",
      ylab = "X Axis (cm)",
-     main = "") 
+     main = ind[i])
+dev.off()
 }
-
-
 
 ```
 
 Looking at relationship between velocity and the Z axis
 
 ```{r}
-
-
+## to save individual graphs of z axis by velocity
 for (i in 1:length(ind)){
-plot(TotalData$v[TotalData$D_V_T==ind[i]],
-     TotalData$Z[TotalData$D_V_T==ind[i]],
-     xlab = "Velocity (cm/s)",
+  jpeg(filename=paste(ind[i], '.jpeg', sep = ''), width = 480, height = 480)
+plot(log10(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]]),
+     CC.TotalData$Z[CC.TotalData$D_V_T==ind[i]],
+     xlab = "Velocity (Log^10, mm/s)",
      ylab = "Z Axis (cm)",
-     main = "") 
+     main = ind[i])
+dev.off()
 }
-
-
 
 ```
 

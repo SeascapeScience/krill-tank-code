@@ -12,7 +12,23 @@ load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data 
 ## Need to use turn angles and a point of reference (e.g. inlet valve) to determine directional bearing
 
 head(TotalData)
+str(TotalData)
+## We already have pitch and heading in TotalData
+##Need to remember to convert heading into degrees - use:  TotalData$heading/(2*pi)*360
+
+## head(CC.TotalData)  Flow and Chlorophyll are numeric - need to get back to factors with correct numbers
+## str(CC.TotalData)
 
 
+library(ggplot2)
+ggplot(TotalData,aes(x=Flow.rate, y=heading/(2*pi)*360, fill=Chlorophyll))+
+  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  labs(size= "",x = "Flow Rate (cm/s)", y = "Heading (degrees)", title = "Light") +
+  scale_fill_manual(values=c("greenyellow", "yellowgreen","lightgreen", "green", "green3", "green4", "darkgreen"),name = "Chlorophyll (mg/L)",
+                    labels=c("0", "4.3", "4.6", "6.1", "7.6", "13.5", "19"))+
+  facet_grid(~Light, scales = "free_x", space = "free")
 ```
 
