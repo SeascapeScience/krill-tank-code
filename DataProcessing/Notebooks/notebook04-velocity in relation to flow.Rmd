@@ -48,8 +48,6 @@ plot(CC.TotalData$turn.angle[CC.TotalData$D_V_T==ind[i]], CC.TotalData$vel.flow[
 dev.off()
 }
 
-## Up to heere done
-
 library(ggplot2)
 
 ## plot Flow Rate by Vel.flow filled by Chla faceted by light
