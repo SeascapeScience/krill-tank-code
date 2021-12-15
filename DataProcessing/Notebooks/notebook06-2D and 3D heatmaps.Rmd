@@ -16,7 +16,8 @@ head(CC.TotalData) ## ONLY complete cases of TotalData
 
 ## start by plotting scatterplot colour by denisty of points
 library(scatterplot3d)
-scatterplot3d(TotalData$X, TotalData$Y, TotalData$Z, color = TotalData$Flow.rate, pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", cex.symbols = 0.5, )
+scatterplot3d(TotalData$X, TotalData$Y, TotalData$Z, color = TotalData$Flow.rate, pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", cex.symbols = 0.5, angle = 55)
+
 ```
 
 
@@ -59,22 +60,25 @@ spcol <- c("lightblue", "blue", "red", "darkblue", "black")
 
 ## 3D scatterplot, colored by Flow.Rate BUT only points with 0 Chlorophyll
 library(scatterplot3d)
-scatterplot3d(ChlA0$X, ChlA0$Y, ChlA0$Z, color = spcol[as.numeric(ChlA0$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 0 mg/L, colour = Flow Rate", cex.symbols = 0.5, )
+scatterplot3d(ChlA0$X, ChlA0$Y, ChlA0$Z, color = spcol[as.numeric(ChlA0$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 0 mg/L, colour = Flow Rate", cex.symbols = 0.01, angle = 55)
 
-scatterplot3d(ChlA4.3$X, ChlA4.3$Y, ChlA4.3$Z, color = spcol[as.numeric(ChlA4.3$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 4.3 mg/L, colour = Flow Rate", cex.symbols = 0.5, )
+scatterplot3d(ChlA4.3$X, ChlA4.3$Y, ChlA4.3$Z, color = spcol[as.numeric(ChlA4.3$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 4.3 mg/L, colour = Flow Rate", cex.symbols = 0.5, angle = 55)
 
-scatterplot3d(ChlA4.6$X, ChlA4.6$Y, ChlA4.6$Z, color = spcol[as.numeric(ChlA4.6$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 4.6 mg/L, colour = Flow Rate", cex.symbols = 0.5, )
+scatterplot3d(ChlA4.6$X, ChlA4.6$Y, ChlA4.6$Z, color = spcol[as.numeric(ChlA4.6$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 4.6 mg/L, colour = Flow Rate", cex.symbols = 0.5, angle = 55)
 
-scatterplot3d(ChlA6$X, ChlA6$Y, ChlA6$Z, color = spcol[as.numeric(ChlA6$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 6.1 mg/L, colour = Flow Rate", cex.symbols = 0.5, )
+scatterplot3d(ChlA6$X, ChlA6$Y, ChlA6$Z, color = spcol[as.numeric(ChlA6$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 6.1 mg/L, colour = Flow Rate", cex.symbols = 0.5, angle = 55)
 
-scatterplot3d(ChlA7$X, ChlA7$Y, ChlA7$Z, color = spcol[as.numeric(ChlA7$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 7.6 mg/L, colour = Flow Rate", cex.symbols = 0.5, )
+scatterplot3d(ChlA7$X, ChlA7$Y, ChlA7$Z, color = spcol[as.numeric(ChlA7$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 7.6 mg/L, colour = Flow Rate", cex.symbols = 0.5, angle = 55)
 
-scatterplot3d(ChlA13$X, ChlA13$Y, ChlA13$Z, color = spcol[as.numeric(ChlA13$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 13.5 mg/L, colour = Flow Rate", cex.symbols = 0.5, )
+scatterplot3d(ChlA13$X, ChlA13$Y, ChlA13$Z, color = spcol[as.numeric(ChlA13$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 13.5 mg/L, colour = Flow Rate", cex.symbols = 0.5, angle = 55)
 
-scatterplot3d(ChlA19$X, ChlA19$Y, ChlA19$Z, color = spcol[as.numeric(ChlA19$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 19 mg/L, colour = Flow Rate", cex.symbols = 0.5, )
-
+scatterplot3d(ChlA19$X, ChlA19$Y, ChlA19$Z, color = spcol[as.numeric(ChlA19$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 19 mg/L, colour = Flow Rate", cex.symbols = 0.5, angle = 55)
 
 ```
+
+
+
+
 Now subsetting for Flow Rate
 ```{r}
 ##  Will subset Totaldata into each set of variables and try plotting this again
@@ -106,15 +110,15 @@ spcol1 <- c("lightgoldenrod1", "khaki1", "darkolivegreen2", "greenyellow", "gree
 
 ## 3D scatterplot, colored by Flow.Rate BUT only points with 0 Chlorophyll
 library(scatterplot3d)
-scatterplot3d(f0$X, f0$Y, f0$Z, color = spcol1[as.numeric(f0$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Flow rate = 0 cm^3/s, colour = Chlorophyll", cex.symbols = 0.5, )
+scatterplot3d(f0$X, f0$Y, f0$Z, color = spcol1[as.numeric(f0$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Flow rate = 0 cm^3/s, colour = Chlorophyll", cex.symbols = 0.5, angle = 55)
 
-scatterplot3d(f.6$X, f.6$Y, f.6$Z, color = spcol1[as.numeric(f.6$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Flow rate = 0.6 cm^3/s, colour = Chlorophyll", cex.symbols = 0.5, )
+scatterplot3d(f.6$X, f.6$Y, f.6$Z, color = spcol1[as.numeric(f.6$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Flow rate = 0.6 cm^3/s, colour = Chlorophyll", cex.symbols = 0.5, angle = 55)
 
-scatterplot3d(f3$X, f3$Y, f3$Z, color = spcol1[as.numeric(f3$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Flow rate = 3 cm^3/s, colour = Chlorophyll", cex.symbols = 0.5, )
+scatterplot3d(f3$X, f3$Y, f3$Z, color = spcol1[as.numeric(f3$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Flow rate = 3 cm^3/s, colour = Chlorophyll", cex.symbols = 0.5, angle = 55)
 
-scatterplot3d(f5$X, f5$Y, f5$Z, color = spcol1[as.numeric(f5$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Flow rate = 5.9 cm^3/s, colour = Chlorophyll", cex.symbols = 0.5, )
+scatterplot3d(f5$X, f5$Y, f5$Z, color = spcol1[as.numeric(f5$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Flow rate = 5.9 cm^3/s, colour = Chlorophyll", cex.symbols = 0.5, angle = 55)
 
-scatterplot3d(f8$X, f8$Y, f8$Z, color = spcol1[as.numeric(f8$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Flow rate = 8.9 cm^3/s, colour = Chlorophyll", cex.symbols = 0.5, )
+scatterplot3d(f8$X, f8$Y, f8$Z, color = spcol1[as.numeric(f8$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Flow rate = 8.9 cm^3/s, colour = Chlorophyll", cex.symbols = 0.5, angle = 55)
 
 ```
 Next is Gunao and Light
@@ -139,13 +143,13 @@ tail(g1)
 
 ## 3D scatterplot, colored by Flow.Rate BUT only points with 0 Chlorophyll
 library(scatterplot3d)
-scatterplot3d(g0$X, g0$Y, g0$Z, color = spcol1[as.numeric(g0$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Guano = Absent, colour = Chlorophyll", cex.symbols = 0.5, )
+scatterplot3d(g0$X, g0$Y, g0$Z, color = spcol1[as.numeric(g0$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Guano = Absent, colour = Chlorophyll", cex.symbols = 0.5, angle = 55)
 
-scatterplot3d(g0$X, g0$Y, g0$Z, color = spcol[as.numeric(g0$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Guano = Absent, colour = Flow Rate", cex.symbols = 0.5, )
+scatterplot3d(g0$X, g0$Y, g0$Z, color = spcol[as.numeric(g0$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Guano = Absent, colour = Flow Rate", cex.symbols = 0.5, angle = 55)
 
-scatterplot3d(g1$X, g1$Y, g1$Z, color = spcol1[as.numeric(g1$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Guano = Present, colour = Chlorophyll", cex.symbols = 0.5, )
+scatterplot3d(g1$X, g1$Y, g1$Z, color = spcol1[as.numeric(g1$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Guano = Present, colour = Chlorophyll", cex.symbols = 0.5, angle = 55)
 
-scatterplot3d(g1$X, g1$Y, g1$Z, color = spcol[as.numeric(g1$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Guano = Present, colour = Flow Rate", cex.symbols = 0.5, )
+scatterplot3d(g1$X, g1$Y, g1$Z, color = spcol[as.numeric(g1$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Guano = Present, colour = Flow Rate", cex.symbols = 0.5, angle = 55)
 ###################################################################################################################################
 
 
@@ -164,13 +168,20 @@ tail(l1)
 
 ## 3D scatterplot, colored by Flow.Rate BUT only points with 0 Chlorophyll
 library(scatterplot3d)
-scatterplot3d(l0$X, l0$Y, l0$Z, color = spcol1[as.numeric(l0$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Light = Absent, colour = Chlorophyll", cex.symbols = 0.5, )
+scatterplot3d(l0$X, l0$Y, l0$Z, color = spcol1[as.numeric(l0$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Light = Absent, colour = Chlorophyll", cex.symbols = 0.5, angle = 55)
 
-scatterplot3d(l0$X, l0$Y, l0$Z, color = spcol[as.numeric(l0$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Light = Absent, colour = Flow Rate", cex.symbols = 0.5, )
+scatterplot3d(l0$X, l0$Y, l0$Z, color = spcol[as.numeric(l0$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Light = Absent, colour = Flow Rate", cex.symbols = 0.5, angle = 55)
 
-scatterplot3d(l1$X, l1$Y, l1$Z, color = spcol1[as.numeric(l1$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Light = Present, colour = Chlorophyll", cex.symbols = 0.5, )
+scatterplot3d(l1$X, l1$Y, l1$Z, color = spcol1[as.numeric(l1$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Light = Present, colour = Chlorophyll", cex.symbols = 0.5, angle = 55)
 
-scatterplot3d(l1$X, l1$Y, l1$Z, color = spcol[as.numeric(l1$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Light = Present, colour = Flow Rate", cex.symbols = 0.5, )
+scatterplot3d(l1$X, l1$Y, l1$Z, color = spcol[as.numeric(l1$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Light = Present, colour = Flow Rate", cex.symbols = 0.5, angle = 55)
+
+
+##### testing alpha values
+
+
+
+scatterplot3d(l1$X, l1$Y, l1$Z, color = spcol[as.numeric(l1$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Light = Present, colour = Flow Rate", cex.symbols = 0.5, angle = 55)
 
 ```
 
@@ -188,3 +199,8 @@ scatterplot3d(TotalData$X[TotalData$D_V_T==ind[i]], TotalData$Y[TotalData$D_V_T=
 
 ```
 
+
+```{r}
+save.image("~/Post-doc/Data/Total Merged Data File (Dec 15 2021).RData")
+
+```
