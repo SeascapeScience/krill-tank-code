@@ -52,7 +52,7 @@ head(ChlA19)
 tail(ChlA19)
 
 
-## need to make a list of colour for each level of Flow rate
+## need to make a list of color for each level of Flow rate
 levels(CC.TotalData$Flow.rate)
 spcol <- c("lightblue", "blue", "red", "darkblue", "black")
 
@@ -75,26 +75,109 @@ scatterplot3d(ChlA19$X, ChlA19$Y, ChlA19$Z, color = spcol[as.numeric(ChlA19$Flow
 
 
 ```
+Now subsetting for Flow Rate
+```{r}
+##  Will subset Totaldata into each set of variables and try plotting this again
+levels(CC.TotalData$Flow.rate)
+f0 <- CC.TotalData[CC.TotalData$Flow.rate == "0",]  ##subsets CC.TotalData by Flow rate but only selects rows where flow rate = 0
+head(f0)
+tail(f0)
 
+f.6 <- CC.TotalData[CC.TotalData$Flow.rate == "0.6",]  ##subsets CC.TotalData by Flow rate but only selects rows where flow rate = 0.6
+head(f.6)
+tail(f.6)
+
+f3<- CC.TotalData[CC.TotalData$Flow.rate == "3",]  ##subsets CC.TotalData by Flow rate but only selects rows where flow rate = 3
+head(f3)
+tail(f3)
+
+f5 <- CC.TotalData[CC.TotalData$Flow.rate == "5.9",]  ##subsets CC.TotalData by Flow rate but only selects rows where flow rate = 5.9
+head(f5)
+tail(f5)
+
+f8 <- CC.TotalData[CC.TotalData$Flow.rate == "8.9",]  ##subsets CC.TotalData by Flow rate but only selects rows where flow rate = 
+head(f8)
+tail(f8)
+
+## need to make a list of colors for each level of Chlorophyll
+levels(CC.TotalData$Chlorophyll)
+spcol1 <- c("lightgoldenrod1", "khaki1", "darkolivegreen2", "greenyellow", "green2", "green4", "black")
+
+
+## 3D scatterplot, colored by Flow.Rate BUT only points with 0 Chlorophyll
+library(scatterplot3d)
+scatterplot3d(f0$X, f0$Y, f0$Z, color = spcol1[as.numeric(f0$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Flow rate = 0 cm^3/s, colour = Chlorophyll", cex.symbols = 0.5, )
+
+scatterplot3d(f.6$X, f.6$Y, f.6$Z, color = spcol1[as.numeric(f.6$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Flow rate = 0.6 cm^3/s, colour = Chlorophyll", cex.symbols = 0.5, )
+
+scatterplot3d(f3$X, f3$Y, f3$Z, color = spcol1[as.numeric(f3$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Flow rate = 3 cm^3/s, colour = Chlorophyll", cex.symbols = 0.5, )
+
+scatterplot3d(f5$X, f5$Y, f5$Z, color = spcol1[as.numeric(f5$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Flow rate = 5.9 cm^3/s, colour = Chlorophyll", cex.symbols = 0.5, )
+
+scatterplot3d(f8$X, f8$Y, f8$Z, color = spcol1[as.numeric(f8$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Flow rate = 8.9 cm^3/s, colour = Chlorophyll", cex.symbols = 0.5, )
+
+```
+Next is Gunao and Light
 
 ```{r}
-## Examples from CRAN-r
+head(CC.TotalData)
+str(CC.TotalData)
 
-## 6 b) The rainbow colors from rainbow(201)
-rbc <- rainbow(201)
-Rrb <- t(col2rgb(rbc))
-rR <- scatterplot3d(Rrb, color = rbc, box = FALSE, angle = 24,
-xlim = c(-50, 300), ylim = c(-50, 300), zlim = c(-50, 300))
-cubedraw(rR)
-rR$points3d(Rrb, col = rbc, pch = 16)
 
+## Guano
+levels(CC.TotalData$Guano)
+g0 <- CC.TotalData[CC.TotalData$Guano == "Absent",]  ##subsets CC.TotalData by Guano but only selects rows where Guano = Absent
+head(g0)
+tail(g0)
+
+g1<- CC.TotalData[CC.TotalData$Guano == "Present",]  ##subsets CC.TotalData by Guano but only selects rows where Guano = Present
+head(g1)
+tail(g1)
+
+##spcol = flow rate
+##spcol1 = chlorophyll
+
+## 3D scatterplot, colored by Flow.Rate BUT only points with 0 Chlorophyll
+library(scatterplot3d)
+scatterplot3d(g0$X, g0$Y, g0$Z, color = spcol1[as.numeric(g0$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Guano = Absent, colour = Chlorophyll", cex.symbols = 0.5, )
+
+scatterplot3d(g0$X, g0$Y, g0$Z, color = spcol[as.numeric(g0$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Guano = Absent, colour = Flow Rate", cex.symbols = 0.5, )
+
+scatterplot3d(g1$X, g1$Y, g1$Z, color = spcol1[as.numeric(g1$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Guano = Present, colour = Chlorophyll", cex.symbols = 0.5, )
+
+scatterplot3d(g1$X, g1$Y, g1$Z, color = spcol[as.numeric(g1$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Guano = Present, colour = Flow Rate", cex.symbols = 0.5, )
+###################################################################################################################################
+
+
+## Light
+levels(CC.TotalData$Light)
+l0 <- CC.TotalData[CC.TotalData$Light == "Absent",]  ##subsets CC.TotalData by Light but only selects rows where Light = Absent
+head(l0)
+tail(l0)
+
+l1<- CC.TotalData[CC.TotalData$Light == "Present",]  ##subsets CC.TotalData by Light but only selects rows where Light = Present
+head(l1)
+tail(l1)
+
+##spcol = flow rate
+##spcol1 = chlorophyll
+
+## 3D scatterplot, colored by Flow.Rate BUT only points with 0 Chlorophyll
+library(scatterplot3d)
+scatterplot3d(l0$X, l0$Y, l0$Z, color = spcol1[as.numeric(l0$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Light = Absent, colour = Chlorophyll", cex.symbols = 0.5, )
+
+scatterplot3d(l0$X, l0$Y, l0$Z, color = spcol[as.numeric(l0$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Light = Absent, colour = Flow Rate", cex.symbols = 0.5, )
+
+scatterplot3d(l1$X, l1$Y, l1$Z, color = spcol1[as.numeric(l1$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Light = Present, colour = Chlorophyll", cex.symbols = 0.5, )
+
+scatterplot3d(l1$X, l1$Y, l1$Z, color = spcol[as.numeric(l1$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Light = Present, colour = Flow Rate", cex.symbols = 0.5, )
 
 ```
 
-Making plots for individual tracks and saving them]
+
+
+Making plots for individual tracks and saving them
 ```{r}
-
-
 ## scatterplots for individuals (saves to working directory)
 library(scatterplot3d)
 for (i in 1:length(ind)){
@@ -102,8 +185,6 @@ for (i in 1:length(ind)){
 scatterplot3d(TotalData$X[TotalData$D_V_T==ind[i]], TotalData$Y[TotalData$D_V_T==ind[i]], TotalData$Z[TotalData$D_V_T==ind[i]], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = ind[i], cex.symbols = 0.5)
 ##dev.off()
 }
-
-
 
 ```
 
