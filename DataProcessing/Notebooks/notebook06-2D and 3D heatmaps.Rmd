@@ -6,7 +6,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File.Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Dec 14 2021).Rdata")
 
 head(TotalData) ## all rows of data from TotalData
 head(CC.TotalData) ## ONLY complete cases of TotalData
@@ -17,27 +17,90 @@ head(CC.TotalData) ## ONLY complete cases of TotalData
 ## start by plotting scatterplot colour by denisty of points
 library(scatterplot3d)
 scatterplot3d(TotalData$X, TotalData$Y, TotalData$Z, color = TotalData$Flow.rate, pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", cex.symbols = 0.5, )
+```
 
+
+Now subsetting for Chlorophyll
+```{r}
 ##  Will subset Totaldata into each set of variables and try plotting this again
 ChlA0 <- CC.TotalData[CC.TotalData$Chlorophyll == "0",]  ##subsets CC.TotalData by Chlorophyll but only selects rows where Chlorophyll = 0
 head(ChlA0)
 tail(ChlA0)
 
-## 3D scatterplot, coloured by Flow.Rate BUT only points with 0 Chlorophyll
+ChlA4.3 <- CC.TotalData[CC.TotalData$Chlorophyll == "4.3",]  ##subsets CC.TotalData by Chlorophyll but only selects rows where Chlorophyll = 4.3
+head(ChlA4.3)
+tail(ChlA4.3)
+
+ChlA4.6 <- CC.TotalData[CC.TotalData$Chlorophyll == "4.6",]  ##subsets CC.TotalData by Chlorophyll but only selects rows where Chlorophyll = 4.6
+head(ChlA4.6)
+tail(ChlA4.6)
+
+ChlA6 <- CC.TotalData[CC.TotalData$Chlorophyll == "6.1",]  ##subsets CC.TotalData by Chlorophyll but only selects rows where Chlorophyll = 6.1
+head(ChlA6)
+tail(ChlA6)
+
+ChlA7 <- CC.TotalData[CC.TotalData$Chlorophyll == "7.6",]  ##subsets CC.TotalData by Chlorophyll but only selects rows where Chlorophyll = 7.6
+head(ChlA7)
+tail(ChlA7)
+
+ChlA13 <- CC.TotalData[CC.TotalData$Chlorophyll == "13.5",]  ##subsets CC.TotalData by Chlorophyll but only selects rows where Chlorophyll = 13.5
+head(ChlA13)
+tail(ChlA13)
+
+ChlA19 <- CC.TotalData[CC.TotalData$Chlorophyll == "19",]  ##subsets CC.TotalData by Chlorophyll but only selects rows where Chlorophyll = 19
+head(ChlA19)
+tail(ChlA19)
+
+
+## need to make a list of colour for each level of Flow rate
+levels(CC.TotalData$Flow.rate)
+spcol <- c("lightblue", "blue", "red", "darkblue", "black")
+
+
+## 3D scatterplot, colored by Flow.Rate BUT only points with 0 Chlorophyll
 library(scatterplot3d)
-scatterplot3d(ChlA0$X, ChlA0$Y, ChlA0$Z, color = ChlA0$Flow.rate, pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 0, colour = Flow Rate", cex.symbols = 0.5, )
+scatterplot3d(ChlA0$X, ChlA0$Y, ChlA0$Z, color = spcol[as.numeric(ChlA0$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 0 mg/L, colour = Flow Rate", cex.symbols = 0.5, )
+
+scatterplot3d(ChlA4.3$X, ChlA4.3$Y, ChlA4.3$Z, color = spcol[as.numeric(ChlA4.3$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 4.3 mg/L, colour = Flow Rate", cex.symbols = 0.5, )
+
+scatterplot3d(ChlA4.6$X, ChlA4.6$Y, ChlA4.6$Z, color = spcol[as.numeric(ChlA4.6$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 4.6 mg/L, colour = Flow Rate", cex.symbols = 0.5, )
+
+scatterplot3d(ChlA6$X, ChlA6$Y, ChlA6$Z, color = spcol[as.numeric(ChlA6$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 6.1 mg/L, colour = Flow Rate", cex.symbols = 0.5, )
+
+scatterplot3d(ChlA7$X, ChlA7$Y, ChlA7$Z, color = spcol[as.numeric(ChlA7$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 7.6 mg/L, colour = Flow Rate", cex.symbols = 0.5, )
+
+scatterplot3d(ChlA13$X, ChlA13$Y, ChlA13$Z, color = spcol[as.numeric(ChlA13$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 13.5 mg/L, colour = Flow Rate", cex.symbols = 0.5, )
+
+scatterplot3d(ChlA19$X, ChlA19$Y, ChlA19$Z, color = spcol[as.numeric(ChlA19$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Chlorophyll = 19 mg/L, colour = Flow Rate", cex.symbols = 0.5, )
 
 
+```
 
 
+```{r}
+## Examples from CRAN-r
+
+## 6 b) The rainbow colors from rainbow(201)
+rbc <- rainbow(201)
+Rrb <- t(col2rgb(rbc))
+rR <- scatterplot3d(Rrb, color = rbc, box = FALSE, angle = 24,
+xlim = c(-50, 300), ylim = c(-50, 300), zlim = c(-50, 300))
+cubedraw(rR)
+rR$points3d(Rrb, col = rbc, pch = 16)
+
+
+```
+
+Making plots for individual tracks and saving them]
+```{r}
 
 
 ## scatterplots for individuals (saves to working directory)
 library(scatterplot3d)
 for (i in 1:length(ind)){
-jpeg(filename=paste(ind[i], '.jpeg', sep = ''), width = 960, height = 960)
+##jpeg(filename=paste(ind[i], '.jpeg', sep = ''), width = 960, height = 960)
 scatterplot3d(TotalData$X[TotalData$D_V_T==ind[i]], TotalData$Y[TotalData$D_V_T==ind[i]], TotalData$Z[TotalData$D_V_T==ind[i]], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = ind[i], cex.symbols = 0.5)
-dev.off()
+##dev.off()
 }
 
 

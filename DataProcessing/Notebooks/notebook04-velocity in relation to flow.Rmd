@@ -6,7 +6,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Dec 6 2021).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Dec 14 2021).Rdata")
 
 
 ## Flow happens in the Y direction
@@ -155,7 +155,7 @@ plot(CC.TotalData$Light, CC.TotalData$heading/(2*pi)*360, xlab = "Light", ylab =
 
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (Dec 6 2021).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (Dec 14 2021).RData")
 
 
 ```
