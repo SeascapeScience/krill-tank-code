@@ -6,7 +6,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Dec 6 2021).Rda")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Dec 14 2021).Rda")
 
 head(TotalData) ## all TotalData rows
 head(CC.TotalData) ##only complete cases of TotalData 
@@ -14,6 +14,26 @@ head(CC.TotalData) ##only complete cases of TotalData
 ## Looking at vx, vy, vz, v and turn angles in xy, yz and total turn angles to calculate 3D turn velocities
 
 ## need to account for the fact that pivetting makes velocity different in the 3D rather than the 2 x 2D planes
+
+## same equation as turn angle but for velocity??
+
+
+
+lth <- dim(TotalData)[1]
+dx1 <- TotalData$dx[1:(lth-1)]
+dx2 <- TotalData$dx[2:lth]
+dy1 <- TotalData$dy[1:(lth-1)]
+dy2 <- TotalData$dy[2:lth]
+dz1 <- TotalData$dz[1:(lth-1)]
+dz2 <- TotalData$dz[2:lth]
+D <- (dx1*dx2)+(dy1*dy2)+(dz1*dz2)
+d1 <- sqrt(dx1^2 + dy1^2 +dz1^2)
+d2 <- sqrt(dx2^2 + dy2^2 +dz2^2)
+
+dd <- D/d1/d2
+hist(acos(dd)/pi*180)
+
+TotalData$turn.angle <- c(NA, acos(D/d1/d2))/pi*180
 
 
 ```
