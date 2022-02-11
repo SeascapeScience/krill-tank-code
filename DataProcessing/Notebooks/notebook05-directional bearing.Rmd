@@ -11,6 +11,9 @@ load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data 
 
 ## Need to use turn angles and a point of reference (e.g. inlet valve) to determine directional bearing
 
+
+library(circular)   ## loads the "circular" package
+
 head(TotalData)
 str(TotalData)
 ## We already have pitch and heading in TotalData
@@ -31,4 +34,180 @@ ggplot(TotalData,aes(x=Flow.rate, y=heading/(2*pi)*360, fill=Chlorophyll))+
                     labels=c("0", "4.3", "4.6", "6.1", "7.6", "13.5", "19"))+
   facet_grid(~Light, scales = "free_x", space = "free")
 ```
+```{r}
+library(circular)
+
+circ <- circular(CC.TotalData$turn.anglexy, type = c("angles"),
+          units = c("degrees"),
+          template = c("geographics"))
+
+## S3 method for class 'circular'
+as(circ, control.circular=list(), ...) ## NOT WORKING CURRENTLY
+
+## S3 method for class 'circular'
+is(circ)
+
+## S3 method for class 'circular'
+print(circ, info=TRUE)
+
+
+## S3 method for class 'circular'
+plot(circ, pch = 16, cex = 1, stack = TRUE,
+axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,
+bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
+col = NULL, tol = 0.04, uin = NULL,
+xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
+template = NULL, zero = NULL, rotation = NULL,
+main = NULL, sub=NULL, xlab = "", ylab = "",
+control.circle=circle.control())
+
+
+### need to subset data into variables to see if more manageable to make figures of
+
+## run dataframe subset code in notebook 06 to do this (SAVED IN RMD FILE)
+
+```
+
+
+Plotting each subset of chlorophyll data in the XY plane
+
+```{r}
+circ0 <- circular(ChlA0$turn.anglexy, type = c("angles"),
+          units = c("degrees"),
+          template = c("clock12"))
+
+##  jpeg(filename= "~/Post-doc/Graphs/Notebook 05 - directional bearing/Chla 0 turn.angle xy geographic.jpeg", units = "px", width = 480, height = 480)
+plot(circ0, pch = 16, cex = 1, stack = TRUE,
+axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,
+bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
+col = NULL, tol = 0.04, uin = NULL,
+xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
+template = NULL, zero = NULL, rotation = NULL,
+main = NULL, sub=NULL, xlab = "", ylab = "",
+control.circle=circle.control())
+
+circ4.3 <- circular(ChlA4.3$turn.anglexy, type = c("angles"),
+          units = c("degrees"),
+          template = c("clock12"))
+
+plot(circ4.3, pch = 16, cex = 1, stack = TRUE,
+axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,
+bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
+col = NULL, tol = 0.04, uin = NULL,
+xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
+template = NULL, zero = NULL, rotation = NULL,
+main = NULL, sub=NULL, xlab = "", ylab = "",
+control.circle=circle.control())
+
+circ4.6 <- circular(ChlA4.6$turn.anglexy, type = c("angles"),
+          units = c("degrees"),
+          template = c("clock12"))
+
+plot(circ4.6, pch = 16, cex = 1, stack = TRUE,
+axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,
+bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
+col = NULL, tol = 0.04, uin = NULL,
+xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
+template = NULL, zero = NULL, rotation = NULL,
+main = NULL, sub=NULL, xlab = "", ylab = "",
+control.circle=circle.control())
+
+circ6 <- circular(ChlA6$turn.anglexy, type = c("angles"),
+          units = c("degrees"),
+          template = c("clock12"))
+
+plot(circ6, pch = 16, cex = 1, stack = TRUE,
+axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,
+bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
+col = NULL, tol = 0.04, uin = NULL,
+xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
+template = NULL, zero = NULL, rotation = NULL,
+main = NULL, sub=NULL, xlab = "", ylab = "",
+control.circle=circle.control())
+
+circ7 <- circular(ChlA7$turn.anglexy, type = c("angles"),
+          units = c("degrees"),
+          template = c("clock12"))
+
+plot(circ7, pch = 16, cex = 1, stack = TRUE,
+axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,
+bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
+col = NULL, tol = 0.04, uin = NULL,
+xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
+template = NULL, zero = NULL, rotation = NULL,
+main = NULL, sub=NULL, xlab = "", ylab = "",
+control.circle=circle.control())
+
+circ13 <- circular(ChlA13$turn.anglexy, type = c("angles"),
+          units = c("degrees"),
+          template = c("clock12"))
+
+plot(circ13, pch = 16, cex = 1, stack = TRUE,
+axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,
+bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
+col = NULL, tol = 0.04, uin = NULL,
+xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
+template = NULL, zero = NULL, rotation = NULL,
+main = NULL, sub=NULL, xlab = "", ylab = "",
+control.circle=circle.control())
+
+circ19 <- circular(ChlA19$turn.anglexy, type = c("angles"),
+          units = c("degrees"),
+          template = c("clock12"))
+
+plot(circ19, pch = 16, cex = 1, stack = TRUE,
+axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,
+bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
+col = NULL, tol = 0.04, uin = NULL,
+xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
+template = NULL, zero = NULL, rotation = NULL,
+main = NULL, sub=NULL, xlab = "", ylab = "",
+control.circle=circle.control())
+
+```
+
+
+
+
+```{r}
+
+## how do we account for krill headings while drifting backwards?
+
+save.image("~/Post-doc/Data/Total Merged Data File (Feb 11 2022).RData")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

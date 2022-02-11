@@ -121,6 +121,8 @@ scatterplot3d(f5$X, f5$Y, f5$Z, color = spcol1[as.numeric(f5$Chlorophyll)], pch 
 scatterplot3d(f8$X, f8$Y, f8$Z, color = spcol1[as.numeric(f8$Chlorophyll)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Flow rate = 8.9 cm^3/s, colour = Chlorophyll", cex.symbols = 0.5, angle = 55)
 
 ```
+
+
 Next is Gunao and Light
 
 ```{r}

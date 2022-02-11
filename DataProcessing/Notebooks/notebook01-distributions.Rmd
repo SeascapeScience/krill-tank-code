@@ -205,7 +205,7 @@ print(freq)
 prob <- prop.table(freq) ##Relative Frequency Table
 print (prob)
 
- ##starting to plot the dip test and skew in the variables
+##starting to plot the dip test and skew in the variables
 plot(tab_AGG$Flow.Rate, tab_AGG$dip.test, xlab = "Flow Rate (cm/s)", ylab = "Dip Test (p.value)")
 plot(tab_AGG$Flow.Rate, tab_AGG$skew, xlab = "Flow Rate (cm/s)", ylab = "Skew Test (p.value)")
 plot(tab_AGG$Chlorophyll, tab_AGG$dip.test, xlab = "Chlorophyll (mg/L)", ylab = "Dip Test (p.value)")

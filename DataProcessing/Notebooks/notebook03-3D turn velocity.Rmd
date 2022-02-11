@@ -8,8 +8,8 @@ output: html_notebook
 rm(list=ls(all=TRUE))
 load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Dec 14 2021).Rda")
 
-head(TotalData) ## all TotalData rows
-head(CC.TotalData) ##only complete cases of TotalData 
+head(TotalData) ## all Total Data rows
+head(CC.TotalData) ##only complete cases of Total Data 
 
 ## Looking at vx, vy, vz, v and turn angles in xy, yz and total turn angles to calculate 3D turn velocities
 
