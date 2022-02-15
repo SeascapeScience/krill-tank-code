@@ -173,41 +173,10 @@ control.circle=circle.control())
 
 ## how do we account for krill headings while drifting backwards?
 
-save.image("~/Post-doc/Data/Total Merged Data File (Feb 11 2022).RData")
+rm(ldf)
+
+save.image("~/Post-doc/Data/Total Merged Data File (Feb 15 2022).RData")
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
