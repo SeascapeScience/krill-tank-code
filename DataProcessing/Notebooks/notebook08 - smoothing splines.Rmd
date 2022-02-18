@@ -1,0 +1,34 @@
+title: "Notebook08 - smoothing splines"
+output: html_notebook
+---
+
+
+```{r}
+rm(list=ls(all=TRUE))
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Dec 14 2021).Rdata")
+
+
+## remove NaNs
+## moving average didn't show a natural trajectory 
+## smoothing spline function instead
+
+## load in the splines packages
+library(splines)
+library(splines2)
+```
+
+
+Now lets set up the data
+
+```{r}
+
+
+
+
+
+
+```
+
+
+
+

@@ -177,12 +177,7 @@ ggplot(TotalData,aes(x=Flow.rate, y=turn.angle, fill=Chlorophyll))+
 
 ```
 
-
-
-
-
-
-Starting to look at bimodality in the variables by merging the TotalData frame with the "tab" table
+Starting to look at bi-modality in the variables by merging the TotalData frame with the "tab" table
 ```{r}
 ##aggregating Complete cases of TotalData so we can merge it with tab data
 

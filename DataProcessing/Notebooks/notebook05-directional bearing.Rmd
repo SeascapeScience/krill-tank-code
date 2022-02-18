@@ -74,21 +74,22 @@ Plotting each subset of chlorophyll data in the XY plane
 ```{r}
 circ0 <- circular(ChlA0$turn.anglexy, type = c("angles"),
           units = c("degrees"),
-          template = c("clock12"))
+          template = c("geographic"))
 
-##  jpeg(filename= "~/Post-doc/Graphs/Notebook 05 - directional bearing/Chla 0 turn.angle xy geographic.jpeg", units = "px", width = 480, height = 480)
 plot(circ0, pch = 16, cex = 1, stack = TRUE,
 axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,
 bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
 col = NULL, tol = 0.04, uin = NULL,
 xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
 template = NULL, zero = NULL, rotation = NULL,
-main = NULL, sub=NULL, xlab = "", ylab = "",
+main = "Chlorophyll 0mg/L", sub="Control Conditions", xlab = "", ylab = "",
 control.circle=circle.control())
+
+##  jpeg(filename= "~/Post-doc/Graphs/Notebook 05 - directional bearing/Chla 0 turn.angle xy geographic.jpeg", units = "px", width = 480, height = 480)
 
 circ4.3 <- circular(ChlA4.3$turn.anglexy, type = c("angles"),
           units = c("degrees"),
-          template = c("clock12"))
+          template = c("geographic"))
 
 plot(circ4.3, pch = 16, cex = 1, stack = TRUE,
 axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,
@@ -96,12 +97,12 @@ bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
 col = NULL, tol = 0.04, uin = NULL,
 xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
 template = NULL, zero = NULL, rotation = NULL,
-main = NULL, sub=NULL, xlab = "", ylab = "",
+main = " Chlorophyll 4.3mg/L", sub="Chlorophyll Conditions", xlab = "", ylab = "",
 control.circle=circle.control())
 
 circ4.6 <- circular(ChlA4.6$turn.anglexy, type = c("angles"),
           units = c("degrees"),
-          template = c("clock12"))
+          template = c("geographic"))
 
 plot(circ4.6, pch = 16, cex = 1, stack = TRUE,
 axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,
@@ -109,12 +110,12 @@ bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
 col = NULL, tol = 0.04, uin = NULL,
 xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
 template = NULL, zero = NULL, rotation = NULL,
-main = NULL, sub=NULL, xlab = "", ylab = "",
+main = "Chlorophyll 4.6mg/L", sub="Chlorophyll Conditions", xlab = "", ylab = "",
 control.circle=circle.control())
 
 circ6 <- circular(ChlA6$turn.anglexy, type = c("angles"),
           units = c("degrees"),
-          template = c("clock12"))
+          template = c("geographic"))
 
 plot(circ6, pch = 16, cex = 1, stack = TRUE,
 axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,
@@ -122,12 +123,12 @@ bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
 col = NULL, tol = 0.04, uin = NULL,
 xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
 template = NULL, zero = NULL, rotation = NULL,
-main = NULL, sub=NULL, xlab = "", ylab = "",
+main = "Chlorophyll 6.1mg/L", sub="Chlorophyll Conditions", xlab = "", ylab = "",
 control.circle=circle.control())
 
 circ7 <- circular(ChlA7$turn.anglexy, type = c("angles"),
           units = c("degrees"),
-          template = c("clock12"))
+          template = c("geographic"))
 
 plot(circ7, pch = 16, cex = 1, stack = TRUE,
 axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,
@@ -135,12 +136,12 @@ bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
 col = NULL, tol = 0.04, uin = NULL,
 xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
 template = NULL, zero = NULL, rotation = NULL,
-main = NULL, sub=NULL, xlab = "", ylab = "",
+main = "Chlorophyll 7.3mg/L", sub="Chlorophyll Conditions", xlab = "", ylab = "",
 control.circle=circle.control())
 
 circ13 <- circular(ChlA13$turn.anglexy, type = c("angles"),
           units = c("degrees"),
-          template = c("clock12"))
+          template = c("geographic"))
 
 plot(circ13, pch = 16, cex = 1, stack = TRUE,
 axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,
@@ -148,12 +149,12 @@ bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
 col = NULL, tol = 0.04, uin = NULL,
 xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
 template = NULL, zero = NULL, rotation = NULL,
-main = NULL, sub=NULL, xlab = "", ylab = "",
+main = "Chorophyll 13.5mg/L", sub="Chlorophyll Conditions", xlab = "", ylab = "",
 control.circle=circle.control())
 
 circ19 <- circular(ChlA19$turn.anglexy, type = c("angles"),
           units = c("degrees"),
-          template = c("clock12"))
+          template = c("geographic"))
 
 plot(circ19, pch = 16, cex = 1, stack = TRUE,
 axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,
@@ -161,12 +162,27 @@ bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
 col = NULL, tol = 0.04, uin = NULL,
 xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
 template = NULL, zero = NULL, rotation = NULL,
-main = NULL, sub=NULL, xlab = "", ylab = "",
+main = "Chlorophyll 19.5mg/L", sub="Chlorophyll Conditions", xlab = "", ylab = "",
 control.circle=circle.control())
 
 ```
 
+Do the same again but for Flow
+```{r}
 
+```
+
+And for Light
+```{r}
+
+```
+
+And for Guano
+```{r}
+
+```
+
+Save the environment and remove unneeded dataframes, lists, etc
 
 
 ```{r}
