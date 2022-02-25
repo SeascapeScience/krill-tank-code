@@ -29,6 +29,13 @@ CC.TotalData$Chlorophyll <- as.factor(CC.TotalData$Chlorophyll)
 CC.TotalData$Guano <- as.factor(CC.TotalData$Guano)
 CC.TotalData$Light <- as.factor(CC.TotalData$Light)
 
+```
+
+```{r}
+
+
+
+
 
 ```
 

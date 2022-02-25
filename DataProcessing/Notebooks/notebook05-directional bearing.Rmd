@@ -3,7 +3,6 @@ title: "Directional Bearing"
 output: html_notebook
 ---
 
-
 ```{r}
 
 rm(list=ls(all=TRUE))
