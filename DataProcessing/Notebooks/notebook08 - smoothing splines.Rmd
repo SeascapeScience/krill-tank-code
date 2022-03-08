@@ -21,14 +21,12 @@ library(splines2)
 Now lets set up the data
 
 ```{r}
-
 head(CC.TotalData)
 str(CC.TotalData)
 CC.TotalData$Flow.rate <- as.factor(CC.TotalData$Flow.rate)
 CC.TotalData$Chlorophyll <- as.factor(CC.TotalData$Chlorophyll)
 CC.TotalData$Guano <- as.factor(CC.TotalData$Guano)
 CC.TotalData$Light <- as.factor(CC.TotalData$Light)
-
 ```
 
 ```{r}

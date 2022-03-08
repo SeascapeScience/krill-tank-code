@@ -217,6 +217,13 @@ plot(CC.TotalData$turn.angle[CC.TotalData$D_V_T==ind[i]], log10(CC.TotalData$v[C
 dev.off()
 }
 ```
+```{r}
+hist(CC.TotalData$turn.angle, breaks = 100)
+
+
+
+```
+
 
 
 ```{r}
