@@ -204,21 +204,61 @@ scatterplot3d(TotalData$X[TotalData$D_V_T==ind[i]], TotalData$Y[TotalData$D_V_T=
 Now to plot each variable by density of points (heatmap style) in 2D and 3D
 
 ```{r}
-#### plotting our data in 2D
+#### plotting our data in 2D from a top down perspective
 
 ############################### Flow Rate ##########################################################
 str(CC.TotalData)
 library(ggplot2)
 brks <- seq(-2,2,0.01)
-lbls <- brks[-0.1]-0.005
+lbls <- brks[-0.01]-0.005
 gg.df <- aggregate(Z ~ cut(X, brks, lbls) + cut(Y, brks, lbls) + CC.TotalData$Flow.rate, CC.TotalData, FUN=mean)
 names(gg.df)[1:3] <- c("X", "Y", "Flow.rate")
 gg.df$X <- as.numeric(as.character(gg.df$X))
 gg.df$Y <- as.numeric(as.character(gg.df$Y))
-ggplot(gg.df, aes(x=X, y=Y, alpha=Z, fill=Flow.rate)) + geom_raster() + coord_fixed()
+p <- ggplot(gg.df, aes(x=X, y=Y, alpha=Z, fill=Flow.rate)) + geom_raster() + coord_fixed()
+p + scale_fill_brewer(palette = "YlOrRd")
 
-### still working on this
-##testing
+
+############################### Chlorophyll ##########################################################
+str(CC.TotalData)
+library(ggplot2)
+brks <- seq(-2,2,0.01)
+lbls <- brks[-0.01]-0.005
+gg.df <- aggregate(Z ~ cut(X, brks, lbls) + cut(Y, brks, lbls) + CC.TotalData$Chlorophyll, CC.TotalData, FUN=mean)
+names(gg.df)[1:3] <- c("X", "Y", "Chlorophyll")
+gg.df$X <- as.numeric(as.character(gg.df$X))
+gg.df$Y <- as.numeric(as.character(gg.df$Y))
+p <- ggplot(gg.df, aes(x=X, y=Y, alpha=Z, fill=Chlorophyll)) + geom_raster() + coord_fixed()
+p + scale_fill_brewer(palette = "YlGn")
+
+
+
+
+############################### Guano ##########################################################
+str(CC.TotalData)
+library(ggplot2)
+brks <- seq(-2,2,0.01)
+lbls <- brks[-0.01]-0.005
+gg.df <- aggregate(Z ~ cut(X, brks, lbls) + cut(Y, brks, lbls) + CC.TotalData$Guano, CC.TotalData, FUN=mean)
+names(gg.df)[1:3] <- c("X", "Y", "Guano")
+gg.df$X <- as.numeric(as.character(gg.df$X))
+gg.df$Y <- as.numeric(as.character(gg.df$Y))
+p <- ggplot(gg.df, aes(x=X, y=Y, alpha=Z, fill=Guano)) + geom_raster() + coord_fixed()
+p + scale_fill_brewer(palette = "Reds")
+
+
+
+############################## Light ##########################################################
+str(CC.TotalData)
+library(ggplot2)
+brks <- seq(-2,2,0.01)
+lbls <- brks[-0.01]-0.005
+gg.df <- aggregate(Z ~ cut(X, brks, lbls) + cut(Y, brks, lbls) + CC.TotalData$Light, CC.TotalData, FUN=mean)
+names(gg.df)[1:3] <- c("X", "Y", "Light")
+gg.df$X <- as.numeric(as.character(gg.df$X))
+gg.df$Y <- as.numeric(as.character(gg.df$Y))
+p <- ggplot(gg.df, aes(x=X, y=Y, alpha=Z, fill=Light)) + geom_raster() + coord_fixed()
+p + scale_fill_brewer(palette = "Greys")
 
 
 ```

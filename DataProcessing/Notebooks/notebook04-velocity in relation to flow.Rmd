@@ -51,12 +51,12 @@ dev.off()
 library(ggplot2)
 
 ## plot Flow Rate by Vel.flow filled by Chla faceted by light
-ggplot(CC.TotalData,aes(x=Flow.rate, y=vel.flow, fill=Chlorophyll))+
+ggplot(CC.TotalData,aes(x=Flow.rate, y=log10(vel.flow), fill=Chlorophyll))+
   geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
   theme(axis.text=element_text(color="black"))+
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
   theme(panel.grid.minor=element_blank())+
-  labs(size= "",x = "Flow Rate (cm/s)", y = "Velocity in relation to flow (cm/s)", title = "Light") +
+  labs(size= "",x = "Flow Rate (cm/s)", y = "Velocity in relation to flow (Log transformed)(cm/s)", title = "Light") +
   scale_fill_manual(values=c("greenyellow", "yellowgreen","lightgreen", "green", "green3", "green4", "darkgreen"),name = "Chlorophyll (mg/L)",
                     labels=c("0", "4.3", "4.6", "6.1", "7.6", "13.5", "19"))+
   facet_grid(~Light, scales = "free_x", space = "free")
@@ -67,7 +67,7 @@ ggplot(CC.TotalData,aes(x=Chlorophyll, y=vel.flow, fill=Flow.rate))+
   theme(axis.text=element_text(color="black"))+
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
   theme(panel.grid.minor=element_blank())+
-  labs(size= "",x = "Chlorophyll (mg/L)", y = "Velocity in realtion to flow (cm/s)", title = "Light") +
+  labs(size= "",x = "Chlorophyll (mg/L)", y = "Velocity in relation to flow (cm/s)", title = "Light") +
   scale_fill_manual(values=c("white", "beige", "yellow", "orange", "red"), name = "Flow Rate (cm/s)",
                     labels=c("0", "0.6", "3", "5.9", "8"))+
   facet_grid(~Light, scales = "free_x", space = "free")
