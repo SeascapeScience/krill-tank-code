@@ -206,9 +206,11 @@ Now to plot each variable by density of points (heatmap style) in 2D and 3D
 ```{r}
 #### plotting our data in 2D from a top down perspective
 
-############################### Flow Rate ##########################################################
 str(CC.TotalData)
 library(ggplot2)
+
+
+############################### Flow Rate ##########################################################
 brks <- seq(-2,2,0.01)
 lbls <- brks[-0.01]-0.005
 gg.df <- aggregate(Z ~ cut(X, brks, lbls) + cut(Y, brks, lbls) + CC.TotalData$Flow.rate, CC.TotalData, FUN=mean)
@@ -220,8 +222,6 @@ p + scale_fill_brewer(palette = "YlOrRd")
 
 
 ############################### Chlorophyll ##########################################################
-str(CC.TotalData)
-library(ggplot2)
 brks <- seq(-2,2,0.01)
 lbls <- brks[-0.01]-0.005
 gg.df <- aggregate(Z ~ cut(X, brks, lbls) + cut(Y, brks, lbls) + CC.TotalData$Chlorophyll, CC.TotalData, FUN=mean)
@@ -232,11 +232,7 @@ p <- ggplot(gg.df, aes(x=X, y=Y, alpha=Z, fill=Chlorophyll)) + geom_raster() + c
 p + scale_fill_brewer(palette = "YlGn")
 
 
-
-
 ############################### Guano ##########################################################
-str(CC.TotalData)
-library(ggplot2)
 brks <- seq(-2,2,0.01)
 lbls <- brks[-0.01]-0.005
 gg.df <- aggregate(Z ~ cut(X, brks, lbls) + cut(Y, brks, lbls) + CC.TotalData$Guano, CC.TotalData, FUN=mean)
@@ -246,11 +242,7 @@ gg.df$Y <- as.numeric(as.character(gg.df$Y))
 p <- ggplot(gg.df, aes(x=X, y=Y, alpha=Z, fill=Guano)) + geom_raster() + coord_fixed()
 p + scale_fill_brewer(palette = "Reds")
 
-
-
 ############################## Light ##########################################################
-str(CC.TotalData)
-library(ggplot2)
 brks <- seq(-2,2,0.01)
 lbls <- brks[-0.01]-0.005
 gg.df <- aggregate(Z ~ cut(X, brks, lbls) + cut(Y, brks, lbls) + CC.TotalData$Light, CC.TotalData, FUN=mean)
@@ -262,6 +254,56 @@ p + scale_fill_brewer(palette = "Greys")
 
 
 ```
+```{r}
+#### plotting our data in 2D from a side on perspective
+
+############################### Flow Rate ##########################################################
+brks <- seq(-2,2,0.01)
+lbls <- brks[-0.01]-0.005
+gg.df <- aggregate(X ~ cut(Y, brks, lbls) + cut(Z, brks, lbls) + CC.TotalData$Flow.rate, CC.TotalData, FUN=mean)
+names(gg.df)[1:3] <- c("Y", "Z", "Flow.rate")
+gg.df$Y <- as.numeric(as.character(gg.df$Y))
+gg.df$Z <- as.numeric(as.character(gg.df$Z))
+p <- ggplot(gg.df, aes(x=Y, y=Z, alpha=X, fill=Flow.rate)) + geom_raster() + coord_fixed()
+p + scale_fill_brewer(palette = "YlOrRd")
+
+
+############################### Chlorophyll ##########################################################
+brks <- seq(-2,2,0.01)
+lbls <- brks[-0.01]-0.005
+gg.df <- aggregate(X ~ cut(Y, brks, lbls) + cut(Z, brks, lbls) + CC.TotalData$Chlorophyll, CC.TotalData, FUN=mean)
+names(gg.df)[1:3] <- c("Y", "Z", "Chlorophyll")
+gg.df$Y <- as.numeric(as.character(gg.df$Y))
+gg.df$Z <- as.numeric(as.character(gg.df$Z))
+p <- ggplot(gg.df, aes(x=Y, y=Z, alpha=Z, fill=Chlorophyll)) + geom_raster() + coord_fixed()
+p + scale_fill_brewer(palette = "YlGn")
+
+
+############################### Guano ##########################################################
+brks <- seq(-2,2,0.01)
+lbls <- brks[-0.01]-0.005
+gg.df <- aggregate(X ~ cut(Y, brks, lbls) + cut(Z, brks, lbls) + CC.TotalData$Guano, CC.TotalData, FUN=mean)
+names(gg.df)[1:3] <- c("Y", "Z", "Guano")
+gg.df$Y <- as.numeric(as.character(gg.df$Y))
+gg.df$Z <- as.numeric(as.character(gg.df$Z))
+p <- ggplot(gg.df, aes(x=Y, y=Z, alpha=X, fill=Guano)) + geom_raster() + coord_fixed()
+p + scale_fill_brewer(palette = "Reds")
+
+
+############################## Light ##########################################################
+brks <- seq(-2,2,0.01)
+lbls <- brks[-0.01]-0.005
+gg.df <- aggregate(X ~ cut(Y, brks, lbls) + cut(Z, brks, lbls) + CC.TotalData$Light, CC.TotalData, FUN=mean)
+names(gg.df)[1:3] <- c("Y", "Z", "Light")
+gg.df$Y <- as.numeric(as.character(gg.df$Y))
+gg.df$Z <- as.numeric(as.character(gg.df$Z))
+p <- ggplot(gg.df, aes(x=Y, y=Z, alpha=X, fill=Light)) + geom_raster() + coord_fixed()
+p + scale_fill_brewer(palette = "Greys")
+
+
+```
+
+
 
 Finally save the image
 
