@@ -15,6 +15,19 @@ load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data 
 ## load in the splines packages
 library(splines)
 library(splines2)
+
+## look at package library (atlastools) from GitHub of atlastools: https://github.com/pratikunterwegs/atlastools/blob/master/R/fun_smooth_data.R
+## also this article on data processing: https://besjournals.onlinelibrary.wiley.com/doi/10.1111/1365-2656.13610
+### need devtools already installed BEFORE proceeding with code
+
+
+devtools::install_github("pratikunterwegs/atlastools")
+library(atlastools)
+
+## need to add frame number into data set to be able to use this
+
+smooth.CC<- atl_median_smooth( data = CC.TotalData, x = "X", y = "Y", time = "Frame", moving_window = 5)
+
 ```
 
 
