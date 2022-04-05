@@ -5,7 +5,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Dec 14 2021).Rda")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (April 5 2022).Rda")
 
 head(TotalData) ## all Total Data rows
 head(CC.TotalData) ##only complete cases of Total Data 
@@ -60,8 +60,8 @@ list2 <- ((acos(dd)/pi)*180)
 list3 <- (v1+v2)/2
 list4 <- c(l, list2)
 list5 <- c(l, list3)
-TotalData$vel.turn.angle <- list4  ##should be derivative of each other
-TotalData$vel <- list5
+CC.TotalData$vel.turn.angle <- list4  ##should be derivative of each other
+CC.TotalData$vel <- list5   
 
 ## can we get the derivative of the theta.angle
 

@@ -7,7 +7,7 @@ Plot and fit distributions of variables
 
 ```{r}
 
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Data Merged File (Dec 14 2021).Rda")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Data Merged File (April 5 2022).Rda")
 
 hist(log10(TotalData$v),
      xlab = "Velocity (Log^10 mm/s)")
@@ -227,7 +227,7 @@ hist(CC.TotalData$turn.angle, breaks = 100)
 
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (Dec 14 2021).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (April 5 2022).RData")
 
 ```
 

@@ -6,7 +6,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Dec 14 2021).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (April 5 2022).Rdata")
 
 head(TotalData) ## all rows of data from TotalData
 head(CC.TotalData) ## ONLY complete cases of TotalData
@@ -308,6 +308,6 @@ p + scale_fill_brewer(palette = "Greys")
 Finally save the image
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (Dec 15 2021).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (April 5 2022).RData")
 
 ```
