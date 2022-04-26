@@ -217,22 +217,81 @@ pre code {
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxucm0obGlzdD1scyhhbGw9VFJVRSkpXG5sb2FkKFxcQzpcXFxcVXNlcnNcXFxcbmljb2xlaDNcXFxcRG9jdW1lbnRzXFxcXFBvc3QtZG9jXFxcXERhdGFcXFxcVG90YWwgTWVyZ2VkIERhdGEgRmlsZS5SZGF0YVxcKVxuXG5oZWFkKFRvdGFsRGF0YSkgIyMgYWxsIHJvd3Mgb2YgZGF0YSBmcm9tIFRvdGFsRGF0YVxuaGVhZChDQy5Ub3RhbERhdGEpICMjIE9OTFkgY29tcGxldGUgY2FzZXMgb2YgVG90YWxEYXRhXG5cblxuYGBgXG5gYGBcbmBgYCJ9 -->
-<pre class="r"><code>```r
-```r
-rm(list=ls(all=TRUE))
-load(\C:\\Users\\nicoleh3\\Documents\\Post-doc\\Data\\Total Merged Data File.Rdata\)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucm0obGlzdD1scyhhbGw9VFJVRSkpXG5sb2FkKFwiQzpcXFxcVXNlcnNcXFxcTmljb2xlIEhlbGxlc3NleVxcXFxEb2N1bWVudHNcXFxcUG9zdC1kb2NcXFxcRGF0YVxcXFxUb3RhbCBNZXJnZWQgRGF0YSBGaWxlIChBcHJpbCAxMiAyMDIyKS5SZGF0YVwiKVxuXG5oZWFkKFRvdGFsRGF0YSkgIyMgYWxsIHJvd3Mgb2YgZGF0YSBmcm9tIFRvdGFsRGF0YVxuaGVhZChDQy5Ub3RhbERhdGEpICMjIE9OTFkgY29tcGxldGUgY2FzZXMgb2YgVG90YWxEYXRhXG5cblxubGlicmFyeShnZ3Bsb3QyKVxubGlicmFyeShHR2FsbHkpXG5cbmdncGFpcnMoQ0MuVG90YWxEYXRhWzYwMDAwOjEyMDAwMCxdLCBjb2x1bW5zID0gYygyMSwgMjIsIDIzLCAyNiwgMjcsIDI4KSlcblxuXG5nZ3Bsb3QoQ0MuVG90YWxEYXRhWzEwMDAwOjIwMDAwLF0sIGFlcyhhYnMocGl0Y2gpLCBhYnModHVybi5hbmdsZS05MCkpKSArICAgIyMjIHdlaXJkIHBhdHRlcm4gPz9cbiAgZ2VvbV9wb2ludChhbHBoYSA9IDAuNylcblxuZ2dwbG90KENDLlRvdGFsRGF0YVsxMDAwMDoyMDAwMCxdLCBhZXMoaGVhZGluZywgdHVybi5hbmdsZSkpICsgICAgICMjIyBubyBwYXR0ZXJuIChnb29kIDopIClcbiAgZ2VvbV9wb2ludChhbHBoYSA9IDAuNylcblxuXG5nZ3Bsb3QoQ0MuVG90YWxEYXRhWzEwMDAwOjIwMDAwLF0sIGFlcyh2ZWwudHVybi5hbmdsZSwgdHVybi5hbmdsZSkpICsgICAgICAjIyMjIHBhdHRlcm4sIGxpbmVhciByZWdyZXNzaW9uPz9cbiAgZ2VvbV9wb2ludChhbHBoYSA9IDAuNylcblxuYGBgIn0= -->
+<pre class="r"><code>rm(list=ls(all=TRUE))
+load(&quot;C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (April 12 2022).Rdata&quot;)
 
 head(TotalData) ## all rows of data from TotalData
 head(CC.TotalData) ## ONLY complete cases of TotalData
+
+
+library(ggplot2)
+library(GGally)
+
+ggpairs(CC.TotalData[60000:120000,], columns = c(21, 22, 23, 26, 27, 28))
+
+
+ggplot(CC.TotalData[10000:20000,], aes(abs(pitch), abs(turn.angle-90))) +   ### weird pattern ??
+  geom_point(alpha = 0.7)
+
+ggplot(CC.TotalData[10000:20000,], aes(heading, turn.angle)) +     ### no pattern (good :) )
+  geom_point(alpha = 0.7)
+
+
+ggplot(CC.TotalData[10000:20000,], aes(vel.turn.angle, turn.angle)) +      #### pattern, linear regression??
+  geom_point(alpha = 0.7)
 </code></pre>
-<pre><code></code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Auto correlation</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjIyMjIyMjIyMjIyMjI1xuXG4jIyMjIGF1dG8gY29ycmVsYXRpb24gdnMgdmFsdWVzIHZzIGxhZygyKSBldGNcblxubGlicmFyeSh0c2VyaWVzKVxuIyMjIGFjZiAtIGF1dG8gY29ycmVsYXRpb24gZnVuY3Rpb25cblxucGFyKG1hcj0gYygyLDIsNCwyKSlcblxuYWNmKENDLlRvdGFsRGF0YSR0dXJuLmFuZ2xlW3NlcSgxLDEwMDAwLDMwKV0pICAjI3NpbnVzb2lkYWwgKHN0YXRpc3RpY2FsIHJlYXNvbiBmb3IgaXQpXG5cbmFjZihDQy5Ub3RhbERhdGEkdmVsLnR1cm4uYW5nbGVbc2VxKDEsMTAwMDAsMzApXSkgICAjI3NpbnVzb2lkYWwgKHN0YXRpc3RpY2FsIHJlYXNvbiBmb3IgaXQpXG5cbmFjZihDQy5Ub3RhbERhdGEkdmVsLmZsb3dbc2VxKDEsMTAwMDAsMzApXSlcblxuYWNmKENDLlRvdGFsRGF0YSRwaXRjaFtzZXEoMSwxMDAwMCwzMCldKVxuXG5hY2YoQ0MuVG90YWxEYXRhJGhlYWRpbmdbc2VxKDEsMTAwMDAsMzApXSlcblxuYWNmKENDLlRvdGFsRGF0YSR2W3NlcSgxLDEwMDAwLDMwKV0pXG5cbmFjZihDQy5Ub3RhbERhdGEkZFtzZXEoMSwxMDAwMCwzMCldKVxuXG4jIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjI1xuXG5hY2YoQ0MuVG90YWxEYXRhJHZ4W3NlcSgxLDEwMDAwLDMwKV0pICAgIyMjIyBuZWVkIHRvIGxvb2sgaW50byB0aGlzIG1vcmVcblxuYWNmKENDLlRvdGFsRGF0YSR2eVtzZXEoMSwxMDAwMCwzMCldKSBcblxuYWNmKENDLlRvdGFsRGF0YSR2eltzZXEoMSwxMDAwMCwzMCldKSBcblxuYWNmKENDLlRvdGFsRGF0YSRkeFtzZXEoMSwxMDAwMCwzMCldKSAgICAjIyMjIG5lZWQgdG8gbG9vayBpbnRvIHRoaXMgbW9yZVxuXG5hY2YoQ0MuVG90YWxEYXRhJGR5W3NlcSgxLDEwMDAwLDMwKV0pIFxuXG5hY2YoQ0MuVG90YWxEYXRhJGR6W3NlcSgxLDEwMDAwLDMwKV0pIFxuXG4jIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjI1xuYGBgIn0= -->
+<pre class="r"><code>################
+
+#### auto correlation vs values vs lag(2) etc
+
+library(tseries)
+### acf - auto correlation function
+
+par(mar= c(2,2,4,2))
+
+acf(CC.TotalData$turn.angle[seq(1,10000,30)])  ##sinusoidal (statistical reason for it)
+
+acf(CC.TotalData$vel.turn.angle[seq(1,10000,30)])   ##sinusoidal (statistical reason for it)
+
+acf(CC.TotalData$vel.flow[seq(1,10000,30)])
+
+acf(CC.TotalData$pitch[seq(1,10000,30)])
+
+acf(CC.TotalData$heading[seq(1,10000,30)])
+
+acf(CC.TotalData$v[seq(1,10000,30)])
+
+acf(CC.TotalData$d[seq(1,10000,30)])
+
+####################################################################################################################
+
+acf(CC.TotalData$vx[seq(1,10000,30)])   #### need to look into this more
+
+acf(CC.TotalData$vy[seq(1,10000,30)]) 
+
+acf(CC.TotalData$vz[seq(1,10000,30)]) 
+
+acf(CC.TotalData$dx[seq(1,10000,30)])    #### need to look into this more
+
+acf(CC.TotalData$dy[seq(1,10000,30)]) 
+
+acf(CC.TotalData$dz[seq(1,10000,30)]) 
+
+####################################################################################################################</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkF1dG9jb3JyZWxhdGlvbiBhbmQgQ3Jvc3MtY29ycmVsYXRpb24iDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQoNCmBgYHtyfQ0Kcm0obGlzdD1scyhhbGw9VFJVRSkpDQpsb2FkKCJDOlxcVXNlcnNcXE5pY29sZSBIZWxsZXNzZXlcXERvY3VtZW50c1xcUG9zdC1kb2NcXERhdGFcXFRvdGFsIE1lcmdlZCBEYXRhIEZpbGUgKEFwcmlsIDEyIDIwMjIpLlJkYXRhIikNCg0KaGVhZChUb3RhbERhdGEpICMjIGFsbCByb3dzIG9mIGRhdGEgZnJvbSBUb3RhbERhdGENCmhlYWQoQ0MuVG90YWxEYXRhKSAjIyBPTkxZIGNvbXBsZXRlIGNhc2VzIG9mIFRvdGFsRGF0YQ0KDQoNCg0KYGBgDQoNCg0K</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkF1dG9jb3JyZWxhdGlvbiBhbmQgQ3Jvc3MtY29ycmVsYXRpb24iDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQoNCmBgYHtyfQ0Kcm0obGlzdD1scyhhbGw9VFJVRSkpDQpsb2FkKCJDOlxcVXNlcnNcXE5pY29sZSBIZWxsZXNzZXlcXERvY3VtZW50c1xcUG9zdC1kb2NcXERhdGFcXFRvdGFsIE1lcmdlZCBEYXRhIEZpbGUgKEFwcmlsIDEyIDIwMjIpLlJkYXRhIikNCg0KaGVhZChUb3RhbERhdGEpICMjIGFsbCByb3dzIG9mIGRhdGEgZnJvbSBUb3RhbERhdGENCmhlYWQoQ0MuVG90YWxEYXRhKSAjIyBPTkxZIGNvbXBsZXRlIGNhc2VzIG9mIFRvdGFsRGF0YQ0KDQoNCmxpYnJhcnkoZ2dwbG90MikNCmxpYnJhcnkoR0dhbGx5KQ0KDQpnZ3BhaXJzKENDLlRvdGFsRGF0YVs2MDAwMDoxMjAwMDAsXSwgY29sdW1ucyA9IGMoMjEsIDIyLCAyMywgMjYsIDI3LCAyOCkpDQoNCg0KZ2dwbG90KENDLlRvdGFsRGF0YVsxMDAwMDoyMDAwMCxdLCBhZXMoYWJzKHBpdGNoKSwgYWJzKHR1cm4uYW5nbGUtOTApKSkgKyAgICMjIyB3ZWlyZCBwYXR0ZXJuID8/DQogIGdlb21fcG9pbnQoYWxwaGEgPSAwLjcpDQoNCmdncGxvdChDQy5Ub3RhbERhdGFbMTAwMDA6MjAwMDAsXSwgYWVzKGhlYWRpbmcsIHR1cm4uYW5nbGUpKSArICAgICAjIyMgbm8gcGF0dGVybiAoZ29vZCA6KSApDQogIGdlb21fcG9pbnQoYWxwaGEgPSAwLjcpDQoNCg0KZ2dwbG90KENDLlRvdGFsRGF0YVsxMDAwMDoyMDAwMCxdLCBhZXModmVsLnR1cm4uYW5nbGUsIHR1cm4uYW5nbGUpKSArICAgICAgIyMjIyBwYXR0ZXJuLCBsaW5lYXIgcmVncmVzc2lvbj8/DQogIGdlb21fcG9pbnQoYWxwaGEgPSAwLjcpDQoNCmBgYA0KQXV0byBjb3JyZWxhdGlvbg0KDQoNCmBgYHtyfQ0KIyMjIyMjIyMjIyMjIyMjIw0KDQojIyMjIGF1dG8gY29ycmVsYXRpb24gdnMgdmFsdWVzIHZzIGxhZygyKSBldGMNCg0KbGlicmFyeSh0c2VyaWVzKQ0KIyMjIGFjZiAtIGF1dG8gY29ycmVsYXRpb24gZnVuY3Rpb24NCg0KcGFyKG1hcj0gYygyLDIsNCwyKSkNCg0KYWNmKENDLlRvdGFsRGF0YSR0dXJuLmFuZ2xlW3NlcSgxLDEwMDAwLDMwKV0pICAjI3NpbnVzb2lkYWwgKHN0YXRpc3RpY2FsIHJlYXNvbiBmb3IgaXQpDQoNCmFjZihDQy5Ub3RhbERhdGEkdmVsLnR1cm4uYW5nbGVbc2VxKDEsMTAwMDAsMzApXSkgICAjI3NpbnVzb2lkYWwgKHN0YXRpc3RpY2FsIHJlYXNvbiBmb3IgaXQpDQoNCmFjZihDQy5Ub3RhbERhdGEkdmVsLmZsb3dbc2VxKDEsMTAwMDAsMzApXSkNCg0KYWNmKENDLlRvdGFsRGF0YSRwaXRjaFtzZXEoMSwxMDAwMCwzMCldKQ0KDQphY2YoQ0MuVG90YWxEYXRhJGhlYWRpbmdbc2VxKDEsMTAwMDAsMzApXSkNCg0KYWNmKENDLlRvdGFsRGF0YSR2W3NlcSgxLDEwMDAwLDMwKV0pDQoNCmFjZihDQy5Ub3RhbERhdGEkZFtzZXEoMSwxMDAwMCwzMCldKQ0KDQojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIw0KDQphY2YoQ0MuVG90YWxEYXRhJHZ4W3NlcSgxLDEwMDAwLDMwKV0pICAgIyMjIyBuZWVkIHRvIGxvb2sgaW50byB0aGlzIG1vcmUNCg0KYWNmKENDLlRvdGFsRGF0YSR2eVtzZXEoMSwxMDAwMCwzMCldKSANCg0KYWNmKENDLlRvdGFsRGF0YSR2eltzZXEoMSwxMDAwMCwzMCldKSANCg0KYWNmKENDLlRvdGFsRGF0YSRkeFtzZXEoMSwxMDAwMCwzMCldKSAgICAjIyMjIG5lZWQgdG8gbG9vayBpbnRvIHRoaXMgbW9yZQ0KDQphY2YoQ0MuVG90YWxEYXRhJGR5W3NlcSgxLDEwMDAwLDMwKV0pIA0KDQphY2YoQ0MuVG90YWxEYXRhJGR6W3NlcSgxLDEwMDAwLDMwKV0pIA0KDQojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIw0KYGBgDQoNCg0KDQo=</div>
 
 
 

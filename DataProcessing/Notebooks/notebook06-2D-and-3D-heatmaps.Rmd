@@ -12,7 +12,7 @@ head(TotalData) ## all rows of data from TotalData
 head(CC.TotalData) ## ONLY complete cases of TotalData
 
 ##  2D heatmaps of time spent in locations
-## Looking at differences by treatment 
+## Looking at differences by treatment
 
 ## start by plotting scatterplot colour by denisty of points
 library(scatterplot3d)
@@ -303,34 +303,61 @@ p + scale_fill_brewer(palette = "Greys")
 
 ```
 
+
+
+
+
+
+
+Smoothed 2D heatmaps 
+
+
+
 ```{r}
 ### interpolate the data so it's smoother
 
 library(fields)
 
 ## E.g. but with variables instead
-s = smooth.2d(CC.TotalData$Z, x=cbind(CC.TotalData$X, CC.TotalData$Y), theta=0.3)
-image.plot(s, axes=TRUE, xlab = "X", ylab = "Y", legend.lab = "Z", legend.width = .5, legend.line = 3)
+s = smooth.2d(CC.TotalData$Z, x=cbind(CC.TotalData$Y, CC.TotalData$X), theta=0.3)
+image.plot(s, axes=TRUE, xlab = "Y", ylab = "X", legend.lab = "Z", legend.width = .5, legend.line = 3)
 
 
+##changing Flow Rate into a numeric vector to plot it as a smooth heat map
+CC.TotalData$Flow.rate<-as.numeric(CC.TotalData$Flow.rate)
+## need to find how to do a stacked heat map like what Kuvvat showed in Python (https://stackoverflow.com/questions/57502763/how-to-plot-horizontal-stack-of-heatmaps-or-a-stack-of-grid)
 
-##image(...,
-              ##   add = FALSE, 
-              ##   breaks= NULL, nlevel = 64, col = NULL,  
-    ## horizontal = FALSE, legend.shrink = 0.9, legend.width = 1.2, 
-    ## legend.mar = ifelse(horizontal, 3.1, 5.1), legend.lab = NULL,
-    ## legend.line= 2,                    
-    ## graphics.reset = FALSE, bigplot = NULL, smallplot = NULL, 
-    ## legend.only = FALSE,  lab.breaks = NULL, 
-    ## axis.args = NULL, legend.args = NULL, legend.cex=1.0,
-    ## midpoint = FALSE, border = NA, 
-    ## lwd = 1,verbose = FALSE )	
+s = smooth.2d(CC.TotalData$Flow.rate, x=cbind(CC.TotalData$Y, CC.TotalData$X), theta=0.3)
+image.plot(s, axes=TRUE, xlab = "Y", ylab = "X", legend.lab = "Flow Rate (m/s)", legend.width = .5, legend.mar=8, legend.line = 4)
+
+################################################################################################################################
+
+################################################################################################################################
+
+##changing Chlorophyll into a numeric vector to plot it as a smooth heat map
+CC.TotalData$Chlorophyll<-as.numeric(CC.TotalData$Chlorophyll)
+## need to find how to do a stacked heat map like what Kuvvat showed in Python (https://stackoverflow.com/questions/57502763/how-to-plot-horizontal-stack-of-heatmaps-or-a-stack-of-grid)
+
+s = smooth.2d(CC.TotalData$Chlorophyll, x=cbind(CC.TotalData$X, CC.TotalData$Y), theta=0.3)
+image.plot(s, axes=TRUE, xlab = "X", ylab = "Y", legend.lab = "Chlorophyll (mg/L)", legend.width = .5, legend.mar=8, legend.line = 4)
+
+################################################################################################################################
+
+################################################################################################################################
+
+##changing Guano into a numeric vector to plot it as a smooth heat map
+CC.TotalData$Guano<-as.numeric(CC.TotalData$Guano)  ##Nans produced 
+
+##   How else to show this???
+
 
 ```
+
+
 
 Finally save the image
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (April 12 2022).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (April 18 2022).RData")
 
 ```

@@ -12,7 +12,66 @@ head(TotalData) ## all rows of data from TotalData
 head(CC.TotalData) ## ONLY complete cases of TotalData
 
 
+library(ggplot2)
+library(GGally)
+
+ggpairs(CC.TotalData[60000:120000,], columns = c(21, 22, 23, 26, 27, 28))
+
+
+ggplot(CC.TotalData[10000:20000,], aes(abs(pitch), abs(turn.angle-90))) +   ### weird pattern ??
+  geom_point(alpha = 0.7)
+
+ggplot(CC.TotalData[10000:20000,], aes(heading, turn.angle)) +     ### no pattern (good :) )
+  geom_point(alpha = 0.7)
+
+
+ggplot(CC.TotalData[10000:20000,], aes(vel.turn.angle, turn.angle)) +      #### pattern, linear regression??
+  geom_point(alpha = 0.7)
 
 ```
+Auto correlation
+
+
+```{r}
+################
+
+#### auto correlation vs values vs lag(2) etc
+
+library(tseries)
+### acf - auto correlation function
+
+par(mar= c(2,2,4,2))
+
+acf(CC.TotalData$turn.angle[seq(1,10000,30)])  ##sinusoidal (statistical reason for it)
+
+acf(CC.TotalData$vel.turn.angle[seq(1,10000,30)])   ##sinusoidal (statistical reason for it)
+
+acf(CC.TotalData$vel.flow[seq(1,10000,30)])
+
+acf(CC.TotalData$pitch[seq(1,10000,30)])
+
+acf(CC.TotalData$heading[seq(1,10000,30)])
+
+acf(CC.TotalData$v[seq(1,10000,30)])
+
+acf(CC.TotalData$d[seq(1,10000,30)])
+
+####################################################################################################################
+
+acf(CC.TotalData$vx[seq(1,10000,30)])   #### need to look into this more
+
+acf(CC.TotalData$vy[seq(1,10000,30)]) 
+
+acf(CC.TotalData$vz[seq(1,10000,30)]) 
+
+acf(CC.TotalData$dx[seq(1,10000,30)])    #### need to look into this more
+
+acf(CC.TotalData$dy[seq(1,10000,30)]) 
+
+acf(CC.TotalData$dz[seq(1,10000,30)]) 
+
+####################################################################################################################
+```
+
 
 

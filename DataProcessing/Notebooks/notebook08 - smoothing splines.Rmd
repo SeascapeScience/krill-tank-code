@@ -5,7 +5,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (April 12 2022).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (April 12 2021).Rdata")
 
 
 ## remove NaNs
@@ -41,6 +41,8 @@ CC.TotalData$Chlorophyll <- as.factor(CC.TotalData$Chlorophyll)
 CC.TotalData$Guano <- as.factor(CC.TotalData$Guano)
 CC.TotalData$Light <- as.factor(CC.TotalData$Light)
 ```
+
+
 
 ```{r}
 
