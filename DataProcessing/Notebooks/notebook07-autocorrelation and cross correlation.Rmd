@@ -6,10 +6,11 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Dec 14 2021).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (April 12 2022).Rdata")
 
 head(TotalData) ## all rows of data from TotalData
 head(CC.TotalData) ## ONLY complete cases of TotalData
+
 
 
 ```

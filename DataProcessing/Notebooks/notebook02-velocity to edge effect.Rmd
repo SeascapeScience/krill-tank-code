@@ -6,7 +6,7 @@ output: html_notebook
 Looking at relationship between velocity and the Y axis
 
 ```{r}
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Data Merged File (April 5 2022).RData") 
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Data Merged File (April 12 2022).RData") 
 
 library(ggplot2)
 ind <- unique(CC.TotalData$D_V_T)

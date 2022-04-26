@@ -6,7 +6,7 @@ output: html_notebook
 ```{r}
 
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (April 5 2022).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (April 12 2022).Rdata")
 
 ## Need to use turn angles and a point of reference (e.g. inlet valve) to determine directional bearing
 
@@ -191,7 +191,7 @@ Save the environment and remove unneeded dataframes, lists, etc
 rm(ldf, s.v, sd.vel, circ, D, d.p, d1, d2, dd, dotprod, dotx, doty, dotz, dx1, dx2, dy1, dy2, dz1, dz2, list2, list3, list4, list5)
 rm(v1, v2, vels, vx1, vx2, vy1, vy2, vz1, vz2, x1, x2, y1, y2, z1, z2)
 
-save.image("~/Post-doc/Data/Total Merged Data File (April 5 2022).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (April 12 2022).RData")
 
 ```
 
