@@ -182,6 +182,15 @@ And for Guano
 ```
 
 Save the environment and remove unneeded dataframes, lists, etc
+```{r}
+#### want to look at absolute heading vs heading to flow. 
+### Is this the same, eg., is 0 degrees (North) the inlet valve? (I think so but need to check this)
+
+
+
+```
+
+
 
 
 ```{r}
