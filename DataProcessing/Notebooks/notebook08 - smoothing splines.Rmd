@@ -2,52 +2,68 @@ title: "Notebook08 - smoothing splines"
 output: html_notebook
 ---
 
-
 ```{r}
 rm(list=ls(all=TRUE))
 load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (April 26 2021).Rdata")
-
-
-## remove NaNs
-## moving average didn't show a natural trajectory 
-## smoothing spline function instead
-
-## load in the splines packages
-library(splines)
-library(splines2)
-
-## look at package library (atlastools) from GitHub of atlastools: https://github.com/pratikunterwegs/atlastools/blob/master/R/fun_smooth_data.R
-## also this article on data processing: https://besjournals.onlinelibrary.wiley.com/doi/10.1111/1365-2656.13610
-### need devtools already installed BEFORE proceeding with code
-
-
-devtools::install_github("pratikunterwegs/atlastools")
-library(atlastools)
-
-## need to add frame number into data set to be able to use this
-
-smooth.CC<- atl_median_smooth( data = CC.TotalData, x = "X", y = "Y", time = "Frame", moving_window = 5)
-
 ```
 
-
-Now lets set up the data
+Remove ends of tank and clean data
 
 ```{r}
-str(CC.TotalData)
-CC.TotalData$Track <- as.factor(CC.TotalData$Track)
-CC.TotalData$Guano <- as.factor(CC.TotalData$Guano)
-CC.TotalData$Light <- as.factor(CC.TotalData$Light)
+#### cut 1cm from each axis to get rid of edge effect
+#### gives us only what's happening in center of tank 
+### gives us defined segments to spline
+
+## start by getting rid of front and back of tank 
+
+CC.TotalData$trim.X <- CC.TotalData$X
+CC.TotalData$trim.X[CC.TotalData$trim.X<.06] <- NA
+CC.TotalData$trim.X[CC.TotalData$trim.X>0.3] <- NA
+hist(CC.TotalData$trim.X)
+
+#####################################################
+
+range(CC.TotalData$X)
+range(CC.TotalData$Y)
+range(CC.TotalData$Z)
+
+plot(CC.TotalData$X)
+plot(CC.TotalData$X[1:542000])
+plot(CC.TotalData$X[542000:1100000])
+hist(CC.TotalData$X)
+hist(CC.TotalData$Y)
+hist(CC.TotalData$Z)
+
+m <- mean(CC.TotalData$X[1:542000])-mean(CC.TotalData$X[542000:1112228])  ## correcting for video camera shift
+m
+CC.TotalData$X[542000:1112228] <- CC.TotalData$X[542000:1112228] + m
+
+m <- min(CC.TotalData$X[542000:1112228])
+CC.TotalData$X[542000:1112228] <- CC.TotalData$X[542000:1112228] - m
 
 
 ```
+
 ```{r}
+?runmed
+
+CC.TotalData$xsmooth <- runmed(x = CC.TotalData$trim.X, k = 31, na.action = 'na.omit')  ## optimum number for smoothing (try 31 to 101)
+plot(CC.TotalData$trim.X[1000:10000])
+plot(CC.TotalData$xsmooth[1000:10000])
 
 
+CC.TotalData$ysmooth <- runmed(x = CC.TotalData$Y, k = 31, na.action = 'na.omit')
+plot(CC.TotalData$Y[1000:10000])
+plot(CC.TotalData$ysmooth[1000:10000])
 
+
+CC.TotalData$zsmooth <- runmed(x = CC.TotalData$Z, k = 31, na.action = 'na.omit')
+plot(CC.TotalData$Z[1000:10000])
+plot(CC.TotalData$zsmooth[1000:10000])
 ```
 
 
-
-
+```{r}
+save.image("~/Post-doc/Data/Total Merged Data File (May 27 2022).RData")
+```
 
