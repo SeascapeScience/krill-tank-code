@@ -1,0 +1,511 @@
+---
+title: "notebook09 - Statistical Analysis"
+output: html_notebook
+---
+
+
+```{r}
+rm(list=ls(all=TRUE))
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (May 27 2022).Rdata")
+```
+
+Data for mean velocity, angular velocity, turn and heading angles each will be analyzed by a mixed model ANCOVA with chemical concentration, and light as fixed (treatment) effects, flow velocity as the co-variate and replicate as a random (blocking affect) with individual paths as the unit of analysis.
+
+```{r}
+
+##To run ANCOVA in R load the following packages:
+library(car)
+library(compute.es)
+library(effects)
+library(ggplot2)
+library(multcomp)
+library(pastecs)
+library(WRS2)
+
+##If you are using lm or aov make sure that you set the contrasts using the "contrasts" function before doing either aov or lm. R uses non-orthogonal contrasts by default which can mess everything up in an ANCOVA. If you want to set orthogonal contrasts use:
+
+contrasts(dataname$factorvariable)=contr.poly()# of levels, i.e. 3) ##example
+contrasts(CC.TotalData$Chlorophyll)=contr.poly(7)
+##then run your model as
+
+model.1=aov(dv~covariate+factorvariable, data=dataname) ## example
+mod1=aov(vel.flow~Flow.rate+Chlorophyll, data=CC.TotalData)
+##To view the model use:
+
+Anova(model.1, type="III") ## example
+Anova(mod1, type="III")
+##Make sure you use capital "A" Anova here and not anova. This will give results using type III SS.
+
+summary.lm(model.1) ##will give another summary and includes the R-sq. output. Example
+summary.lm(mod1)
+
+posth=glht(model.1, linfct=mcp(factorvariable="Tukey"))  ##gives the post-hoc Tukey analysis. Example
+posth=glht(mod1, linfct=mcp(Chlorophyll="Tukey"))
+summary(posth) ##shows the output in a nice format.
+
+##If you want to test for homogeneity of regression slopes you can also include an interaction term for the IV and covariate. That would be:
+
+model=aov(dv~covariate+IV+covariate:IV, data=dataname) ## example
+
+mod2=aov(vel.flow~Flow.rate+Chlorophyll+Flow.rate:Chlorophyll, data=CC.TotalData) ## not right?
+##If the interaction term is significant then you do not have homogeneity.
+
+
+```
+```{r}
+##Looking at other stats we could run
+library(nlme)
+library(lme4)
+library(effects)
+
+
+## example
+d <- data.frame(
+    Y = rnorm(48),  ### e.g. velocity
+    subject = factor(rep(1:12, 4)),  ### e.g. D_V_T
+    A = factor(rep(1:2, each=24)),   #### e.g. Light
+    B = factor(rep(rep(1:2, each=12), 2)))   ### e.g. Flow.rate
+
+summary(aov(Y ~ A*B + Error(subject/(A*B)), data=d))  # Standard repeated measures ANOVA
+
+mode1 <- lme(Y~A*B, random = ~1|subject, data=d)  ## nlme
+
+lmer(Y ~ A*B + (1|subject) + (1|A:subject) + (1|B:subject), data=d)  ### lme4
+
+
+
+#########    our data using nlme package     #########
+
+mode1 <- lme(heading~vel.flow*Light, random= ~1|D_V_T, data=CC.TotalData)
+
+mode2 <- lme(heading~vel.flow, random= ~1|D_V_T, data=CC.TotalData)
+
+anova(mode1, mode2) #if it shows only minor improvement, no need to include missing factor
+
+anova(mode1)
+
+
+#########    our data using l4me package     #########
+
+model1 <- lmer(vel.flow ~ Flow.rate*Chlorophyll + (1|D_V_T) + (1|Flow.rate:D_V_T) + (1|Chlorophyll:D_V_T), data=CC.TotalData)  ###
+
+model2 <- lmer(vel.flow ~ Flow.rate + (1|D_V_T) + (1|Flow.rate:D_V_T), data=CC.TotalData)
+
+anova(model1, model2) #if it shows only minor improvement, no need to include missing factor
+
+anova(model1)
+
+######### plotting effect of the models    ##########
+plot(effect("vel.flow*Light",se=TRUE, confidence.level=.95, mode1))
+
+
+###### interaction plot with Lattice extra #########
+library(latticeExtra)
+xyplot(CC.TotalData$turn.angle~CC.TotalData$Flow.rate|CC.TotalData$Light*CC.TotalData$Guano,  main="Scatterplots by Light and Guano", 
+   ylab="Turn Angle (degrees)", xlab="Flow Rate (cm/s)") +
+   layer(panel.ablineq(lm(y ~ x), r.sq = TRUE,
+   at = 0.75, adj=1:5), style = 4)
+
+
+############## interaction plots ###########################
+
+interaction.plot(CC.TotalData$Flow.rate, ## x axis
+                 CC.TotalData$Chlorophyll, ## factor for lines
+                 CC.TotalData$turn.angle,  ## y axis
+                 fun = mean,
+                 type = c("b"), legend = TRUE,
+                 trace.label = "Chlorophyll",
+                 xlab = "Flow rate (cm/s)",
+                 ylab = "Turn Angle (degrees)",
+                 col = CC.TotalData$Chlorophyll, pch = c(1:9),
+                 axes = TRUE)
+
+
+###########################################################
+
+rm(mode1)
+
+rm(mode2)
+
+
+mod1 <- lm(vel.flow~Flow.rate*Chlorophyll, data = CC.TotalData)
+summary(mod1)
+
+```
+
+
+```{r}
+### Kernel density plots ################### Turn Angles
+par(mar= c(4,4,2,1))
+par(mfrow=c(2,2))
+
+################################ Flow Rate ########################
+levels(CC.TotalData$Flow.rate)
+
+kd1 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="0"])
+plot(kd1, col='blue', lwd=2, main = "Turn Angles Vs Flow Rate")
+
+kd2 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="0.6"])
+lines(kd2, col='light blue', lwd=2)
+
+kd3 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="3"])
+lines(kd3, col='yellow', lwd=2)
+
+kd4 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="5.9"])
+lines(kd4, col='orange', lwd=2)
+
+kd5 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="8.9"])
+lines(kd5, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Flow rate  0", "Flow rate 0.6", "Flow rate 3", "Flow rate 5.9", "Flow rate 8.9"),
+       col = c("blue", "light blue", "yellow", "orange", "red"),
+       lty = 1)
+
+################################ Chlorophyll ########################
+levels(CC.TotalData$Chlorophyll)
+
+kd1 <- density(CC.TotalData$turn.angle[CC.TotalData$Chlorophyll=="0"])
+plot(kd1, col='blue', lwd=2, main = "Turn Angles Vs Chlorophyll")
+
+kd2 <- density(CC.TotalData$turn.angle[CC.TotalData$Chlorophyll=="4.3"])
+lines(kd2, col='light blue', lwd=2)
+
+kd3 <- density(CC.TotalData$turn.angle[CC.TotalData$Chlorophyll=="4.6"])
+lines(kd3, col='yellow', lwd=2)
+
+kd4 <- density(CC.TotalData$turn.angle[CC.TotalData$Chlorophyll=="6.1"])
+lines(kd4, col='orange', lwd=2)
+
+kd5 <- density(CC.TotalData$turn.angle[CC.TotalData$Chlorophyll=="7.6"])
+lines(kd5, col='red', lwd=2)
+
+kd6 <- density(CC.TotalData$turn.angle[CC.TotalData$Chlorophyll=="13.5"])
+lines(kd6, col='purple', lwd=2)
+
+kd7 <- density(CC.TotalData$turn.angle[CC.TotalData$Chlorophyll=="19"])
+lines(kd7, col='black', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Chlorophyll  0", "Chlorophyll 4.3", "Chlorophyll 4.6", "Chlorophyll 6.1", "Chlorophyll 7.6", "Chlorophyll 13.5", 'Chlorophyll 19'),
+       col = c("blue", "light blue", "yellow", "orange", "red", "purple", "black"),
+       lty = 1)
+
+################################ Guano ########################
+levels(CC.TotalData$Guano)
+
+kd1 <- density(CC.TotalData$turn.angle[CC.TotalData$Guano=="Present"])
+plot(kd1, col='blue', lwd=2, main = "Turn Angles Vs Guano")
+
+kd2 <- density(CC.TotalData$turn.angle[CC.TotalData$Guano=="Absent"])
+lines(kd2, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Guano Present", "Guano Absent"),
+       col = c("blue", "red"),
+       lty = 1)
+
+################################ Light ########################
+levels(CC.TotalData$Light)
+
+kd1 <- density(CC.TotalData$turn.angle[CC.TotalData$Light=="Present"])
+plot(kd1, col='blue', lwd=2, main = "Turn Angles Vs Light")
+
+kd2 <- density(CC.TotalData$turn.angle[CC.TotalData$Light=="Absent"])
+lines(kd2, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Light Present", "Light Absent"),
+       col = c("blue", "red"),
+       lty = 1)
+
+```
+
+Now looking at velocity in relation to flow instead....
+
+
+
+```{r}
+### Kernel density plots ################### Swimming velocity
+par(mar= c(4,4,2,1))
+par(mfrow=c(2,2))
+#range(CC.TotalData$vel.flow)
+#plot(CC.TotalData$vel.flow)
+CC.TotalData$log.vel.flow <- log10(CC.TotalData$vel.flow)
+#str(CC.TotalData)
+################################ Flow Rate ########################
+levels(CC.TotalData$Flow.rate)
+
+kd1 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Flow.rate=="0"])
+plot(kd1, col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Flow Rate")
+
+kd2 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Flow.rate=="0.6"])
+lines(kd2, col='light blue', lwd=2)
+
+kd3 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Flow.rate=="3"])
+lines(kd3, col='yellow', lwd=2)
+
+kd4 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Flow.rate=="5.9"])
+lines(kd4, col='orange', lwd=2)
+
+kd5 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Flow.rate=="8.9"])
+lines(kd5, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Flow rate  0", "Flow rate 0.6", "Flow rate 3", "Flow rate 5.9", "Flow rate 8.9"),
+       col = c("blue", "light blue", "yellow", "orange", "red"),
+       lty = 1)
+
+################################ Chlorophyll ########################
+levels(CC.TotalData$Chlorophyll)
+
+kd1 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Chlorophyll=="0"])
+plot(kd1, col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Chlorophyll")
+
+kd2 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Chlorophyll=="4.3"])
+lines(kd2, col='light blue', lwd=2)
+
+kd3 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Chlorophyll=="4.6"])
+lines(kd3, col='yellow', lwd=2)
+
+kd4 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Chlorophyll=="6.1"])
+lines(kd4, col='orange', lwd=2)
+
+kd5 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Chlorophyll=="7.6"])
+lines(kd5, col='red', lwd=2)
+
+kd6 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Chlorophyll=="13.5"])
+lines(kd6, col='purple', lwd=2)
+
+kd7 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Chlorophyll=="19"])
+lines(kd7, col='black', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Chlorophyll  0", "Chlorophyll 4.3", "Chlorophyll 4.6", "Chlorophyll 6.1", "Chlorophyll 7.6", "Chlorophyll 13.5", 'Chlorophyll 19'),
+       col = c("blue", "light blue", "yellow", "orange", "red", "purple", "black"),
+       lty = 1)
+
+################################ Guano ########################
+levels(CC.TotalData$Guano)
+
+kd1 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Guano=="Present"])
+plot(kd1, col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Guano")
+
+kd2 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Guano=="Absent"])
+lines(kd2, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Guano Present", "Guano Absent"),
+       col = c("blue", "red"),
+       lty = 1)
+
+################################ Light ########################
+levels(CC.TotalData$Light)
+
+kd1 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Light=="Present"])
+plot(kd1, col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Light")
+
+kd2 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Light=="Absent"])
+lines(kd2, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Light Present", "Light Absent"),
+       col = c("blue", "red"),
+       lty = 1)
+
+```
+
+Now for headings.....
+
+
+```{r}
+### Kernel density plots ################### Headings
+par(mar= c(4,4,2,1))
+par(mfrow=c(2,2))
+
+CC.TotalData$heading.pi <- CC.TotalData$heading/(2*pi)*360
+################################ Flow Rate ########################
+levels(CC.TotalData$Flow.rate)
+
+kd1 <- density(CC.TotalData$heading.pi[CC.TotalData$Flow.rate=="0"])
+plot(kd1, col='blue', lwd=2, main = "Heading Vs Flow Rate")
+
+kd2 <- density(CC.TotalData$heading.pi[CC.TotalData$Flow.rate=="0.6"])
+lines(kd2, col='light blue', lwd=2)
+
+kd3 <- density(CC.TotalData$heading.pi[CC.TotalData$Flow.rate=="3"])
+lines(kd3, col='yellow', lwd=2)
+
+kd4 <- density(CC.TotalData$heading.pi[CC.TotalData$Flow.rate=="5.9"])
+lines(kd4, col='orange', lwd=2)
+
+kd5 <- density(CC.TotalData$heading.pi[CC.TotalData$Flow.rate=="8.9"])
+lines(kd5, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Flow rate  0", "Flow rate 0.6", "Flow rate 3", "Flow rate 5.9", "Flow rate 8.9"),
+       col = c("blue", "light blue", "yellow", "orange", "red"),
+       lty = 1)
+
+################################ Chlorophyll ########################
+levels(CC.TotalData$Chlorophyll)
+
+kd1 <- density(CC.TotalData$heading.pi[CC.TotalData$Chlorophyll=="0"])
+plot(kd1, col='blue', lwd=2, main = "Heading Vs Chlorophyll")
+
+kd2 <- density(CC.TotalData$heading.pi[CC.TotalData$Chlorophyll=="4.3"])
+lines(kd2, col='light blue', lwd=2)
+
+kd3 <- density(CC.TotalData$heading.pi[CC.TotalData$Chlorophyll=="4.6"])
+lines(kd3, col='yellow', lwd=2)
+
+kd4 <- density(CC.TotalData$heading.pi[CC.TotalData$Chlorophyll=="6.1"])
+lines(kd4, col='orange', lwd=2)
+
+kd5 <- density(CC.TotalData$heading.pi[CC.TotalData$Chlorophyll=="7.6"])
+lines(kd5, col='red', lwd=2)
+
+kd6 <- density(CC.TotalData$heading.pi[CC.TotalData$Chlorophyll=="13.5"])
+lines(kd6, col='purple', lwd=2)
+
+kd7 <- density(CC.TotalData$heading.pi[CC.TotalData$Chlorophyll=="19"])
+lines(kd7, col='black', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Chlorophyll  0", "Chlorophyll 4.3", "Chlorophyll 4.6", "Chlorophyll 6.1", "Chlorophyll 7.6", "Chlorophyll 13.5", 'Chlorophyll 19'),
+       col = c("blue", "light blue", "yellow", "orange", "red", "purple", "black"),
+       lty = 1)
+
+################################ Guano ########################
+levels(CC.TotalData$Guano)
+
+kd1 <- density(CC.TotalData$heading.pi[CC.TotalData$Guano=="Present"])
+plot(kd1, col='blue', lwd=2, main = "Heading Vs Guano")
+
+kd2 <- density(CC.TotalData$heading.pi[CC.TotalData$Guano=="Absent"])
+lines(kd2, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Guano Present", "Guano Absent"),
+       col = c("blue", "red"),
+       lty = 1)
+
+################################ Light ########################
+levels(CC.TotalData$Light)
+
+kd1 <- density(CC.TotalData$heading.pi[CC.TotalData$Light=="Present"])
+plot(kd1, col='blue', lwd=2, main = "Heading Vs Light")
+
+kd2 <- density(CC.TotalData$heading.pi[CC.TotalData$Light=="Absent"])
+lines(kd2, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Light Present", "Light Absent"),
+       col = c("blue", "red"),
+       lty = 1)
+
+```
+Now for pitch....
+
+```{r}
+### Kernel density plots ################### Pitch
+par(mar= c(4,4,2,1))
+par(mfrow=c(1,1))
+
+CC.TotalData$pitch.perfect <- CC.TotalData$pitch/(2*pi)*360
+################################ Flow Rate ########################
+levels(CC.TotalData$Flow.rate)
+
+kd1 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Flow.rate=="0"])
+plot(kd1, col='blue', lwd=2, main = "Pitch Vs Flow Rate")
+
+kd2 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Flow.rate=="0.6"])
+lines(kd2, col='light blue', lwd=2)
+
+kd3 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Flow.rate=="3"])
+lines(kd3, col='yellow', lwd=2)
+
+kd4 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Flow.rate=="5.9"])
+lines(kd4, col='orange', lwd=2)
+
+kd5 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Flow.rate=="8.9"])
+lines(kd5, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Flow rate  0", "Flow rate 0.6", "Flow rate 3", "Flow rate 5.9", "Flow rate 8.9"),
+       col = c("blue", "light blue", "yellow", "orange", "red"),
+       lty = 1)
+
+################################ Chlorophyll ########################
+levels(CC.TotalData$Chlorophyll)
+
+kd1 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="0"])
+plot(kd1, col='blue', lwd=2, main = "Pitch Vs Chlorophyll")
+
+kd2 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="4.3"])
+lines(kd2, col='light blue', lwd=2)
+
+kd3 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="4.6"])
+lines(kd3, col='yellow', lwd=2)
+
+kd4 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="6.1"])
+lines(kd4, col='orange', lwd=2)
+
+kd5 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="7.6"])
+lines(kd5, col='red', lwd=2)
+
+kd6 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="13.5"])
+lines(kd6, col='purple', lwd=2)
+
+kd7 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="19"])
+lines(kd7, col='black', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Chlorophyll  0", "Chlorophyll 4.3", "Chlorophyll 4.6", "Chlorophyll 6.1", "Chlorophyll 7.6", "Chlorophyll 13.5", 'Chlorophyll 19'),
+       col = c("blue", "light blue", "yellow", "orange", "red", "purple", "black"),
+       lty = 1)
+
+################################ Guano ########################
+levels(CC.TotalData$Guano)
+
+kd1 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Guano=="Present"])
+plot(kd1, col='blue', lwd=2, main = "Pitch Vs Guano")
+
+kd2 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Guano=="Absent"])
+lines(kd2, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Guano Present", "Guano Absent"),
+       col = c("blue", "red"),
+       lty = 1)
+
+################################ Light ########################
+levels(CC.TotalData$Light)
+
+kd1 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Light=="Present"])
+plot(kd1, col='blue', lwd=2, main = "Pitch Vs Light")
+
+kd2 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Light=="Absent"])
+lines(kd2, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Light Present", "Light Absent"),
+       col = c("blue", "red"),
+       lty = 1)
+
+```
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+
+
