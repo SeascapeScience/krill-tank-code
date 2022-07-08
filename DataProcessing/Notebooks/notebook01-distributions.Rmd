@@ -177,14 +177,18 @@ ggplot(TotalData,aes(x=Flow.rate, y=turn.angle, fill=Chlorophyll))+
 
 ```
 
+
+
 Starting to look at bi-modality in the variables by merging the TotalData frame with the "tab" table
 ```{r}
 ##aggregating Complete cases of TotalData so we can merge it with tab data
 
-AGG_TD <- aggregate(CC.TotalData, by = list(CC.TotalData$D_V_T), FUN = mean)
+## guano and light not working
+
+AGG_TD <- aggregate(CC.TotalData, by = list(CC.TotalData$D_V_T, CC.TotalData$Guano, CC.TotalData$Light), FUN = mean)
 head(AGG_TD)
-AGG_TD <- AGG_TD[ -c(2:3, 8:10) ]
-colnames(AGG_TD) <- c("Ind", "X", "Y", "Z", "Track", "Flow.Rate", "Chlorophyll", "Guano", "Light", "dx", "dy", "dz", "d", "vx", "vy", "vz", "v", "heading", "pitch", "turn.anglexy", "turn.angleyz", "turn.angle")
+AGG_TD <- AGG_TD[ -c(4:5, 9:12, 15:16) ]
+colnames(AGG_TD) <- c("Ind", "Guano", "Light", "X", "Y", "Z", "Flow.Rate", "Chlorophyll", "dx", "dy", "dz", "d", "vx", "vy", "vz", "v", "heading", "pitch", "turn.anglexy", "turn.angleyz", "turn.angle", "vel.flow", "vel.turn.angle", "trim.X", "xsmooth", "ysmooth", "zsmooth", "log.vel.flow", "heading.pi", "pitch.perfect")
 head(AGG_TD)
 tail(AGG_TD)
 
