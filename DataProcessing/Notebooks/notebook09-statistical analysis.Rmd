@@ -148,7 +148,7 @@ par(mfrow=c(2,2))
 levels(CC.TotalData$Flow.rate)
 
 kd1 <- density(l1$turn.angle[l1$Flow.rate=="0"])
-plot(kd1, col='blue', lwd=2, main = "Turn Angles Vs Flow Rate, Lights On")
+plot(kd1, xlim = c(5,175), ylim = c(0, 0.030), col='blue', lwd=2, main = "Turn Angles Vs Flow Rate, Lights On")
 
 kd2 <- density(l1$turn.angle[l1$Flow.rate=="0.6"])
 lines(kd2, col='light blue', lwd=2)
@@ -171,7 +171,7 @@ legend("topright",                                  # Add legend to density
 levels(CC.TotalData$Chlorophyll)
 
 kd1 <- density(l1$turn.angle[l1$Chlorophyll=="0"])
-plot(kd1, col='blue', lwd=2, main = "Turn Angles Vs Chlorophyll, Lights On")
+plot(kd1, xlim = c(5,175), ylim = c(0, 0.030), col='blue', lwd=2, main = "Turn Angles Vs Chlorophyll, Lights On")
 
 kd2 <- density(l1$turn.angle[l1$Chlorophyll=="4.3"])
 lines(kd2, col='light blue', lwd=2)
@@ -201,7 +201,7 @@ legend("topright",                                  # Add legend to density
 levels(CC.TotalData$Guano)
 
 kd1 <- density(l1$turn.angle[l1$Guano=="Present"])
-plot(kd1, col='blue', lwd=2, main = "Turn Angles Vs Guano, Lights On")
+plot(kd1, xlim = c(5,175), ylim = c(0, 0.030), col='blue', lwd=2, main = "Turn Angles Vs Guano, Lights On")
 
 kd2 <- density(l1$turn.angle[l1$Guano=="Absent"])
 lines(kd2, col='red', lwd=2)
@@ -215,7 +215,7 @@ legend("topright",                                  # Add legend to density
 levels(CC.TotalData$Light)
 
 kd1 <- density(CC.TotalData$turn.angle[CC.TotalData$Light=="Present"])
-plot(kd1, col='blue', lwd=2, main = "Turn Angles Vs Light")
+plot(kd1, xlim = c(5,175), ylim = c(0, 0.030), col='blue', lwd=2, main = "Turn Angles Vs Light")
 
 kd2 <- density(CC.TotalData$turn.angle[CC.TotalData$Light=="Absent"])
 lines(kd2, col='red', lwd=2)
@@ -226,6 +226,10 @@ legend("topright",                                  # Add legend to density
        lty = 1)
 
 ```
+
+
+
+
 
 Now looking at velocity in relation to flow instead....
 
@@ -243,7 +247,7 @@ CC.TotalData$log.vel.flow <- log10(CC.TotalData$vel.flow)
 levels(CC.TotalData$Flow.rate)
 
 kd1 <- density(log10(l1$vel.flow[l1$Flow.rate=="0"]))
-plot(kd1, col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Flow Rate, Lights On")
+plot(kd1, xlim = c(-90,90), ylim = c(0, 0.035), col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Flow Rate, Lights On")
 
 kd2 <- density(log10(l1$vel.flow[l1$Flow.rate=="0.6"]))
 lines(kd2, col='light blue', lwd=2)
@@ -266,7 +270,7 @@ legend("topright",                                  # Add legend to density
 levels(CC.TotalData$Chlorophyll)
 
 kd1 <- density(log10(l1$vel.flow[l1$Chlorophyll=="0"]))
-plot(kd1, col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Chlorophyll, Lights On")
+plot(kd1, xlim = c(-90,90), ylim = c(0, 0.035), col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Chlorophyll, Lights On")
 
 kd2 <- density(log10(l1$vel.flow[l1$Chlorophyll=="4.3"]))
 lines(kd2, col='light blue', lwd=2)
@@ -295,7 +299,7 @@ legend("topright",                                  # Add legend to density
 levels(CC.TotalData$Guano)
 
 kd1 <- density(log10(l1$vel.flow[l1$Guano=="Present"]))
-plot(kd1, col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Guano, Lights On")
+plot(kd1, xlim = c(-90,90), ylim = c(0, 0.035), col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Guano, Lights On")
 
 kd2 <- density(log10(l1$vel.flow[l1$Guano=="Absent"]))
 lines(kd2, col='red', lwd=2)
@@ -309,7 +313,7 @@ legend("topright",                                  # Add legend to density
 levels(CC.TotalData$Light)
 
 kd1 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Light=="Present"])
-plot(kd1, col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Light")
+plot(kd1, xlim = c(-90,90), ylim = c(0, 0.035), col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Light")
 
 kd2 <- density(CC.TotalData$log.vel.flow[CC.TotalData$Light=="Absent"])
 lines(kd2, col='red', lwd=2)
@@ -321,6 +325,13 @@ legend("topright",                                  # Add legend to density
 
 ```
 
+
+
+
+
+
+
+
 Now for headings.....
 
 
@@ -329,12 +340,17 @@ Now for headings.....
 par(mar= c(4,4,2,1))
 par(mfrow=c(2,2))
 
+## copied from notebook00-merginf files and adding columns
+##TotalData$heading <- atan(TotalData$dx/TotalData$dy), ## this is how it was calculated
+
 CC.TotalData$heading.pi <- CC.TotalData$heading/(2*pi)*360
+range(CC.TotalData$heading)  ## gives -1.57 to 1.57
+range(CC.TotalData$heading.pi)  ## gives -90 to 90  (why not -180, to 180??)
 ################################ Flow Rate ########################
 levels(CC.TotalData$Flow.rate)
 
 kd1 <- density(CC.TotalData$heading.pi[CC.TotalData$Flow.rate=="0"])
-plot(kd1, col='blue', lwd=2, main = "Heading Vs Flow Rate")
+plot(kd1, xlim = c(-85,85), ylim = c(0, 0.035), col='blue', lwd=2, main = "Heading Vs Flow Rate")
 
 kd2 <- density(CC.TotalData$heading.pi[CC.TotalData$Flow.rate=="0.6"])
 lines(kd2, col='light blue', lwd=2)
@@ -1487,6 +1503,8 @@ legend("topright",                                  # Add legend to density
        col = c("blue", "red"),
        lty = 1)
 
+
+range(CC.TotalData$turn.angle)
 ```
 
 
