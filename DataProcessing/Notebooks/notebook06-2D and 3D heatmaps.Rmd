@@ -6,10 +6,11 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (April 12 2022).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (July 11 2022).Rdata")
 
 head(TotalData) ## all rows of data from TotalData
 head(CC.TotalData) ## ONLY complete cases of TotalData
+
 
 ##  2D heatmaps of time spent in locations
 ## Looking at differences by treatment
@@ -36,6 +37,10 @@ ChlA4.6 <- CC.TotalData[CC.TotalData$Chlorophyll == "4.6",]  ##subsets CC.TotalD
 head(ChlA4.6)
 tail(ChlA4.6)
 
+ChlA5.5 <- CC.TotalData[CC.TotalData$Chlorophyll == "5.5",]  ##subsets CC.TotalData by Chlorophyll but only selects rows where Chlorophyll = 4.6
+head(ChlA5.5)
+tail(ChlA5.5)
+
 ChlA6 <- CC.TotalData[CC.TotalData$Chlorophyll == "6.1",]  ##subsets CC.TotalData by Chlorophyll but only selects rows where Chlorophyll = 6.1
 head(ChlA6)
 tail(ChlA6)
@@ -51,7 +56,9 @@ tail(ChlA13)
 ChlA19 <- CC.TotalData[CC.TotalData$Chlorophyll == "19",]  ##subsets CC.TotalData by Chlorophyll but only selects rows where Chlorophyll = 19
 head(ChlA19)
 tail(ChlA19)
+```
 
+```{r}
 
 ## need to make a list of color for each level of Flow rate
 levels(CC.TotalData$Flow.rate)
@@ -102,6 +109,9 @@ tail(f5)
 f8 <- CC.TotalData[CC.TotalData$Flow.rate == "8.9",]  ##subsets CC.TotalData by Flow rate but only selects rows where flow rate = 
 head(f8)
 tail(f8)
+```
+
+```{r}
 
 ## need to make a list of colors for each level of Chlorophyll
 levels(CC.TotalData$Chlorophyll)
@@ -139,7 +149,9 @@ tail(g0)
 g1<- CC.TotalData[CC.TotalData$Guano == "Present",]  ##subsets CC.TotalData by Guano but only selects rows where Guano = Present
 head(g1)
 tail(g1)
+```
 
+```{r}
 ##spcol = flow rate
 ##spcol1 = chlorophyll
 
@@ -154,7 +166,9 @@ scatterplot3d(g1$X, g1$Y, g1$Z, color = spcol1[as.numeric(g1$Chlorophyll)], pch 
 scatterplot3d(g1$X, g1$Y, g1$Z, color = spcol[as.numeric(g1$Flow.rate)], pch = 20, xlab = "X Axis (m)", ylab = "Y Axis (m)", zlab = "Z Axis (m)", main = "Guano = Present, colour = Flow Rate", cex.symbols = 0.5, angle = 55)
 ###################################################################################################################################
 
+```
 
+```{r}
 ## Light
 levels(CC.TotalData$Light)
 l0 <- CC.TotalData[CC.TotalData$Light == "Absent",]  ##subsets CC.TotalData by Light but only selects rows where Light = Absent
@@ -164,7 +178,10 @@ tail(l0)
 l1<- CC.TotalData[CC.TotalData$Light == "Present",]  ##subsets CC.TotalData by Light but only selects rows where Light = Present
 head(l1)
 tail(l1)
+```
 
+
+```{r}
 ##spcol = flow rate
 ##spcol1 = chlorophyll
 
@@ -331,6 +348,6 @@ image.plot(s, axes=TRUE, xlab = "X", ylab = "Y", legend.lab = "Z", legend.width 
 Finally save the image
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (April 12 2022).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (July 11 2022).RData")
 
 ```

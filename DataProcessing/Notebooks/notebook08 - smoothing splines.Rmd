@@ -4,7 +4,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (April 26 2021).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (July 11 2022).Rdata")
 ```
 
 Remove ends of tank and clean data
@@ -43,47 +43,23 @@ CC.TotalData$X[542000:1112228] <- CC.TotalData$X[542000:1112228] - m
 
 
 ```
-
 ```{r}
-?runmed
-<<<<<<< HEAD
-
-CC.TotalData$xsmooth <- runmed(x = CC.TotalData$trim.X, k = 31, na.action = 'na.omit')  ## optimum number for smoothing (try 31 to 101)
-plot(CC.TotalData$trim.X[1000:10000])
-plot(CC.TotalData$xsmooth[1000:10000])
-=======
 
 CC.TotalData$xsmooth <- runmed(x = CC.TotalData$trim.X, k = 31, na.action = 'na.omit')  ## optimum number for smoothing (try 31 to 101)
 plot(CC.TotalData$trim.X[1000:10000])
 plot(CC.TotalData$xsmooth[1000:10000])
 
->>>>>>> 575ca01e347be572769a73f650a85c1bb1615e89
-
 CC.TotalData$ysmooth <- runmed(x = CC.TotalData$Y, k = 31, na.action = 'na.omit')
 plot(CC.TotalData$Y[1000:10000])
 plot(CC.TotalData$ysmooth[1000:10000])
 
-CC.TotalData$ysmooth <- runmed(x = CC.TotalData$Y, k = 31, na.action = 'na.omit')
-plot(CC.TotalData$Y[1000:10000])
-plot(CC.TotalData$ysmooth[1000:10000])
-
-<<<<<<< HEAD
-=======
-CC.TotalData$zsmooth <- runmed(x = CC.TotalData$Z, k = 31, na.action = 'na.omit')
-plot(CC.TotalData$Z[1000:10000])
-plot(CC.TotalData$zsmooth[1000:10000])
-```
->>>>>>> 575ca01e347be572769a73f650a85c1bb1615e89
 
 CC.TotalData$zsmooth <- runmed(x = CC.TotalData$Z, k = 31, na.action = 'na.omit')
 plot(CC.TotalData$Z[1000:10000])
 plot(CC.TotalData$zsmooth[1000:10000])
 
-<<<<<<< HEAD
+
 ```
 
-
-=======
->>>>>>> 575ca01e347be572769a73f650a85c1bb1615e89
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (May 27 2022).RData")
+save.image("~/Post-doc/Data/Total Merged Data File July 11 2022).RData")

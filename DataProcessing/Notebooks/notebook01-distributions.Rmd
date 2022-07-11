@@ -7,7 +7,7 @@ Plot and fit distributions of variables
 
 ```{r}
 
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Data Merged File (April 12 2022).Rda")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Data Merged File (July 11 2022).Rda")
 
 hist(log10(TotalData$v),
      xlab = "Velocity (Log^10 mm/s)")
@@ -188,7 +188,7 @@ Starting to look at bi-modality in the variables by merging the TotalData frame 
 AGG_TD <- aggregate(CC.TotalData, by = list(CC.TotalData$D_V_T, CC.TotalData$Guano, CC.TotalData$Light), FUN = mean)
 head(AGG_TD)
 AGG_TD <- AGG_TD[ -c(4:5, 9:12, 15:16) ]
-colnames(AGG_TD) <- c("Ind", "Guano", "Light", "X", "Y", "Z", "Flow.Rate", "Chlorophyll", "dx", "dy", "dz", "d", "vx", "vy", "vz", "v", "heading", "pitch", "turn.anglexy", "turn.angleyz", "turn.angle", "vel.flow", "vel.turn.angle", "trim.X", "xsmooth", "ysmooth", "zsmooth", "log.vel.flow", "heading.pi", "pitch.perfect")
+colnames(AGG_TD) <- c("Ind", "Guano", "Light", "X", "Y", "Z", "Flow.Rate", "Chlorophyll", "dx", "dy", "dz", "d", "vx", "vy", "vz", "v", "heading", "pitch", "turn.anglexy", "turn.angleyz", "turn.angle")##, "vel.flow", "vel.turn.angle", "trim.X", "xsmooth", "ysmooth", "zsmooth", "log.vel.flow", "heading.pi", "pitch.perfect")
 head(AGG_TD)
 tail(AGG_TD)
 
@@ -231,7 +231,7 @@ hist(CC.TotalData$turn.angle, breaks = 100)
 
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (April 12 2022).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (July 11 2022).RData")
 
 ```
 

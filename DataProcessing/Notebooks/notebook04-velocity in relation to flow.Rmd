@@ -6,7 +6,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (April 12 2022).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (July 11 2022).Rdata")
 
 
 ## Flow happens in the Y direction
@@ -15,15 +15,17 @@ load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data 
 
 
 ## Need to make flow rate numeric first
-str(TotalData)
-TotalData$Flow.rate <- as.character(TotalData$Flow.rate)
-TotalData$Flow.rate <- as.numeric(TotalData$Flow.rate)
+str(CC.TotalData)
+CC.TotalData$Flow.rate <- as.character(CC.TotalData$Flow.rate)
+CC.TotalData$Flow.rate <- as.numeric(CC.TotalData$Flow.rate)
 
-head(TotalData) ## all TotalData rows
-str(TotalData)
-TotalData$vel.flow <- TotalData$Flow.rate+TotalData$vy
-TotalData$Flow.rate <- as.factor(TotalData$Flow.rate)
-
+head(CC.TotalData) ## all TotalData rows
+str(CC.TotalData)
+CC.TotalData$vel.flow <- CC.TotalData$Flow.rate+CC.TotalData$vy
+CC.TotalData$Flow.rate <- as.factor(CC.TotalData$Flow.rate)
+CC.TotalData$Chlorophyll <- as.factor(CC.TotalData$Chlorophyll)
+CC.TotalData$Light <- as.factor(CC.TotalData$Light)
+CC.TotalData$Guano <- as.factor(CC.TotalData$Guano)
 
 ##remake complete cases dataframe with vel.flow included
 CC.TotalData <- na.omit(TotalData)
@@ -155,7 +157,7 @@ plot(CC.TotalData$Light, CC.TotalData$heading/(2*pi)*360, xlab = "Light", ylab =
 
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (April 12 2022).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (July 11 2022).RData")
 
 
 ```
