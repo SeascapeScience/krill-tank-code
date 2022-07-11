@@ -340,12 +340,18 @@ Now for headings.....
 par(mar= c(4,4,2,1))
 par(mfrow=c(2,2))
 
-## copied from notebook00-merginf files and adding columns
-##TotalData$heading <- atan(TotalData$dx/TotalData$dy), ## this is how it was calculated
-
-CC.TotalData$heading.pi <- CC.TotalData$heading/(2*pi)*360
+## copied from notebook00-merging files and adding columns
+##TotalData$heading <- atan2(TotalData$dx/TotalData$dy), ## this is how it was calculated
 range(CC.TotalData$heading)  ## gives -1.57 to 1.57
 range(CC.TotalData$heading.pi)  ## gives -90 to 90  (why not -180, to 180??)
+## should be
+CC.TotalData$heading <- atan2(CC.TotalData$dx, CC.TotalData$dy)
+
+CC.TotalData$heading.pi <- CC.TotalData$heading/(2*pi)*360
+range(CC.TotalData$heading)  ## gives -3.14 to 3.14
+range(CC.TotalData$heading.pi)  ## gives -180 to 180  
+
+
 ################################ Flow Rate ########################
 levels(CC.TotalData$Flow.rate)
 
