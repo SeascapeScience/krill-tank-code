@@ -7,7 +7,7 @@ Plot and fit distributions of variables
 
 ```{r}
 
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Data Merged File (July 11 2022).Rda")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Data Merged File (July 12 2022).Rda")
 
 hist(log10(TotalData$v),
      xlab = "Velocity (Log^10 mm/s)")
@@ -122,6 +122,9 @@ dd <- D/d1/d2
 hist(acos(dd)/pi*180)
 
 TotalData$turn.angle <- c(NA, acos(D/d1/d2))/pi*180
+
+
+
 head(TotalData)
 CC.TotalData <- na.omit(TotalData)
 head(CC.TotalData)
@@ -231,7 +234,7 @@ hist(CC.TotalData$turn.angle, breaks = 100)
 
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (July 11 2022).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (July 12 2022).RData")
 
 ```
 

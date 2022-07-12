@@ -218,50 +218,58 @@ pre code {
 <p>Looking at relationship between velocity and the Y axis</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxubGlicmFyeShnZ3Bsb3QyKVxuaW5kIDwtIHVuaXF1ZShDQy5Ub3RhbERhdGEkRF9WX1QpXG5sZW5ndGgoaW5kKVxuXG5gYGBcbmBgYFxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuYGBgclxubGlicmFyeShnZ3Bsb3QyKVxuaW5kIDwtIHVuaXF1ZShDQy5Ub3RhbERhdGEkRF9WX1QpXG5sZW5ndGgoaW5kKVxuXG5gYGBcbmBgYFxuYGBgXG5gYGAifQ== -->
 <pre class="r"><code>```r
+```r
 ```r
 library(ggplot2)
 ind &lt;- unique(CC.TotalData$D_V_T)
 length(ind)
 </code></pre>
 <pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Looking at relationship between velocity and the X axis</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgdG8gc2F2ZSBpbmRpdmlkdWFsIGdyYXBocyBvZiBYIGF4aXMgYnkgdmVsb2NpdHlcbmZvciAoaSBpbiAxOmxlbmd0aChpbmQpKXtcbiAganBlZyhmaWxlbmFtZT1wYXN0ZShpbmRbaV0sICcuanBlZycsIHNlcCA9ICcnKSwgd2lkdGggPSA0ODAsIGhlaWdodCA9IDQ4MClcbnBsb3QobG9nMTAoQ0MuVG90YWxEYXRhJHZbQ0MuVG90YWxEYXRhJERfVl9UPT1pbmRbaV1dKSxcbiAgICAgQ0MuVG90YWxEYXRhJFhbQ0MuVG90YWxEYXRhJERfVl9UPT1pbmRbaV1dLFxuICAgICB4bGFiID0gXCJWZWxvY2l0eSAoTG9nXjEwLCBtbS9zKVwiLFxuICAgICB5bGFiID0gXCJYIEF4aXMgKGNtKVwiLFxuICAgICBtYWluID0gaW5kW2ldKVxuZGV2Lm9mZigpXG59XG5cbmBgYCJ9 -->
-<pre class="r"><code>## to save individual graphs of X axis by velocity
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+
+Looking at relationship between velocity and the X axis
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyMgdG8gc2F2ZSBpbmRpdmlkdWFsIGdyYXBocyBvZiBYIGF4aXMgYnkgdmVsb2NpdHlcbmZvciAoaSBpbiAxOmxlbmd0aChpbmQpKXtcbiAganBlZyhmaWxlbmFtZT1wYXN0ZShpbmRbaV0sICcuanBlZycsIHNlcCA9ICcnKSwgd2lkdGggPSA0ODAsIGhlaWdodCA9IDQ4MClcbnBsb3QobG9nMTAoQ0MuVG90YWxEYXRhJHZbQ0MuVG90YWxEYXRhJERfVl9UPT1pbmRbaV1dKSxcbiAgICAgQ0MuVG90YWxEYXRhJFhbQ0MuVG90YWxEYXRhJERfVl9UPT1pbmRbaV1dLFxuICAgICB4bGFiID0gXFxWZWxvY2l0eSAoTG9nXjEwXG5gYGAifQ== --&gt;
+
+```r
+```r
+## to save individual graphs of X axis by velocity
 for (i in 1:length(ind)){
   jpeg(filename=paste(ind[i], &#39;.jpeg&#39;, sep = &#39;&#39;), width = 480, height = 480)
 plot(log10(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]]),
      CC.TotalData$X[CC.TotalData$D_V_T==ind[i]],
-     xlab = &quot;Velocity (Log^10, mm/s)&quot;,
-     ylab = &quot;X Axis (cm)&quot;,
-     main = ind[i])
-dev.off()
-}
-</code></pre>
+     xlab = \Velocity (Log^10</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Looking at relationship between velocity and the Z axis</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMgdG8gc2F2ZSBpbmRpdmlkdWFsIGdyYXBocyBvZiB6IGF4aXMgYnkgdmVsb2NpdHlcbmZvciAoaSBpbiAxOmxlbmd0aChpbmQpKXtcbiAganBlZyhmaWxlbmFtZT1wYXN0ZShpbmRbaV0sICcuanBlZycsIHNlcCA9ICcnKSwgd2lkdGggPSA0ODAsIGhlaWdodCA9IDQ4MClcbnBsb3QobG9nMTAoQ0MuVG90YWxEYXRhJHZbQ0MuVG90YWxEYXRhJERfVl9UPT1pbmRbaV1dKSxcbiAgICAgQ0MuVG90YWxEYXRhJFpbQ0MuVG90YWxEYXRhJERfVl9UPT1pbmRbaV1dLFxuICAgICB4bGFiID0gXCJWZWxvY2l0eSAoTG9nXjEwLCBtbS9zKVwiLFxuICAgICB5bGFiID0gXCJaIEF4aXMgKGNtKVwiLFxuICAgICBtYWluID0gaW5kW2ldKVxuZGV2Lm9mZigpXG59XG5cbmBgYCJ9 -->
-<pre class="r"><code>## to save individual graphs of z axis by velocity
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyMgdG8gc2F2ZSBpbmRpdmlkdWFsIGdyYXBocyBvZiB6IGF4aXMgYnkgdmVsb2NpdHlcbmZvciAoaSBpbiAxOmxlbmd0aChpbmQpKXtcbiAganBlZyhmaWxlbmFtZT1wYXN0ZShpbmRbaV0sICcuanBlZycsIHNlcCA9ICcnKSwgd2lkdGggPSA0ODAsIGhlaWdodCA9IDQ4MClcbnBsb3QobG9nMTAoQ0MuVG90YWxEYXRhJHZbQ0MuVG90YWxEYXRhJERfVl9UPT1pbmRbaV1dKSxcbiAgICAgQ0MuVG90YWxEYXRhJFpbQ0MuVG90YWxEYXRhJERfVl9UPT1pbmRbaV1dLFxuICAgICB4bGFiID0gXFxWZWxvY2l0eSAoTG9nXjEwXG5gYGAifQ== -->
+<pre class="r"><code>```r
+## to save individual graphs of z axis by velocity
 for (i in 1:length(ind)){
   jpeg(filename=paste(ind[i], &#39;.jpeg&#39;, sep = &#39;&#39;), width = 480, height = 480)
 plot(log10(CC.TotalData$v[CC.TotalData$D_V_T==ind[i]]),
      CC.TotalData$Z[CC.TotalData$D_V_T==ind[i]],
-     xlab = &quot;Velocity (Log^10, mm/s)&quot;,
-     ylab = &quot;Z Axis (cm)&quot;,
-     main = ind[i])
-dev.off()
-}
-</code></pre>
+     xlab = \Velocity (Log^10</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -271,7 +279,7 @@ dev.off()
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlZlbG9jaXR5IGluIHJlbGF0aW9uIHRvIGRpc3RhbmNlIGZyb20gZWRnZSINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCkxvb2tpbmcgYXQgcmVsYXRpb25zaGlwIGJldHdlZW4gdmVsb2NpdHkgYW5kIHRoZSBZIGF4aXMNCg0KYGBge3J9DQpsb2FkKCJDOlxcVXNlcnNcXE5pY29sZSBIZWxsZXNzZXlcXERvY3VtZW50c1xcUG9zdC1kb2NcXERhdGFcXFRvdGFsIERhdGEgTWVyZ2VkIEZpbGUgKEFwcmlsIDEyIDIwMjIpLlJEYXRhIikgDQoNCmxpYnJhcnkoZ2dwbG90MikNCmluZCA8LSB1bmlxdWUoQ0MuVG90YWxEYXRhJERfVl9UKQ0KbGVuZ3RoKGluZCkNCg0Kc3RyKENDLlRvdGFsRGF0YSkNCg0KIyMgdG8gc2F2ZSBpbmQgZ3JhcGhzIG9mIHZlbG9jaXR5IGJ5IFkgYXhpcw0KZm9yIChpIGluIDE6bGVuZ3RoKGluZCkpew0KanBlZyhmaWxlbmFtZT1wYXN0ZShpbmRbaV0sICcuanBlZycsIHNlcCA9ICcnKSwgd2lkdGggPSA0ODAsIGhlaWdodCA9IDQ4MCkNCnBsb3QobG9nMTAoQ0MuVG90YWxEYXRhJHZbQ0MuVG90YWxEYXRhJERfVl9UPT1pbmRbaV1dKSwNCiAgICAgQ0MuVG90YWxEYXRhJFlbQ0MuVG90YWxEYXRhJERfVl9UPT1pbmRbaV1dLA0KICAgICB4bGFiID0gIlZlbG9jaXR5IChMb2deMTAsIG1tL3MpIiwNCiAgICAgeWxhYiA9ICJZIEF4aXMgKGNtKSIsDQogICAgIG1haW4gPSBpbmRbaV0pIA0KZGV2Lm9mZigpDQp9DQoNCmBgYA0KDQoNCkxvb2tpbmcgYXQgcmVsYXRpb25zaGlwIGJldHdlZW4gdmVsb2NpdHkgYW5kIHRoZSBYIGF4aXMNCg0KYGBge3J9DQojIyB0byBzYXZlIGluZGl2aWR1YWwgZ3JhcGhzIG9mIFggYXhpcyBieSB2ZWxvY2l0eQ0KZm9yIChpIGluIDE6bGVuZ3RoKGluZCkpew0KICBqcGVnKGZpbGVuYW1lPXBhc3RlKGluZFtpXSwgJy5qcGVnJywgc2VwID0gJycpLCB3aWR0aCA9IDQ4MCwgaGVpZ2h0ID0gNDgwKQ0KcGxvdChsb2cxMChDQy5Ub3RhbERhdGEkdltDQy5Ub3RhbERhdGEkRF9WX1Q9PWluZFtpXV0pLA0KICAgICBDQy5Ub3RhbERhdGEkWFtDQy5Ub3RhbERhdGEkRF9WX1Q9PWluZFtpXV0sDQogICAgIHhsYWIgPSAiVmVsb2NpdHkgKExvZ14xMCwgbW0vcykiLA0KICAgICB5bGFiID0gIlggQXhpcyAoY20pIiwNCiAgICAgbWFpbiA9IGluZFtpXSkNCmRldi5vZmYoKQ0KfQ0KDQpgYGANCg0KTG9va2luZyBhdCByZWxhdGlvbnNoaXAgYmV0d2VlbiB2ZWxvY2l0eSBhbmQgdGhlIFogYXhpcw0KDQpgYGB7cn0NCiMjIHRvIHNhdmUgaW5kaXZpZHVhbCBncmFwaHMgb2YgeiBheGlzIGJ5IHZlbG9jaXR5DQpmb3IgKGkgaW4gMTpsZW5ndGgoaW5kKSl7DQogIGpwZWcoZmlsZW5hbWU9cGFzdGUoaW5kW2ldLCAnLmpwZWcnLCBzZXAgPSAnJyksIHdpZHRoID0gNDgwLCBoZWlnaHQgPSA0ODApDQpwbG90KGxvZzEwKENDLlRvdGFsRGF0YSR2W0NDLlRvdGFsRGF0YSREX1ZfVD09aW5kW2ldXSksDQogICAgIENDLlRvdGFsRGF0YSRaW0NDLlRvdGFsRGF0YSREX1ZfVD09aW5kW2ldXSwNCiAgICAgeGxhYiA9ICJWZWxvY2l0eSAoTG9nXjEwLCBtbS9zKSIsDQogICAgIHlsYWIgPSAiWiBBeGlzIChjbSkiLA0KICAgICBtYWluID0gaW5kW2ldKQ0KZGV2Lm9mZigpDQp9DQoNCmBgYA0KDQpgYGB7cn0NCg0KDQpgYGANCg0KDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlZlbG9jaXR5IGluIHJlbGF0aW9uIHRvIGRpc3RhbmNlIGZyb20gZWRnZSINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCkxvb2tpbmcgYXQgcmVsYXRpb25zaGlwIGJldHdlZW4gdmVsb2NpdHkgYW5kIHRoZSBZIGF4aXMNCg0KYGBge3J9DQpsb2FkKCJDOlxcVXNlcnNcXE5pY29sZSBIZWxsZXNzZXlcXERvY3VtZW50c1xcUG9zdC1kb2NcXERhdGFcXFRvdGFsIERhdGEgTWVyZ2VkIEZpbGUgKEp1bHkgMTIgMjAyMikuUkRhdGEiKSANCg0KbGlicmFyeShnZ3Bsb3QyKQ0KaW5kIDwtIHVuaXF1ZShDQy5Ub3RhbERhdGEkRF9WX1QpDQpsZW5ndGgoaW5kKQ0KDQpzdHIoQ0MuVG90YWxEYXRhKQ0KDQojIyB0byBzYXZlIGluZCBncmFwaHMgb2YgdmVsb2NpdHkgYnkgWSBheGlzDQpmb3IgKGkgaW4gMTpsZW5ndGgoaW5kKSl7DQpqcGVnKGZpbGVuYW1lPXBhc3RlKGluZFtpXSwgJy5qcGVnJywgc2VwID0gJycpLCB3aWR0aCA9IDQ4MCwgaGVpZ2h0ID0gNDgwKQ0KcGxvdChsb2cxMChDQy5Ub3RhbERhdGEkdltDQy5Ub3RhbERhdGEkRF9WX1Q9PWluZFtpXV0pLA0KICAgICBDQy5Ub3RhbERhdGEkWVtDQy5Ub3RhbERhdGEkRF9WX1Q9PWluZFtpXV0sDQogICAgIHhsYWIgPSAiVmVsb2NpdHkgKExvZ14xMCwgbW0vcykiLA0KICAgICB5bGFiID0gIlkgQXhpcyAoY20pIiwNCiAgICAgbWFpbiA9IGluZFtpXSkgDQpkZXYub2ZmKCkNCn0NCg0KYGBgDQoNCg0KTG9va2luZyBhdCByZWxhdGlvbnNoaXAgYmV0d2VlbiB2ZWxvY2l0eSBhbmQgdGhlIFggYXhpcw0KDQpgYGB7cn0NCiMjIHRvIHNhdmUgaW5kaXZpZHVhbCBncmFwaHMgb2YgWCBheGlzIGJ5IHZlbG9jaXR5DQpmb3IgKGkgaW4gMTpsZW5ndGgoaW5kKSl7DQogIGpwZWcoZmlsZW5hbWU9cGFzdGUoaW5kW2ldLCAnLmpwZWcnLCBzZXAgPSAnJyksIHdpZHRoID0gNDgwLCBoZWlnaHQgPSA0ODApDQpwbG90KGxvZzEwKENDLlRvdGFsRGF0YSR2W0NDLlRvdGFsRGF0YSREX1ZfVD09aW5kW2ldXSksDQogICAgIENDLlRvdGFsRGF0YSRYW0NDLlRvdGFsRGF0YSREX1ZfVD09aW5kW2ldXSwNCiAgICAgeGxhYiA9ICJWZWxvY2l0eSAoTG9nXjEwLCBtbS9zKSIsDQogICAgIHlsYWIgPSAiWCBBeGlzIChjbSkiLA0KICAgICBtYWluID0gaW5kW2ldKQ0KZGV2Lm9mZigpDQp9DQoNCmBgYA0KDQpMb29raW5nIGF0IHJlbGF0aW9uc2hpcCBiZXR3ZWVuIHZlbG9jaXR5IGFuZCB0aGUgWiBheGlzDQoNCmBgYHtyfQ0KIyMgdG8gc2F2ZSBpbmRpdmlkdWFsIGdyYXBocyBvZiB6IGF4aXMgYnkgdmVsb2NpdHkNCmZvciAoaSBpbiAxOmxlbmd0aChpbmQpKXsNCiAganBlZyhmaWxlbmFtZT1wYXN0ZShpbmRbaV0sICcuanBlZycsIHNlcCA9ICcnKSwgd2lkdGggPSA0ODAsIGhlaWdodCA9IDQ4MCkNCnBsb3QobG9nMTAoQ0MuVG90YWxEYXRhJHZbQ0MuVG90YWxEYXRhJERfVl9UPT1pbmRbaV1dKSwNCiAgICAgQ0MuVG90YWxEYXRhJFpbQ0MuVG90YWxEYXRhJERfVl9UPT1pbmRbaV1dLA0KICAgICB4bGFiID0gIlZlbG9jaXR5IChMb2deMTAsIG1tL3MpIiwNCiAgICAgeWxhYiA9ICJaIEF4aXMgKGNtKSIsDQogICAgIG1haW4gPSBpbmRbaV0pDQpkZXYub2ZmKCkNCn0NCg0KYGBgDQoNCmBgYHtyfQ0KDQoNCmBgYA0KDQo=</div>
 
 
 
