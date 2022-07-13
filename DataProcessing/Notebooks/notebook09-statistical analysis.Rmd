@@ -3,7 +3,6 @@ title: "notebook09 - Statistical Analysis"
 output: html_notebook
 ---
 
-
 ```{r}
 rm(list=ls(all=TRUE))
 load("~/Post-doc/Data/Total Merged Data File (July 11 2022).RData")
@@ -52,6 +51,9 @@ mod2=aov(vel.flow~Flow.rate+Chlorophyll+Flow.rate:Chlorophyll, data=CC.TotalData
 
 
 ```
+
+Stats on each level
+
 ```{r}
 ##Looking at other stats we could run
 library(nlme)
@@ -138,14 +140,9 @@ summary(mod1)
 
 ```
 
-
 #################################################################################
 
-
                  Kernel Density Plots
-
-
-
 
 ##################################################################################
 
@@ -244,13 +241,7 @@ legend("topright",                                  # Add legend to density
 
 ```
 
-
-
-
-
 Now looking at velocity in relation to flow instead....
-
-
 
 ```{r}
 ### Kernel density plots ################### Swimming velocity
@@ -345,15 +336,7 @@ legend("topright",                                  # Add legend to density
 
 ```
 
-
-
-
-
-
-
-
 Now for headings.....
-
 
 ```{r}
 ## copied from notebook00-merging files and adding columns
@@ -460,12 +443,6 @@ legend("topright",                                  # Add legend to density
 
 ```
 
-
-
-
-
-
-
 Now for pitch....
 
 ```{r}
@@ -558,11 +535,6 @@ legend("topright",                                  # Add legend to density
        lty = 1)
 
 ```
-
-
-
-
-
 
 For each level of Flow
 
@@ -887,13 +859,6 @@ legend("topright",                                  # Add legend to density
 
 ```
 
-
-
-
-
-
-
-
 For each level of Chlorophyll
 
 ```{r}
@@ -1193,14 +1158,6 @@ legend("topright",                                  # Add legend to density
 
 ```
 
-
-
-
-
-
-
-
-
 For each level of Flow (now for velocity)
 
 ```{r}
@@ -1441,15 +1398,6 @@ legend("topright",                                  # Add legend to density
 
 
 ```
-
-
-
-
-
-
-
-
-
 
 For each level of Chlorophyll (velocity)
 
@@ -1740,9 +1688,6 @@ legend("topright",                                  # Add legend to density
 
 range(CC.TotalData$turn.angle)
 ```
-
-
-
 
 Now for each level of Flow (for headings)
 
@@ -2065,8 +2010,6 @@ legend("topright",                                  # Add legend to density
 
 
 ```
-
-
 
 Now for each level of Chlorophyll (for headings)
 
