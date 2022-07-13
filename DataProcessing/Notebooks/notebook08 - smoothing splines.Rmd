@@ -4,7 +4,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (July 12 2022).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (July 11 2022).Rdata")
 ```
 
 Remove ends of tank and clean data
@@ -24,11 +24,15 @@ range(CC.TotalData$X)
 range(CC.TotalData$Y)
 range(CC.TotalData$Z)
 
-CC.TotalData$X[which(CC.TotalData$X < 0)] = CC.TotalData$X*(-1)
+CC.TotalData$X[which(CC.TotalData$X < 0)] = CC.TotalData$X+0.1
+##CC.TotalData$X[which(CC.TotalData$X < 0)] = CC.TotalData$X+0.1 ##not sure if this would be better as it's not a mirror image flipping with the negative numbers
 
 hist(CC.TotalData$X)
 
 ```
+
+
+
 ```{r}
 
 CC.TotalData$xsmooth <- runmed(x = CC.TotalData$X, k = 31, na.action = 'na.omit')  ## optimum number for smoothing (try 31 to 101)
@@ -176,7 +180,7 @@ It's in Notebook 06
 
 ```{r}
 rm(D, d1, d2, dd, dotprod, dotx, doty, dotz, dx1, dx2, dy1, dy2, dz1, dz2, list2, list3, list4, list5, v1, v2, vx1, vx2, vy1, vy2, vz1, vz2, x1, x2, y1, y2, z1, z2)
-save.image("~/Post-doc/Data/Total Merged Data File (July 12 2022).RData")
+save.image("~/Post-doc/Data/Updated Factor Levels Data File (July 12 2022).RData")
 ```
 
 
