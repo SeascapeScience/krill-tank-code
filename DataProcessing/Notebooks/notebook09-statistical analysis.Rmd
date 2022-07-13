@@ -1746,33 +1746,6 @@ Now for each level of Flow (for headings)
 par(mar= c(4,4,2,1))
 par(mfrow=c(3,2))
 
-## should be
-f0$heading <- atan2(f0$dx, f0$dy)
-f0$heading.pi <- f0$heading/(2*pi)*360
-range(f0$heading)  ## gives -3.14 to 3.14
-range(f0$heading.pi)  ## gives -180 to 180
-
-f.6$heading <- atan2(f.6$dx, f.6$dy)
-f.6$heading.pi <- f.6$heading/(2*pi)*360
-range(f.6$heading)  ## gives -3.14 to 3.14
-range(f.6$heading.pi)  ## gives -180 to 180
-
-f3$heading <- atan2(f3$dx, f3$dy)
-f3$heading.pi <- f3$heading/(2*pi)*360
-range(f3$heading)  ## gives -3.14 to 3.14
-range(f3$heading.pi)  ## gives -180 to 180
-
-f5$heading <- atan2(f5$dx, f5$dy)
-f5$heading.pi <- f5$heading/(2*pi)*360
-range(f5$heading)  ## gives -3.14 to 3.14
-range(f5$heading.pi)  ## gives -180 to 180
-
-f8$heading <- atan2(f8$dx, f8$dy)
-f8$heading.pi <- f8$heading/(2*pi)*360
-range(f8$heading)  ## gives -3.14 to 3.14
-range(f8$heading.pi)  ## gives -180 to 180
-
-
 ################################ Chlorophyll ########################
 levels(CC.TotalData$Chlorophyll)
 
@@ -2098,32 +2071,6 @@ Now for each level of Chlorophyll (for headings)
 ### Kernel density plots ################### Headings
 par(mar= c(4,4,2,1))
 par(mfrow=c(3,3))
-
-## should be
-ChlA0$heading <- atan2(ChlA0$dx, ChlA0$dy)
-ChlA0$heading.pi <- ChlA0$heading/(2*pi)*360
-
-ChlA4.3$heading <- atan2(ChlA4.3$dx, ChlA4.3$dy)
-ChlA4.3$heading.pi <- ChlA4.3$heading/(2*pi)*360
-
-ChlA4.6$heading <- atan2(ChlA4.6$dx, ChlA4.6$dy)
-ChlA4.6$heading.pi <- ChlA4.6$heading/(2*pi)*360
-
-ChlA5.5$heading <- atan2(ChlA5.5$dx, ChlA5.5$dy)
-ChlA5.5$heading.pi <- ChlA5.5$heading/(2*pi)*360
-
-ChlA6$heading <- atan2(ChlA6$dx, ChlA6$dy)
-ChlA6$heading.pi <- ChlA6$heading/(2*pi)*360
-
-ChlA7$heading <- atan2(ChlA7$dx, ChlA7$dy)
-ChlA7$heading.pi <- ChlA7$heading/(2*pi)*360
-
-ChlA13$heading <- atan2(ChlA13$dx, ChlA13$dy)
-ChlA13$heading.pi <- ChlA13$heading/(2*pi)*360
-
-ChlA19$heading <- atan2(ChlA19$dx, ChlA19$dy)
-ChlA19$heading.pi <- ChlA19$heading/(2*pi)*360
-
 
 ################################ Flow Rate ########################
 levels(CC.TotalData$Flow.rate)
