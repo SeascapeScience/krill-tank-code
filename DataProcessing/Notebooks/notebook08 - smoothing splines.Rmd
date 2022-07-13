@@ -16,10 +16,7 @@ Remove ends of tank and clean data
 
 ## start by getting rid of front and back of tank 
 
-CC.TotalData$trim.X <- CC.TotalData$X
-CC.TotalData$trim.X[CC.TotalData$trim.X<.06] <- NA
-CC.TotalData$trim.X[CC.TotalData$trim.X>0.3] <- NA
-hist(CC.TotalData$trim.X)
+hist(CC.TotalData$X)
 
 #####################################################
 
@@ -27,26 +24,15 @@ range(CC.TotalData$X)
 range(CC.TotalData$Y)
 range(CC.TotalData$Z)
 
-#plot(CC.TotalData$X)
-#plot(CC.TotalData$X[1:542000])
-#plot(CC.TotalData$X[542000:1100000])
-#hist(CC.TotalData$X)
-#hist(CC.TotalData$Y)
-#hist(CC.TotalData$Z)
+CC.TotalData$X[which(CC.TotalData$X < 0)] = CC.TotalData$X*(-1)
 
-m <- mean(CC.TotalData$X[1:542000])-mean(CC.TotalData$X[542000:1112228])  ## correcting for video camera shift
-m
-CC.TotalData$X[542000:1112228] <- CC.TotalData$X[542000:1112228] + m
-
-m <- min(CC.TotalData$X[542000:1112228])
-CC.TotalData$X[542000:1112228] <- CC.TotalData$X[542000:1112228] - m
-
+hist(CC.TotalData$X)
 
 ```
 ```{r}
 
-CC.TotalData$xsmooth <- runmed(x = CC.TotalData$trim.X, k = 31, na.action = 'na.omit')  ## optimum number for smoothing (try 31 to 101)
-plot(CC.TotalData$trim.X[1000:10000])
+CC.TotalData$xsmooth <- runmed(x = CC.TotalData$X, k = 31, na.action = 'na.omit')  ## optimum number for smoothing (try 31 to 101)
+plot(CC.TotalData$X[1000:10000])
 plot(CC.TotalData$xsmooth[1000:10000])
 
 CC.TotalData$ysmooth <- runmed(x = CC.TotalData$Y, k = 31, na.action = 'na.omit')
@@ -66,3 +52,48 @@ rm(alldata, df, TotalData, D, d1, d2, dd, dotprod, dotx, doty, dotz, dx1, dx2, d
 rm(lth, l, ind, i, files)
 rm(metadata, ldf)
 save.image("~/Post-doc/Data/Total Merged Data File (July 12 2022).RData")
+```
+
+
+
+```{r}
+x1 <- CC.TotalData$X[1:(nrow(CC.TotalData)-1)]
+x2 <- CC.TotalData$X[2:nrow(CC.TotalData)]
+CC.TotalData$dx[1:(nrow(CC.TotalData)-1)] <- x2-x1
+
+y1 <- CC.TotalData$Y[1:(nrow(CC.TotalData)-1)]
+y2 <- CC.TotalData$Y[2:nrow(CC.TotalData)]
+CC.TotalData$dy[1:(nrow(CC.TotalData)-1)] <- y2-y1
+
+z1 <- CC.TotalData$Z[1:(nrow(CC.TotalData)-1)]
+z2 <- CC.TotalData$Z[2:nrow(CC.TotalData)]
+CC.TotalData$dz[1:(nrow(CC.TotalData)-1)] <- z2-z1
+
+CC.TotalData$d <- sqrt(CC.TotalData$dx^2 + CC.TotalData$dy^2 + CC.TotalData$dz^2)
+
+head(CC.TotalData)
+tail(CC.TotalData)
+```
+
+
+
+```{r}
+CC.TotalData$vx <- CC.TotalData$dx/(1/30)  ## velocity on the x axis
+CC.TotalData$vy <- CC.TotalData$dy/(1/30)  ## velocity on the y axis
+CC.TotalData$vz <- CC.TotalData$dz/(1/30)  ## velocity on the z axis
+CC.TotalData$v <- CC.TotalData$d/(1/30) ## total velocity
+
+CC.TotalData$heading <- atan2(CC.TotalData$dx, CC.TotalData$dy)
+CC.TotalData$heading.pi <- CC.TotalData$heading/(2*pi)*360
+CC.TotalData$pitch <- atan2(CC.TotalData$dz, (sqrt(CC.TotalData$dx^2 + CC.TotalData$dy^2)))
+CC.TotalData$pitch.perfect <- CC.TotalData$pitch/(2*pi)*360
+
+
+hist(CC.TotalData$pitch/(2*pi)*360)
+hist(CC.TotalData$heading/(2*pi)*360)
+
+hist(CC.TotalData$dz[abs(CC.TotalData$dz)<.01],breaks = 100)
+hist(CC.TotalData$dy[abs(CC.TotalData$dy)<.01],breaks = 100)
+hist(CC.TotalData$dx[abs(CC.TotalData$dx)<.01],breaks = 100)
+
+```
