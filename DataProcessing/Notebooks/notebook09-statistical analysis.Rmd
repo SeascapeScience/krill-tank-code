@@ -246,9 +246,7 @@ Now looking at velocity in relation to flow instead....
 
 ```{r}
 ### Kernel density plots ################### Swimming velocity
-par(mar= c(4,4,2,1))
-par(mfrow=c(2,2))
-#range(CC.TotalData$vel.flow)
+##range(CC.TotalData$vel.flow)
 ## plot(log.vel.flow)
 ##log.vel.flow <- log10(CC.TotalData$vel.flow[CC.TotalData$vel.flow > 0])
 #str(CC.TotalData)
@@ -256,8 +254,13 @@ par(mfrow=c(2,2))
 ################################ Flow Rate ########################
 levels(CC.TotalData$Flow.rate)
 
+####################################################################
+par(mar= c(4,4,2,1))
+par(mfrow=c(2,2))
+
+
 kd1 <- density(l1$vel.flow[l1$Flow.rate=="0"])
-plot(kd1, xlim = c(-12,12), ylim = c(0, 110), col='blue', lwd=2, main = "Velocity (in relation to flow, not logged) Vs Flow Rate, Lights On")
+plot(kd1, xlim = c(-12,12), ylim = c(0, 6), col='blue', lwd=2, main = "Velocity (in relation to flow, not logged) Vs Flow Rate, Lights On")
 
 kd2 <- density(l1$vel.flow[l1$Flow.rate=="0.6"])
 lines(kd2, col='light blue', lwd=2)
@@ -279,28 +282,28 @@ legend("topright",                                  # Add legend to density
 ################################ Chlorophyll ########################
 levels(CC.TotalData$Chlorophyll)
 
-kd1 <- density(log10(l1$vel.flow[l1$Chlorophyll=="0"]))
-plot(kd1, xlim = c(-90,90), ylim = c(0, 0.035), col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Chlorophyll, Lights On")
+kd1 <- density(l1$vel.flow[l1$Chlorophyll=="0"])
+plot(kd1, xlim = c(-12,12), ylim = c(0, 6), col='blue', lwd=2, main = "Velocity (in relation to flow, not logged) Vs Chlorophyll, Lights On")
 
-kd2 <- density(log10(l1$vel.flow[l1$Chlorophyll=="4.3"]))
+kd2 <- density(l1$vel.flow[l1$Chlorophyll=="4.3"])
 lines(kd2, col='light blue', lwd=2)
 
-kd3 <- density(log10(l1$vel.flow[l1$Chlorophyll=="4.6"]))
+kd3 <- density(l1$vel.flow[l1$Chlorophyll=="4.6"])
 lines(kd3, col='yellow', lwd=2)
 
-kd8 <- density(log10(l1$vel.flow[l1$Chlorophyll=="5.5"]))
+kd8 <- density(l1$vel.flow[l1$Chlorophyll=="5.5"])
 lines(kd8, col='orange', lwd=2)
 
-kd4 <- density(log10(l1$vel.flow[l1$Chlorophyll=="6.1"]))
+kd4 <- density(l1$vel.flow[l1$Chlorophyll=="6.1"])
 lines(kd4, col='red', lwd=2)
 
-kd5 <- density(log10(l1$vel.flow[l1$Chlorophyll=="7.6"]))
+kd5 <- density(l1$vel.flow[l1$Chlorophyll=="7.6"])
 lines(kd5, col='dark red', lwd=2)
 
-kd6 <- density(log10(l1$vel.flow[l1$Chlorophyll=="13.5"]))
+kd6 <- density(l1$vel.flow[l1$Chlorophyll=="13.5"])
 lines(kd6, col='purple', lwd=2)
 
-kd7 <- density(log10(l1$vel.flow[l1$Chlorophyll=="19"]))
+kd7 <- density(l1$vel.flow[l1$Chlorophyll=="19"])
 lines(kd7, col='black', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -312,7 +315,7 @@ legend("topright",                                  # Add legend to density
 levels(CC.TotalData$Guano)
 
 kd1 <- density(log10(l1$vel.flow[l1$Guano=="Present"]))
-plot(kd1, xlim = c(-90,90), ylim = c(0, 0.035), col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Guano, Lights On")
+plot(kd1, xlim = c(-12,12), ylim = c(0, 6), col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Guano, Lights On")
 
 kd2 <- density(log10(l1$vel.flow[l1$Guano=="Absent"]))
 lines(kd2, col='red', lwd=2)
@@ -326,7 +329,7 @@ legend("topright",                                  # Add legend to density
 levels(CC.TotalData$Light)
 
 kd1 <- density(l1$log.vel.flow[l1$Light=="Present"])
-plot(kd1, xlim = c(-90,90), ylim = c(0, 0.035), col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Light")
+plot(kd1, xlim = c(-12,12), ylim = c(0, 6), col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Light")
 
 kd2 <- density(l1$log.vel.flow[l1$Light=="Absent"])
 lines(kd2, col='red', lwd=2)
