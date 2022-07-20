@@ -6,6 +6,7 @@ output: html_notebook
 ```{r}
 rm(list=ls(all=TRUE))
 load("~/Post-doc/Data/Total Merged Data File (July 11 2022).RData")
+str(CC.TotalData)
 ```
 
 Data for mean velocity, angular velocity, turn and heading angles each will be analyzed by a mixed model ANCOVA with chemical concentration, and light as fixed (treatment) effects, flow velocity as the co-variate and replicate as a random (blocking affect) with individual paths as the unit of analysis.
@@ -158,19 +159,19 @@ par(mfrow=c(2,2))
 ################################ Flow Rate ########################
 levels(CC.TotalData$Flow.rate)
 
-kd1 <- density(l1$turn.angle[l1$Flow.rate=="0"])
-plot(kd1, xlim = c(5,175), ylim = c(0, 0.030), col='blue', lwd=2, main = "Turn Angles Vs Flow Rate, (all data no light var), Lights On")
+kd1 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="0"])
+plot(kd1, xlim = c(5,175), ylim = c(0, 0.030), col='blue', lwd=2, main = "Turn Angles Vs Flow Rate")
 
-kd2 <- density(l1$turn.angle[l1$Flow.rate=="0.6"])
+kd2 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="0.6"])
 lines(kd2, col='light blue', lwd=2)
 
-kd3 <- density(l1$turn.angle[l1$Flow.rate=="3"])
+kd3 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="3"])
 lines(kd3, col='yellow', lwd=2)
 
-kd4 <- density(l1$turn.angle[l1$Flow.rate=="5.9"])
+kd4 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="5.9"])
 lines(kd4, col='orange', lwd=2)
 
-kd5 <- density(l1$turn.angle[l1$Flow.rate=="8.9"])
+kd5 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="8.9"])
 lines(kd5, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -249,8 +250,9 @@ par(mar= c(4,4,2,1))
 par(mfrow=c(2,2))
 #range(CC.TotalData$vel.flow)
 #plot(CC.TotalData$vel.flow)
-##CC.TotalData$log.vel.flow <- log10(CC.TotalData$vel.flow)
+log.vel.flow <- log10(CC.TotalData$vel.flow[CC.TotalData$vel.flow > 0])
 #str(CC.TotalData)
+#  vels <- (CC.TotalData$v[CC.TotalData$D_V_T==ind[i]])  ## vels <- log10(vels[vels>0])  ## from notebook01, could be useful to try this instead
 ################################ Flow Rate ########################
 levels(CC.TotalData$Flow.rate)
 
@@ -345,8 +347,8 @@ Now for headings.....
 range(CC.TotalData$heading)  ## gives -1.57 to 1.57
 range(l1$heading.pi[l1$Flow.rate=="0"])  ## gives -90 to 90  (why not -180, to 180??)
 ## should be
-CC.TotalData$heading <- atan2(CC.TotalData$dx, CC.TotalData$dy)
-
+l1$heading <- atan2(l1$dx, l1$dy)
+range(l1$heading)
 l1$heading.pi <- l1$heading/(2*pi)*360
 range(CC.TotalData$heading)  ## gives -3.14 to 3.14
 range(l1$heading.pi)  ## gives -180 to 180  
@@ -545,10 +547,10 @@ par(mar= c(4,4,2,1))
 par(mfrow=c(3,2))
 
 ################################ Chlorophyll ########################
-levels(CC.TotalData$Chlorophyll)
+levels(f0$Chlorophyll)
 
 kd1 <- density(f0$turn.angle[f0$Chlorophyll=="0"])
-plot(kd1, xlim = c(5,175), ylim = c(0, 0.05), col='blue', lwd=2, main = "Turn Angles Vs Chlorophyll, Flow = 0")
+plot(kd1, xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Chlorophyll, Flow = 0")
 
 ##kd2 <- density(f0$turn.angle[f0$Chlorophyll=="4.3"])
 ##lines(kd2, col='light blue', lwd=2)
@@ -713,7 +715,7 @@ legend("topright",                                  # Add legend to density
 
 par(mar= c(4,4,2,1))
 par(mfrow=c(3,2))
-levels(CC.TotalData$Guano)
+levels(f0$Guano)
 
 kd1 <- density(f0$turn.angle[f0$Guano=="Present"])
 plot(kd1, xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Guano, Flow = 0")
@@ -1697,8 +1699,46 @@ Now for each level of Flow (for headings)
 par(mar= c(4,4,2,1))
 par(mfrow=c(3,2))
 
+f0$heading <- atan2(f0$dx, f0$dy)
+range(f0$heading)
+f0$heading.pi <- f0$heading/(2*pi)*360
+range(CC.TotalData$heading)  ## gives -3.14 to 3.14
+range(f0$heading.pi)  ## gives -180 to 180  
+
+
+f.6$heading <- atan2(f.6$dx, f.6$dy)
+range(f.6$heading)
+f.6$heading.pi <- f.6$heading/(2*pi)*360
+range(CC.TotalData$heading)  ## gives -3.14 to 3.14
+range(f.6$heading.pi)  ## gives -180 to 180  
+
+
+f3$heading <- atan2(f3$dx, f3$dy)
+range(f3$heading)
+f3$heading.pi <- f3$heading/(2*pi)*360
+range(CC.TotalData$heading)  ## gives -3.14 to 3.14
+range(f3$heading.pi)  ## gives -180 to 180  
+
+
+f5$heading <- atan2(f5$dx, f5$dy)
+range(f5$heading)
+f5$heading.pi <- f5$heading/(2*pi)*360
+range(CC.TotalData$heading)  ## gives -3.14 to 3.14
+range(f5$heading.pi)  ## gives -180 to 180  
+
+
+f8$heading <- atan2(f8$dx, f8$dy)
+range(f8$heading)
+f8$heading.pi <- f8$heading/(2*pi)*360
+range(CC.TotalData$heading)  ## gives -3.14 to 3.14
+range(f8$heading.pi)  ## gives -180 to 180  
+
+
 ################################ Chlorophyll ########################
 levels(CC.TotalData$Chlorophyll)
+
+par(mar= c(4,4,2,1))
+par(mfrow=c(3,2))
 
 kd1 <- density(f0$heading.pi[f0$Chlorophyll=="0"])
 plot(kd1, xlim = c(-180,180), ylim = c(0, 0.02), col='blue', lwd=2, main = "Headings Vs Chlorophyll, Flow = 0")

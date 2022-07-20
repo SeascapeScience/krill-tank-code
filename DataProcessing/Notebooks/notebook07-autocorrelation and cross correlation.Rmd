@@ -22,6 +22,8 @@ ggpairs(ChlA0[700000:750000,], columns = c(21, 22, 23, 26, 27))  ### 0 chlorophy
 
 ggpairs(g1[60000:120000,], columns = c(21, 22, 23, 26, 27))      ### Guano present data
 
+ggpairs(f8[60000:120000,], columns = c(21, 22, 23, 26, 27, 28, 29))      ### flow 8.9 cm/s data
+
 ### looking at specific pairs
 
 ggplot(CC.TotalData[10000:20000,], aes(abs(pitch), abs(turn.angle-90))) +   ### weird pattern ??
