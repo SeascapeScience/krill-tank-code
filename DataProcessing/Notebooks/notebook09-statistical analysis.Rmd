@@ -249,26 +249,26 @@ Now looking at velocity in relation to flow instead....
 par(mar= c(4,4,2,1))
 par(mfrow=c(2,2))
 #range(CC.TotalData$vel.flow)
-#plot(CC.TotalData$vel.flow)
-log.vel.flow <- log10(CC.TotalData$vel.flow[CC.TotalData$vel.flow > 0])
+## plot(log.vel.flow)
+##log.vel.flow <- log10(CC.TotalData$vel.flow[CC.TotalData$vel.flow > 0])
 #str(CC.TotalData)
 #  vels <- (CC.TotalData$v[CC.TotalData$D_V_T==ind[i]])  ## vels <- log10(vels[vels>0])  ## from notebook01, could be useful to try this instead
 ################################ Flow Rate ########################
 levels(CC.TotalData$Flow.rate)
 
-kd1 <- density(log10(l1$vel.flow[l1$Flow.rate=="0"]))
-plot(kd1, xlim = c(-10,90), ylim = c(0, 0.035), col='blue', lwd=2, main = "Velocity (in relation to flow) Vs Flow Rate, Lights On")
+kd1 <- density(l1$vel.flow[l1$Flow.rate=="0"])
+plot(kd1, xlim = c(-12,12), ylim = c(0, 110), col='blue', lwd=2, main = "Velocity (in relation to flow, not logged) Vs Flow Rate, Lights On")
 
-kd2 <- density(log10(l1$vel.flow[l1$Flow.rate=="0.6"]))
+kd2 <- density(l1$vel.flow[l1$Flow.rate=="0.6"])
 lines(kd2, col='light blue', lwd=2)
 
-kd3 <- density(log10(l1$vel.flow[l1$Flow.rate=="3"]))
+kd3 <- density(l1$vel.flow[l1$Flow.rate=="3"])
 lines(kd3, col='yellow', lwd=2)
 
-kd4 <- density(log10(l1$vel.flow[l1$Flow.rate=="5.9"]))
+kd4 <- density(l1$vel.flow[l1$Flow.rate=="5.9"])
 lines(kd4, col='orange', lwd=2)
 
-kd5 <- density(log10(l1$vel.flow[l1$Flow.rate=="8.9"]))
+kd5 <- density(l1$vel.flow[l1$Flow.rate=="8.9"])
 lines(kd5, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
