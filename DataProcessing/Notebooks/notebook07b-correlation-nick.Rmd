@@ -14,27 +14,40 @@ rm(list=ls(all=TRUE))
 #load('~/Work/Data/Antarctic/Total Merged Data File (July 11 2022).RData')
 load('~/Work/Data/Antarctic/CC.TotalData.2022.07.20.RData')
 
-head(TotalData) ## all rows of data from TotalData
-head(CC.TotalData) ## ONLY complete cases of TotalData
+#head(TotalData) ## all rows of data from TotalData
+#head(CC.TotalData) ## ONLY complete cases of TotalData
 
 
 library(ggplot2)
 library(GGally)
+library(hexbin)
 
 flow.rate <- 0  # 0 0.6 3 5.9 8.9
 chlorophyll <- 0 # 0 4.3 4.6 5.5 6.1 7.6 13.5 19
 guano <- 1 # Absent=1 Present=2
 light <- 2 # Absent=1 Present=2
 
+frs <- as.numeric(as.character(unique(CC.TotalData$Flow.rate)))
+chls <- as.numeric(as.character(unique(CC.TotalData$Chlorophyll)))
+guans <- c(1,2)
+light <- c(1,2)
+
+conditions <- expand.grid(frs,chls,guans,light)
+
+
 velocity <- CC.TotalData$v[
   (CC.TotalData$Flow.rate==flow.rate & 
      CC.TotalData$Chlorophyll==chlorophyll & 
      as.numeric(CC.TotalData$Guano)==guano &
      as.numeric(CC.TotalData$Light)==light)]
-plot(log10(velocity[1:length(x)-1]),log10(velocity[2:length(x)]),
-     pch = 20,
-  cex = 1.2,
-  col = rgb(0, 0, 0.2, .1))
+
+plot(hexbin(log10(velocity[1:length(velocity)-1]),
+            log10(velocity[2:length(velocity)]),
+            xbins = 100),
+     xlab='Log velocity (m/s)',
+     ylab='Log velocity (m/s) next time step',
+     legend = 0)
+     
 
 C <- NA
 chls <- as.numeric(as.character(unique(CC.TotalData$Chlorophyll)))
@@ -48,13 +61,36 @@ for (i in 1:length(chls))
      as.numeric(CC.TotalData$Light)==light)]
   if (length(velocity) <= 1) {
     C[i] <- NA } else {
-      c<-cor.test(log10(velocity[1:length(x)-1]),
-                  log10(velocity[2:length(x)]))
+      c<-cor.test(log10(velocity[1:length(velocity)-1]),
+                  log10(velocity[2:length(velocity)]))
       C[i] <- c$estimate}
 }
   
 
+for (i in 1:dim(conditions)[1])
+{
+  velocity <- CC.TotalData$v[
+  (CC.TotalData$Flow.rate==conditions[i,1] & 
+     CC.TotalData$Chlorophyll==conditions[i,2] & 
+     as.numeric(CC.TotalData$Guano)==conditions[i,3] &
+     as.numeric(CC.TotalData$Light)==conditions[i,4])]
+  if (length(velocity) <= 1) {
+    conditions[i,5] <- NA } else {
+      c<-cor.test(log10(velocity[1:length(velocity)-1]),
+                  log10(velocity[2:length(velocity)]))
+      conditions[i,5] <- c$estimate
+        v0 <- log10(velocity[1:length(velocity)-1])
+        v1 <- log10(velocity[2:length(velocity)])
+        df <- data.frame(v0,v1)
+        fit <- lm(v1 ~ v0 + 1, data = df)
+        conditions[i,6] <- fit$coefficients[1]
+        conditions[i,7] <- fit$coefficients[2]
+  }  
+}
 
+
+
+#####
 
 ggpairs(CC.TotalData[
   (CC.TotalData$Flow.rate==flow.rate & 
