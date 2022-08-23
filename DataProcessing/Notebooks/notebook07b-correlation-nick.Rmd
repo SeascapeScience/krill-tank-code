@@ -1,0 +1,214 @@
+---
+title: "Cross-correlation, Nick version"
+output: html_notebook
+---
+
+
+
+```{r}
+# This is a work in progress....
+rm(list=ls(all=TRUE))
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (August 17 2022).Rdata")
+#load('~/Work/Data/Antarctic/Total Merged Data File (July 11 2022).RData')
+##load('~/Work/Data/Antarctic/CC.TotalData.2022.07.20.RData')
+#head(TotalData) ## all rows of data from TotalData
+#head(CC.TotalData) ## ONLY complete cases of TotalData
+library(ggplot2)
+library(GGally)
+library(hexbin)
+flow.rate <- 0  # 0 0.6 3 5.9 8.9
+chlorophyll <- 0 # 0 4.3 4.6 5.5 6.1 7.6 13.5 19
+guano <- 1 # Absent=1 Present=2
+light <- 2 # Absent=1 Present=2
+frs <- as.numeric(as.character(unique(CC.TotalData$Flow.rate)))
+chls <- as.numeric(as.character(unique(CC.TotalData$Chlorophyll)))
+guans <- c(1,2)
+light <- c(1,2)
+conditions <- expand.grid(frs,chls,guans,light)
+velocity <- CC.TotalData$v[
+  (CC.TotalData$Flow.rate==flow.rate & 
+     CC.TotalData$Chlorophyll==chlorophyll & 
+     as.numeric(CC.TotalData$Guano)==guano &
+     as.numeric(CC.TotalData$Light)==light)]
+plot(hexbin(log10(velocity[1:length(velocity)-1]),
+            log10(velocity[2:length(velocity)]),
+            xbins = 100),
+     xlab='Log velocity (m/s)',
+     ylab='Log velocity (m/s) next time step',
+     legend = 0)
+
+
+velocity.flow <- CC.TotalData$vel.flow[
+  (CC.TotalData$Flow.rate==flow.rate & 
+     CC.TotalData$Chlorophyll==chlorophyll & 
+     as.numeric(CC.TotalData$Guano)==guano &
+     as.numeric(CC.TotalData$Light)==light)]
+plot(hexbin(log10(velocity.flow[1:length(velocity.flow)-1]),  ## works without log10, but not with
+            log10(velocity.flow[2:length(velocity.flow)]),
+            xbins = 100),
+     xlab='Log velocity (m/s) (relation to flow)',
+     ylab='Log velocity (m/s) (relation to flow) next time step',
+     legend = 0)
+
+
+
+turn.angle <- CC.TotalData$turn.angle[
+  (CC.TotalData$Flow.rate==flow.rate & 
+     CC.TotalData$Chlorophyll==chlorophyll & 
+     as.numeric(CC.TotalData$Guano)==guano &
+     as.numeric(CC.TotalData$Light)==light)]
+plot(hexbin(turn.angle[1:length(turn.angle)-1],
+            turn.angle[2:length(turn.angle)],
+            xbins = 100),
+     xlab='Turn Angles (degrees)',
+     ylab='Turn Angles (degrees) next time step',
+     legend = 0)
+
+
+turn.anglexy <- CC.TotalData$turn.anglexy[
+  (CC.TotalData$Flow.rate==flow.rate & 
+     CC.TotalData$Chlorophyll==chlorophyll & 
+     as.numeric(CC.TotalData$Guano)==guano &
+     as.numeric(CC.TotalData$Light)==light)]
+turn.anglexy <- turn.anglexy/(2*pi)*360
+plot(hexbin(turn.anglexy[1:length(turn.anglexy)-1],
+            turn.anglexy[2:length(turn.anglexy)],
+            xbins = 100),
+     xlab='Turn Angles (xy, degrees)',
+     ylab='Turn Angles (xy, degrees) next time step',
+     legend = 0)
+
+
+turn.angleyz <- CC.TotalData$turn.angleyz[
+  (CC.TotalData$Flow.rate==flow.rate & 
+     CC.TotalData$Chlorophyll==chlorophyll & 
+     as.numeric(CC.TotalData$Guano)==guano &
+     as.numeric(CC.TotalData$Light)==light)]
+turn.angleyz <- turn.angleyz/(2*pi)*360
+plot(hexbin(turn.angleyz[1:length(turn.angleyz)-1],
+            turn.angleyz[2:length(turn.angleyz)],
+            xbins = 100),
+     xlab='Turn Angles (yz, degrees)',
+     ylab='Turn Angles (yz, degrees) next time step',
+     legend = 0)
+
+###############################################################################
+
+####     Not working
+     
+C <- NA
+chls <- as.numeric(as.character(unique(CC.TotalData$Chlorophyll)))
+for (i in 1:length(chls))
+{
+  chlorophyll <- (chls[i])
+  velocity <- CC.TotalData$v[
+  (CC.TotalData$Flow.rate==flow.rate & 
+     CC.TotalData$Chlorophyll==chlorophyll & 
+     as.numeric(CC.TotalData$Guano)==guano &
+     as.numeric(CC.TotalData$Light)==light)]
+  if (length(velocity) <= 1) {
+    C[i] <- NA } else {
+      c<-cor.test(log10(velocity[1:length(velocity)-1]),
+                  log10(velocity[2:length(velocity)]))
+      C[i] <- c$estimate}
+}
+  
+for (i in 1:dim(conditions)[1])
+{
+  velocity <- CC.TotalData$v[
+  (CC.TotalData$Flow.rate==conditions[i,1] & 
+     CC.TotalData$Chlorophyll==conditions[i,2] & 
+     as.numeric(CC.TotalData$Guano)==conditions[i,3] &
+     as.numeric(CC.TotalData$Light)==conditions[i,4])]
+  if (length(velocity) <= 1) {
+    conditions[i,5] <- NA } else {
+      c<-cor.test(log10(velocity[1:length(velocity)-1]),
+                  log10(velocity[2:length(velocity)]))
+      conditions[i,5] <- c$estimate
+        v0 <- log10(velocity[1:length(velocity)-1])
+        v1 <- log10(velocity[2:length(velocity)])
+        df <- data.frame(v0,v1)
+        fit <- lm(v1 ~ v0 + 1, data = df)
+        conditions[i,6] <- fit$coefficients[1]
+        conditions[i,7] <- fit$coefficients[2]
+  }  
+}
+#####
+ggpairs(CC.TotalData[
+  (CC.TotalData$Flow.rate==flow.rate & 
+     CC.TotalData$Chlorophyll==chlorophyll & 
+     as.numeric(CC.TotalData$Guano)==guano &
+     as.numeric(CC.TotalData$Light)==light),],
+  columns = c(21,22,23,26,27,28))
+
+plot(log10(CC.TotalData[
+  (CC.TotalData$Flow.rate==flow.rate & 
+     CC.TotalData$Chlorophyll==chlorophyll & 
+     as.numeric(CC.TotalData$Guano)==guano &
+     as.numeric(CC.TotalData$Light)==light),21]),
+  (CC.TotalData[
+  (CC.TotalData$Flow.rate==flow.rate & 
+     CC.TotalData$Chlorophyll==chlorophyll & 
+     as.numeric(CC.TotalData$Guano)==guano &
+     as.numeric(CC.TotalData$Light)==light),22]))
+
+plot((CC.TotalData[
+  (CC.TotalData$Flow.rate==flow.rate & 
+     CC.TotalData$Chlorophyll==chlorophyll & 
+     as.numeric(CC.TotalData$Guano)==guano &
+     as.numeric(CC.TotalData$Light)==light),22]),
+  (CC.TotalData[
+  (CC.TotalData$Flow.rate==flow.rate & 
+     CC.TotalData$Chlorophyll==chlorophyll & 
+     as.numeric(CC.TotalData$Guano)==guano &
+     as.numeric(CC.TotalData$Light)==light),23]),
+  pch = 20,
+  cex = 1.2,
+  col = rgb(0, 0, 0.2, .1))
+
+ggpairs(CC.TotalData[
+  (CC.TotalData$Flow.rate==flow.rate & 
+     CC.TotalData$Chlorophyll==chlorophyll),],
+  columns = c(21,22,23,26,27,28))
+
+#####################################################################################
+
+### ggpairs from TotalData
+ggpairs(CC.TotalData[60000:120000,], columns = c(21, 22, 23, 26, 27, 28)) ### works
+## look at cross correlation with specific variables?
+ggpairs(ChlA0[700000:750000,], columns = c(21, 22, 23, 26, 27))  ### 0 chlorophyll data
+ggpairs(g1[60000:120000,], columns = c(21, 22, 23, 26, 27))      ### Guano present data
+### looking at specific pairs
+ggplot(CC.TotalData[10000:20000,], aes(abs(pitch), abs(turn.angle-90))) +   ### weird pattern ??
+  geom_point(alpha = 0.7)
+ggplot(CC.TotalData[10000:20000,], aes(heading, turn.angle)) +     ### no pattern (good :) )
+  geom_point(alpha = 0.7)
+ggplot(CC.TotalData[10000:20000,], aes(vel.turn.angle, turn.angle)) +      #### pattern, linear regression??
+  geom_point(alpha = 0.7)
+```
+Auto correlation
+
+
+```{r}
+################
+#### auto correlation vs values vs lag(2) etc
+library(tseries)
+### acf - auto correlation function
+par(mar= c(2,2,4,2))
+acf(CC.TotalData$turn.angle[seq(1,10000,30)])  ##sinusoidal (statistical reason for it)
+acf(CC.TotalData$vel.turn.angle[seq(1,10000,30)])   ##sinusoidal (statistical reason for it)
+acf(CC.TotalData$vel.flow[seq(1,10000,30)])
+acf(CC.TotalData$pitch[seq(1,10000,30)])
+acf(CC.TotalData$heading[seq(1,10000,30)])
+acf(CC.TotalData$v[seq(1,10000,30)])
+acf(CC.TotalData$d[seq(1,10000,30)])
+####################################################################################################################
+acf(CC.TotalData$vx[seq(1,10000,30)])   #### need to look into this more
+acf(CC.TotalData$vy[seq(1,10000,30)]) 
+acf(CC.TotalData$vz[seq(1,10000,30)]) 
+acf(CC.TotalData$dx[seq(1,10000,30)])    #### need to look into this more
+acf(CC.TotalData$dy[seq(1,10000,30)]) 
+acf(CC.TotalData$dz[seq(1,10000,30)]) 
+####################################################################################################################
+###   Do we need to look at acf across variables as well?
+```

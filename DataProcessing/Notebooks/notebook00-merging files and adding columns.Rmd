@@ -13,6 +13,7 @@ setwd("~/Post-doc/Data/Processed MatLab Files")
 path <- "C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Processed MatLab Files\\"
 files <- list.files(path=path, pattern="*.csv")
 
+
 ldf = lapply(files, function(x) {
       dat = read.table(x, header=T, sep=",")
       # Add column names
@@ -29,11 +30,11 @@ ldf = lapply(files, function(x) {
 library(dplyr)
 df <- do.call("rbind", ldf)
 ## Date_view_track factor created
-df$D_V_T <- paste(df$Date, df$View, df$Track, sep='_')
-df$D_V_T <- as.factor(df$D_V_T)
+df$D_V_T <- paste(ldf$Date, ldf$View, ldf$Track, sep='_')
+df$D_V_T <- as.factor(ldf$D_V_T)
 ## Date_view factor created
-df$D_V <- paste(df$Date, df$View, sep='_') 
-df$D_V <- as.factor(df$D_V)
+df$D_V <- paste(ldf$Date, ldf$View, sep='_') 
+df$D_V <- as.factor(ldf$D_V)
 
 head(df)
 tail(df)
@@ -89,7 +90,7 @@ TotalData$vy <- TotalData$dy/(1/30)  ## velocity on the y axis
 TotalData$vz <- TotalData$dz/(1/30)  ## velocity on the z axis
 TotalData$v <- TotalData$d/(1/30) ## total velocity
 
-TotalData$heading <- atan(TotalData$dx/TotalData$dy)
+TotalData$heading <- atan2(TotalData$dx, TotalData$dy)
 TotalData$pitch <- atan(TotalData$dz/(sqrt(TotalData$dx^2 + TotalData$dy^2)))
 
 hist(TotalData$pitch/(2*pi)*360)
@@ -102,7 +103,7 @@ hist(TotalData$dx[abs(TotalData$dx)<.01],breaks = 100)
 ```
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (July 12 2022).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (August 17 2022).RData")
 
 ```
 

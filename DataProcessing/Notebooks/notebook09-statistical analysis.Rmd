@@ -5,7 +5,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("~/Post-doc/Data/Total Merged Data File (July 11 2022).RData")
+load("~/Post-doc/Data/Total Merged Data File (August 17 2022).RData")
 str(CC.TotalData)
 ```
 
@@ -79,13 +79,13 @@ lmer(Y ~ A*B + (1|subject) + (1|A:subject) + (1|B:subject), data=d)  ### lme4
 
 #########    our data using nlme package     #########
 
-mode1 <- lme(heading~vel.flow*Light, random= ~1|D_V_T, data=CC.TotalData)
+mode1 <- lme(pitch.perfect~Chlorophyll*Light, random= ~1|D_V_T, data=CC.TotalData)
 
-mode2 <- lme(heading~vel.flow, random= ~1|D_V_T, data=CC.TotalData)
+mode2 <- lme(pitch.perfect~Light, random= ~1|D_V_T, data=CC.TotalData)
 
 anova(mode1, mode2) #if it shows only minor improvement, no need to include missing factor
 
-anova(mode1)
+anova(mode2)
 
 
 #########    our data using l4me package     #########
@@ -99,30 +99,30 @@ anova(model1, model2) #if it shows only minor improvement, no need to include mi
 anova(model1)
 
 ######### plotting effect of the models    ##########
-plot(effect("vel.flow*Light",se=TRUE, confidence.level=.95, mode1))
+plot(effect("turn.angle*Flow.rate",se=TRUE, confidence.level=.95, mode2))
 
 
 ###### interaction plot with Lattice extra #########
 library(latticeExtra)
-xyplot(CC.TotalData$turn.angle~CC.TotalData$Flow.rate|CC.TotalData$Light*CC.TotalData$Chlorophyll,  main="Scatterplots by Light and Chlorophyll", 
-   ylab="Turn Angle (degrees)", xlab="Flow Rate (cm/s)") +
+xyplot(CC.TotalData$vel.flow~CC.TotalData$turn.angle|CC.TotalData$Light*CC.TotalData$Flow.rate,  main="Scatterplots by Light and Flow Rate", 
+   ylab="Vel.flow", xlab="Turn Angle") +
    layer(panel.ablineq(lm(y ~ x), r.sq = TRUE,
    at = 0.75, adj=1:5), style = 4)
 
 
 ############## interaction plots ###########################
 
-interaction.plot(CC.TotalData$Flow.rate, ## x axis
-                 CC.TotalData$Chlorophyll, ## factor for lines
-                 log10(CC.TotalData$vel.flow),  ## y axis
+interaction.plot(CC.TotalData$vel.flow, ## x axis
+                 CC.TotalData$Flow.rate, ## factor for lines
+                 CC.TotalData$turn.angle,  ## y axis
                  fun = mean,
                  type = c("b"), legend = TRUE,
-                 trace.label = "Chlorophyll",
-                 ylim = c(-1,10),
+                 trace.label = "Flow Rate",
+                 ylim = c(-1,180),
                  main = "Lights On",
-                 xlab = "Flow rate (cm/s)",
-                 ylab = "Velocity (cm/s)",
-                 col = CC.TotalData$Chlorophyll, pch = c(1:9),
+                 xlab = "vel.flow",
+                 ylab = "turn angle",
+                 col = CC.TotalData$Flow.rate, pch = c(1:9),
                  axes = TRUE)
 #library(tidyr)
 #library(dplyr)
@@ -137,7 +137,7 @@ rm(mode2)
 
 
 mod1 <- lm(vel.flow~Flow.rate*Chlorophyll, data = CC.TotalData)
-summary(mod1)
+summary(mode2)
 
 ```
 
@@ -350,7 +350,7 @@ Now for headings.....
 range(CC.TotalData$heading)  ## gives -1.57 to 1.57
 range(l1$heading.pi[l1$Flow.rate=="0"])  ## gives -90 to 90  (why not -180, to 180??)
 ## should be
-l1$heading <- atan2(l1$dx, l1$dy)
+##l1$heading <- atan2(l1$dx, l1$dy)
 range(l1$heading)
 l1$heading.pi <- l1$heading/(2*pi)*360
 range(CC.TotalData$heading)  ## gives -3.14 to 3.14
@@ -547,7 +547,7 @@ For each level of Flow
 
 ### Kernel density plots ################### Turn Angles
 par(mar= c(4,4,2,1))
-par(mfrow=c(3,2))
+par(mfrow=c(1,2))
 
 ################################ Chlorophyll ########################
 levels(f0$Chlorophyll)
@@ -1402,6 +1402,76 @@ legend("topright",                                  # Add legend to density
        lty = 1)
 
 
+##########################################################################
+
+################################# Light ##################################
+
+###########################################################################
+par(mar= c(4,4,2,1))
+par(mfrow=c(3,2))
+levels(CC.TotalData$Light)
+
+kd1 <- density(f0$vel.flow[f0$Light=="Present"])
+plot(kd1, xlim = c(-10,10), ylim = c(0, 25), col='blue', lwd=2, main = "Velocity (not logged, in relation to flow) Vs Light, Flow = 0")
+
+kd2 <- density(f0$vel.flow[f0$Light=="Absent"])
+lines(kd2, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Light Present", "Light Absent"),
+       col = c("blue", "red"),
+       lty = 1)
+
+kd1 <- density(f.6$vel.flow[f.6$Light=="Present"])
+plot(kd1, xlim = c(-10,10), ylim = c(0, 025), col='blue', lwd=2, main = "Velocity (not logged, in relation to flow) Vs Light, Flow = 0.6")
+
+kd2 <- density(f.6$vel.flow[f.6$Light=="Absent"])
+##plot(kd2, xlim = c(-10,10), ylim = c(0, 25), col='red', lwd=2, main = "Velocity (not logged, in relation to flow) Vs Light, Flow = 0.6")
+lines(kd2, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Light Present", "Light Absent"),
+       col = c("blue", "red"),
+       lty = 1)
+
+kd1 <- density(f3$vel.flow[f3$Light=="Present"])
+plot(kd1, xlim = c(-10,10), ylim = c(0, 25), col='blue', lwd=2, main = "Velocity (not logged, in relation to flow) Vs Light, Flow = 3")
+
+##kd2 <- density(f3$vel.flow[f3$Light=="Absent"])
+##plot(kd2, xlim = c(-10,10), ylim = c(0, 25), col='red', lwd=2, main = "Velocity (not logged, in relation to flow) Vs Light, Flow = 3")
+##lines(kd2, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Light Present", "Light Absent"),
+       col = c("blue", "red"),
+       lty = 1)
+
+kd1 <- density(f5$vel.flow[f5$Light=="Present"])
+plot(kd1, xlim = c(-10,10), ylim = c(0, 25), col='blue', lwd=2, main = "Velocity (not logged, in relation to flow) Vs Guano, Flow = 5.9")
+
+##kd2 <- density(f5$vel.flow[f5$Light=="Absent"])
+##plot(kd2, xlim = c(-10,10), ylim = c(0, 25), col='red', lwd=2, main = "Velocity (not logged, in relation to flow) Vs Light, Flow = 5.9")
+##lines(kd2, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Light Present", "Light Absent"),
+       col = c("blue", "red"),
+       lty = 1)
+
+kd1 <- density(f8$vel.flow[f8$Light=="Present"])
+plot(kd1, xlim = c(-10,10), ylim = c(0, 25), col='blue', lwd=2, main = "Velocity (not logged, in relation to flow) Vs Light, Flow = 8.9")
+
+kd2 <- density(f8$vel.flow[f8$Light=="Absent"])
+##plot(kd2, xlim = c(-10,10), ylim = c(0, 25), col='red', lwd=2, main = "Velocity (not logged, in relation to flow) Vs Light, Flow = 8.9")
+lines(kd2, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Light Present", "Light Absent"),
+       col = c("blue", "red"),
+       lty = 1)
+
+
+
 ```
 
 For each level of Chlorophyll (velocity)
@@ -1700,7 +1770,7 @@ Now for each level of Flow (for headings)
 
 ### Kernel density plots ################### Headings
 par(mar= c(4,4,2,1))
-par(mfrow=c(3,2))
+par(mfrow=c(1,2))
 
 f0$heading <- atan2(f0$dx, f0$dy)
 range(f0$heading)
@@ -1741,10 +1811,10 @@ range(f8$heading.pi)  ## gives -180 to 180
 levels(CC.TotalData$Chlorophyll)
 
 par(mar= c(4,4,2,1))
-par(mfrow=c(3,2))
+par(mfrow=c(1,2))
 
 kd1 <- density(f0$heading.pi[f0$Chlorophyll=="0"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.02), col='blue', lwd=2, main = "Headings Vs Chlorophyll, Flow = 0")
+plot(kd1, xlim = c(-180,180), ylim = c(0, 0.02), col='blue', lwd=2, main = "Flow = 0", xlab = "Heading (degrees)")
 
 ##kd2 <- density(f0$heading.pi[f0$Chlorophyll=="4.3"])
 ##lines(kd2, col='light blue', lwd=2)
@@ -1768,15 +1838,15 @@ kd7 <- density(f0$heading.pi[f0$Chlorophyll=="19"])
 lines(kd7, col='black', lwd=2)
 
 legend("topright",                                  # Add legend to density
-       legend = c("Chlorophyll  0", "Chlorophyll 4.3", "Chlorophyll 4.6", "Chlorophyll 5.5", "Chlorophyll 6.1", 
-                  "Chlorophyll 7.6", "Chlorophyll 13.5", 'Chlorophyll 19'),
-       col = c("blue", "light blue", "yellow", "orange", "red", "dark red", "purple", "black"),
+       legend = c("Chlorophyll  0",  "Chlorophyll 4.6", "Chlorophyll 5.5",  
+                  "Chlorophyll 7.6",  'Chlorophyll 19'),
+       col = c("blue",  "yellow", "orange",  "dark red", "black"),
        lty = 1)
 
 
 
 kd1 <- density(f.6$heading.pi[f.6$Chlorophyll=="0"])
-plot(kd1,xlim = c(-180,180), ylim = c(0, 0.02), col='blue', lwd=2, main = "Headings Vs Chlorophyll, Flow = 0.6")
+plot(kd1,xlim = c(-180,180), ylim = c(0, 0.02), col='blue', lwd=2, main = "Flow = 0.6", xlab = "Heading (degrees)")
 
 kd2 <- density(f.6$heading.pi[f.6$Chlorophyll=="4.3"])
 lines(kd2, col='light blue', lwd=2)
@@ -1800,9 +1870,9 @@ lines(kd6, col='purple', lwd=2)
 ##lines(kd7, col='black', lwd=2)
 
 legend("topright",                                  # Add legend to density
-       legend = c("Chlorophyll  0", "Chlorophyll 4.3", "Chlorophyll 4.6", "Chlorophyll 5.5", "Chlorophyll 6.1", 
-                  "Chlorophyll 7.6", "Chlorophyll 13.5", 'Chlorophyll 19'),
-       col = c("blue", "light blue", "yellow", "orange", "red", "dark red", "purple", "black"),
+       legend = c("Chlorophyll  0", "Chlorophyll 4.3", "Chlorophyll 4.6", "Chlorophyll 6.1", 
+              "Chlorophyll 13.5"),
+       col = c("blue", "light blue", "yellow",  "red", "purple"),
        lty = 1)
 
 

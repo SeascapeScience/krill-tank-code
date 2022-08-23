@@ -35,8 +35,18 @@ ggplot(TotalData,aes(x=Flow.rate, y=heading/(2*pi)*360, fill=Chlorophyll))+
 ```
 ```{r}
 library(circular)
+TotalData$ta.xy.pi <- TotalData$turn.anglexy/(2*pi)*360
 
-circ <- circular(CC.TotalData$turn.anglexy, type = c("angles"),
+
+track.one<-TotalData[TotalData$Track=="1",]
+
+track.two<-TotalData[TotalData$Track=="2",]
+
+track.three<-TotalData[TotalData$Track=="3",]
+
+track.four<-TotalData[TotalData$Track=="4",]
+
+circ <- circular(track.one$turn.angleyz, type = c("angles"),
           units = c("degrees"),
           template = c("geographics"))
 
@@ -52,12 +62,12 @@ print(circ, info=TRUE)
 
 ## S3 method for class 'circular'
 plot(circ, pch = 16, cex = 1, stack = TRUE,
-axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,
+axes = TRUE, start.sep=0, sep = 0.025, shrink = 1.5,
 bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
 col = NULL, tol = 0.04, uin = NULL,
 xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
 template = NULL, zero = NULL, rotation = NULL,
-main = NULL, sub=NULL, xlab = "", ylab = "",
+main = "Track 1 Turn Angles (yz)", sub=NULL, xlab = "", ylab = "",
 control.circle=circle.control())
 
 

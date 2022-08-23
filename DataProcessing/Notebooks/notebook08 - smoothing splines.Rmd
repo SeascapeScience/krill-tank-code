@@ -64,19 +64,19 @@ save.image("~/Post-doc/Data/Factor levels working correctly (July 13 2022).RData
 
 
 ```{r}
-x1 <- CC.TotalData$trim.X[1:(nrow(CC.TotalData)-1)]
-x2 <- CC.TotalData$trim.X[2:nrow(CC.TotalData)]
-CC.TotalData$dx[1:(nrow(CC.TotalData)-1)] <- x2-x1
+smoothx1 <- CC.TotalData$xsmooth[1:(nrow(CC.TotalData)-1)]
+smoothx2 <- CC.TotalData$xsmooth[2:nrow(CC.TotalData)]
+CC.TotalData$smooth.dx[1:(nrow(CC.TotalData)-1)] <- smoothx2-smoothx1
 
-y1 <- CC.TotalData$Y[1:(nrow(CC.TotalData)-1)]
-y2 <- CC.TotalData$Y[2:nrow(CC.TotalData)]
-CC.TotalData$dy[1:(nrow(CC.TotalData)-1)] <- y2-y1
+smoothy1 <- CC.TotalData$ysmooth[1:(nrow(CC.TotalData)-1)]
+smoothy2 <- CC.TotalData$ysmooth[2:nrow(CC.TotalData)]
+CC.TotalData$smooth.dy[1:(nrow(CC.TotalData)-1)] <- smoothy2-smoothy1
 
-z1 <- CC.TotalData$Z[1:(nrow(CC.TotalData)-1)]
-z2 <- CC.TotalData$Z[2:nrow(CC.TotalData)]
-CC.TotalData$dz[1:(nrow(CC.TotalData)-1)] <- z2-z1
+smoothz1 <- CC.TotalData$zsmooth[1:(nrow(CC.TotalData)-1)]
+smoothz2 <- CC.TotalData$zsmooth[2:nrow(CC.TotalData)]
+CC.TotalData$smooth.dz[1:(nrow(CC.TotalData)-1)] <- smoothz2-smoothz1
 
-CC.TotalData$d <- sqrt(CC.TotalData$dx^2 + CC.TotalData$dy^2 + CC.TotalData$dz^2)
+CC.TotalData$smooth.d <- sqrt(CC.TotalData$smooth.dx^2 + CC.TotalData$smooth.dy^2 + CC.TotalData$smooth.dz^2)
 
 head(CC.TotalData)
 tail(CC.TotalData)
@@ -85,38 +85,39 @@ tail(CC.TotalData)
 
 
 ```{r}
-CC.TotalData$vx <- CC.TotalData$dx/(1/30)  ## velocity on the x axis
-CC.TotalData$vy <- CC.TotalData$dy/(1/30)  ## velocity on the y axis
-CC.TotalData$vz <- CC.TotalData$dz/(1/30)  ## velocity on the z axis
-CC.TotalData$v <- CC.TotalData$d/(1/30) ## total velocity
+CC.TotalData$smooth.vx <- CC.TotalData$smooth.dx/(1/30)  ## velocity on the x axis
+CC.TotalData$smooth.vy <- CC.TotalData$smooth.dy/(1/30)  ## velocity on the y axis
+CC.TotalData$smooth.vz <- CC.TotalData$smooth.dz/(1/30)  ## velocity on the z axis
+CC.TotalData$smooth.v <- CC.TotalData$smooth.d/(1/30) ## total velocity
 
-CC.TotalData$heading <- atan2(CC.TotalData$dx, CC.TotalData$dy)
-CC.TotalData$heading.pi <- CC.TotalData$heading/(2*pi)*360
-CC.TotalData$pitch <- atan2(CC.TotalData$dz, (sqrt(CC.TotalData$dx^2 + CC.TotalData$dy^2)))
-CC.TotalData$pitch.perfect <- CC.TotalData$pitch/(2*pi)*360
+CC.TotalData$smooth.heading <- atan2(CC.TotalData$smooth.dx, CC.TotalData$smooth.dy)
+CC.TotalData$heading.pi <- CC.TotalData$smooth.heading/(2*pi)*360
+CC.TotalData$smooth.pitch <- atan2(CC.TotalData$smooth.dz, (sqrt(CC.TotalData$smooth.dx^2 + CC.TotalData$smooth.dy^2)))
+CC.TotalData$pitch.perfect <- CC.TotalData$smooth.pitch/(2*pi)*360
 
 
-hist(CC.TotalData$pitch/(2*pi)*360)
-hist(CC.TotalData$heading/(2*pi)*360)
+hist(CC.TotalData$smooth.pitch/(2*pi)*360)
+hist(CC.TotalData$smooth.heading/(2*pi)*360)
+hist(CC.TotalData$smooth.heading)
 
-hist(CC.TotalData$dz[abs(CC.TotalData$dz)<.01],breaks = 100)
-hist(CC.TotalData$dy[abs(CC.TotalData$dy)<.01],breaks = 100)
-hist(CC.TotalData$dx[abs(CC.TotalData$dx)<.01],breaks = 100)
+hist(CC.TotalData$smooth.dz[abs(CC.TotalData$smooth.dz)<.01],breaks = 100)
+hist(CC.TotalData$smooth.dy[abs(CC.TotalData$smooth.dy)<.01],breaks = 100)
+hist(CC.TotalData$smooth.dx[abs(CC.TotalData$smooth.dx)<.01],breaks = 100)
 
 ```
 
 ```{r}
-CC.TotalData$turn.anglexy <- atan2(CC.TotalData$trim.X, CC.TotalData$Y)
-CC.TotalData$turn.angleyz <- atan2(CC.TotalData$Y, CC.TotalData$Z)
+CC.TotalData$turn.anglexysmooth <- atan2(CC.TotalData$xsmooth, CC.TotalData$ysmooth)
+CC.TotalData$turn.angleyzsmooth <- atan2(CC.TotalData$ysmooth, CC.TotalData$zsmooth)
 
 
 lth <- dim(CC.TotalData)[1]
-dx1 <- CC.TotalData$dx[1:(lth-1)]
-dx2 <- CC.TotalData$dx[2:lth]
-dy1 <- CC.TotalData$dy[1:(lth-1)]
-dy2 <- CC.TotalData$dy[2:lth]
-dz1 <- CC.TotalData$dz[1:(lth-1)]
-dz2 <- CC.TotalData$dz[2:lth]
+dx1 <- CC.TotalData$smooth.dx[1:(lth-1)]
+dx2 <- CC.TotalData$smooth.dx[2:lth]
+dy1 <- CC.TotalData$smooth.dy[1:(lth-1)]
+dy2 <- CC.TotalData$smoothdy[2:lth]
+dz1 <- CC.TotalData$smooth.dz[1:(lth-1)]
+dz2 <- CC.TotalData$smooth.dz[2:lth]
 D <- (dx1*dx2)+(dy1*dy2)+(dz1*dz2)
 d1 <- sqrt(dx1^2 + dy1^2 +dz1^2)
 d2 <- sqrt(dx2^2 + dy2^2 +dz2^2)
@@ -124,8 +125,7 @@ d2 <- sqrt(dx2^2 + dy2^2 +dz2^2)
 dd <- D/d1/d2
 hist(acos(dd)/pi*180)
 
-CC.TotalData$turn.angle <- c(NA, acos(D/d1/d2))/pi*180
-
+CC.TotalData$turn.angle.smooth <- c(NA, acos(D/d1/d2))/pi*180
 
 ```
 
@@ -134,14 +134,14 @@ CC.TotalData$turn.angle <- c(NA, acos(D/d1/d2))/pi*180
 
 lth <- dim(CC.TotalData)[1]
 
-vx1 <- CC.TotalData$vx[1:(lth-1)]
-vy1 <- CC.TotalData$vy[1:(lth-1)]
-vz1 <- CC.TotalData$vz[1:(lth-1)]
+vx1 <- CC.TotalData$smooth.vx[1:(lth-1)]
+vy1 <- CC.TotalData$smooth.vy[1:(lth-1)]
+vz1 <- CC.TotalData$smooth.vz[1:(lth-1)]
 
 
-vx2 <- CC.TotalData$vx[2:lth]
-vy2 <- CC.TotalData$vy[2:lth]
-vz2 <- CC.TotalData$vz[2:lth]
+vx2 <- CC.TotalData$smooth.vx[2:lth]
+vy2 <- CC.TotalData$smooth.vy[2:lth]
+vz2 <- CC.TotalData$smooth.vz[2:lth]
 
 v1 <- sqrt((vx1^2)+(vy1^2)+(vz1^2))  ##velocity magnitude (one time step above)
 
@@ -161,7 +161,7 @@ list2 <- ((acos(dd)/pi)*180)
 list3 <- (v1+v2)/2
 list4 <- c(l, list2)
 list5 <- c(l, list3)
-CC.TotalData$vel.turn.angle <- list4
+CC.TotalData$vel.turn.angle.smooth <- list4
 
 ```
 
