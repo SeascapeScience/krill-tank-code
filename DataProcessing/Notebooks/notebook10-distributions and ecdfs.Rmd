@@ -1,0 +1,288 @@
+---
+title: "notebook10 - distributions and ECDF's"
+output: html_notebook
+---
+
+First, here are some quick comments:
+
+The p-values of a Kolmovorov-Smirnov-Test (KS-Test) with estimated parameters can be quite wrong because the p-value does not take the uncertainty of the estimation into account. So unfortunately, you can't just fit a distribution and then use the estimated parameters in a Kolmogorov-Smirnov-Test to test your sample. There is a normality test called Lilliefors test which is a modified version of the KS-Test that allows for estimated parameters.
+Your sample will never follow a specific distribution exactly. So even if your p-values from the KS-Test would be valid and >0.05, it would just mean that you can't rule out that your data follow this specific distribution. Another formulation would be that your sample is compatible with a certain distribution. But the answer to the question "Does my data follow the distribution xy exactly?" is always no.
+The goal here cannot be to determine with certainty what distribution your sample follows with certainty. The goal is what @whuber (in the comments) calls parsimonious approximate descriptions of the data. Having a specific parametric distribution can be useful as a model of the data (such as the model "earth is a sphere" can be useful).
+
+
+But let's do some exploration. I will use the excellent fitdistrplus package which offers some nice functions for distribution fitting. We will use the functiondescdist to gain some ideas about possible candidate distributions.
+
+```{r}
+library(fitdistrplus)
+library(logspline)
+
+x <- c(37.50,46.79,48.30,46.04,43.40,39.25,38.49,49.51,40.38,36.98,40.00,
+38.49,37.74,47.92,44.53,44.91,44.91,40.00,41.51,47.92,36.98,43.40,
+42.26,41.89,38.87,43.02,39.25,40.38,42.64,36.98,44.15,44.91,43.40,
+49.81,38.87,40.00,52.45,53.13,47.92,52.45,44.91,29.54,27.13,35.60,
+45.34,43.37,54.15,42.77,42.88,44.26,27.14,39.31,24.80,16.62,30.30,
+36.39,28.60,28.53,35.84,31.10,34.55,52.65,48.81,43.42,52.49,38.00,
+38.65,34.54,37.70,38.11,43.05,29.95,32.48,24.63,35.33,41.34)
+```
+
+Now lets use descdist:
+
+```{r}
+descdist(x, discrete = FALSE)
+```
+
+The kurtosis and squared skewness of your sample is plottet as a blue point named "Observation". It seems that possible distributions include the Weibull, Lognormal and possibly the Gamma distribution.
+
+Let's fit a Weibull distribution and a normal distribution:
+
+```{r}
+
+fit.weibull <- fitdist(x, "weibull")
+fit.norm <- fitdist(x, "norm")
+
+```
+
+Now inspect the fit for the normal:
+
+
+```{r}
+plot(fit.norm)
+```
+
+And for the Weibull fit:
+
+```{r}
+plot(fit.weibull)
+```
+
+Both look good but judged by the QQ-Plot, the Weibull maybe looks a bit better, especially at the tails. Correspondingly, the AIC of the Weibull fit is lower compared to the normal fit:
+
+```{r}
+fit.weibull$aic
+
+fit.norm$aic
+```
+
+Kolmogorov-Smirnov test simulation
+I will use Aksakal's procedure explained here (https://stats.stackexchange.com/questions/126539/testing-whether-data-follows-t-distribution/126552#126552)to simulate the KS-statistic under the null.
+
+
+```{r}
+n.sims <- 5e4
+
+stats <- replicate(n.sims, {      
+  r <- rweibull(n = length(x)
+                , shape= fit.weibull$estimate["shape"]
+                , scale = fit.weibull$estimate["scale"]
+  )
+  estfit.weibull <- fitdist(r, "weibull") # added to account for the estimated parameters
+  as.numeric(ks.test(r
+                     , "pweibull"
+                     , shape= estfit.weibull$estimate["shape"]
+                     , scale = estfit.weibull$estimate["scale"])$statistic
+  )      
+})
+
+```
+
+The ECDF of the simulated KS-statistics looks like follows:
+
+```{r}
+plot(ecdf(stats), las = 1, main = "KS-test statistic simulation (CDF)", col = "darkorange", lwd = 1.7)
+grid()
+
+```
+Finally, our p-value using the simulated null distribution of the KS-statistics is:
+
+```{r}
+fit <- logspline(stats)
+
+1 - plogspline(ks.test(x
+                       , "pweibull"
+                       , shape= fit.weibull$estimate["shape"]
+                       , scale = fit.weibull$estimate["scale"])$statistic
+               , fit
+)
+
+```
+
+This confirms our graphical conclusion that the sample is compatible with a Weibull distribution.
+
+As explained here, we can use bootstrapping to add pointwise confidence intervals to the estimated Weibull PDF or CDF:
+
+```{r}
+true.weibull <- rweibull(1e6, shape= fit.weibull$estimate["shape"]
+                         , scale = fit.weibull$estimate["scale"])
+
+boot.pdf <- sapply(1:1000, function(i) {
+  xi <- sample(x, size=length(x), replace=TRUE)
+  MLE.est <- suppressWarnings(fitdist(xi, distr="weibull"))  
+  dweibull(xs, shape=MLE.est$estimate["shape"],  scale = MLE.est$estimate["scale"])
+}
+)
+
+boot.cdf <- sapply(1:1000, function(i) {
+  xi <- sample(x, size=length(x), replace=TRUE)
+  MLE.est <- suppressWarnings(fitdist(xi, distr="weibull"))  
+  pweibull(xs, shape= MLE.est$estimate["shape"],  scale = MLE.est$estimate["scale"])
+}
+)   
+
+#-----------------------------------------------------------------------------
+# Plot PDF
+#-----------------------------------------------------------------------------
+
+par(bg="white", las=1, cex=1.2)
+plot(xs, boot.pdf[, 1], type="l", col=rgb(.6, .6, .6, .1), ylim=range(boot.pdf),
+     xlab="x", ylab="Probability density")
+for(i in 2:ncol(boot.pdf)) lines(xs, boot.pdf[, i], col=rgb(.6, .6, .6, .1))
+
+# Add pointwise confidence bands
+
+quants <- apply(boot.pdf, 1, quantile, c(0.025, 0.5, 0.975))
+min.point <- apply(boot.pdf, 1, min, na.rm=TRUE)
+max.point <- apply(boot.pdf, 1, max, na.rm=TRUE)
+lines(xs, quants[1, ], col="red", lwd=1.5, lty=2)
+lines(xs, quants[3, ], col="red", lwd=1.5, lty=2)
+lines(xs, quants[2, ], col="darkred", lwd=2)
+
+```
+
+
+```{r}
+#-----------------------------------------------------------------------------
+# Plot CDF
+#-----------------------------------------------------------------------------
+
+par(bg="white", las=1, cex=1.2)
+plot(xs, boot.cdf[, 1], type="l", col=rgb(.6, .6, .6, .1), ylim=range(boot.cdf),
+     xlab="x", ylab="F(x)")
+for(i in 2:ncol(boot.cdf)) lines(xs, boot.cdf[, i], col=rgb(.6, .6, .6, .1))
+
+# Add pointwise confidence bands
+
+quants <- apply(boot.cdf, 1, quantile, c(0.025, 0.5, 0.975))
+min.point <- apply(boot.cdf, 1, min, na.rm=TRUE)
+max.point <- apply(boot.cdf, 1, max, na.rm=TRUE)
+lines(xs, quants[1, ], col="red", lwd=1.5, lty=2)
+lines(xs, quants[3, ], col="red", lwd=1.5, lty=2)
+lines(xs, quants[2, ], col="darkred", lwd=2)
+#lines(xs, min.point, col="purple")
+#lines(xs, max.point, col="purple")
+
+
+```
+
+Automatic distribution fitting with GAMLSS
+The gamlss package for R offers the ability to try many different distributions and select the "best" according to the GAIC (the generalized Akaike information criterion). The main function is fitDist. An important option in this function is the type of the distributions that are tried. For example, setting type = "realline" will try all implemented distributions defined on the whole real line whereas type = "realsplus" will only try distributions defined on the real positive line. Another important option is the parameter k, which is the penalty for the GAIC. In the example below, I set the parameter k=2 which means that the "best" distribution is selected according to the classic AIC. You can set k to anything you like, such as log(n) for the BIC.
+
+```{r}
+library(gamlss)
+library(gamlss.dist)
+library(gamlss.add)
+
+x <- c(37.50,46.79,48.30,46.04,43.40,39.25,38.49,49.51,40.38,36.98,40.00,
+       38.49,37.74,47.92,44.53,44.91,44.91,40.00,41.51,47.92,36.98,43.40,
+       42.26,41.89,38.87,43.02,39.25,40.38,42.64,36.98,44.15,44.91,43.40,
+       49.81,38.87,40.00,52.45,53.13,47.92,52.45,44.91,29.54,27.13,35.60,
+       45.34,43.37,54.15,42.77,42.88,44.26,27.14,39.31,24.80,16.62,30.30,
+       36.39,28.60,28.53,35.84,31.10,34.55,52.65,48.81,43.42,52.49,38.00,
+       38.65,34.54,37.70,38.11,43.05,29.95,32.48,24.63,35.33,41.34)
+
+fit <- fitDist(x, k = 2, type = "realplus", trace = FALSE, try.gamlss = TRUE)
+
+summary(fit)
+
+```
+
+According to the AIC, the Weibull distribution (more specifically WEI2, a special parametrization of it) fits the data best. The exact parametrization of the distribution WEI2 is detailled in this document on page 279. Let's inspect the fit by looking at the residuals in a worm plot (basically a de-trended Q-Q-plot):
+
+```{r}
+read.lms <- function(filename) 
+  { 
+  # function to read the z-scores from the .lms output file generated 
+  # by the LMS software of T.J. Cole (version June 1998) 
+  lms.par <<- scan(filename,n=8) 
+  print(lms.par) 
+  lms.skip <- lms.par[8] + 2 
+  read.table(filename, skip = lms.skip, col.names = c("age", "val", "z")) 
+}
+
+wp <- function(data, layout = c(4,4), overlap = 0, worms = T, cubines = F, coefsave = F, labels = T, hor = T, vert = F, ci = T, sub = paste (deparse( substitute(data )), deparse(substitute(overlap)))) 
+  # function for plotting the worm plot on the active graphics device 
+  { 
+  panel <- function(x, y) 
+    { 
+    qq <- as.data.frame(qqnorm(y, plot = F)) 
+    qq$y <- qq$y- qq$x 
+    plot (qq$x, qq$y, type = "n", ylim = c(-0.5, 0.5), xlim = c(-3, 3), lab = c(3, 5, 7), tck =-0.01) 
+    if (hor) abline(0, 0, lty = 2, col = 1) 
+    if (vert) abline(0, 100000, lty = 2, col = 1) 
+    if(worms) points(qq$x, qq$y, col = 1, pch = 1, mkh = 0, cex = 0.25) 
+    if(cubines | coefsave) 
+      fit <- lm(y ~ x+x^2+x^3,data = qq) 
+    if(cubines) {
+      s <- spline(qq$x, fitted(fit)) 
+      flags <- s$x >-2 & s$x < 2 
+      lines(list(x = s$x[flags], y = s$y[flags])) 
+      } 
+    if(coefsave) {
+      est <- coef(summary(fit))[, 3] 
+      assign(".est", c(.est, est), frame = 0) 
+      } 
+    if (ci) ciplot(sum(!is.na(qq$y))) 
+    } 
+  agetext <- function (classes, layout = c(4, 4), cex=0.6, dx = 0.06, dy=0.02) 
+    # function for adding age group text to the worm plot panels 
+    { txt <- apply(format(round(summary(classes)$intervals,1)), 1,paste,collapse = "-") 
+    x <- rep((0:(layout[1]-1))/layout[1]+dx,layout[2]) 
+    y <- rep((1:(layout[2]))/layout[2]-dy,each = layout[1]) 
+    text(x, y, txt, cex=cex)
+  } 
+  assign("panel", panel, frame = 1) 
+  assign("worms", worms, frame = 1) 
+  assign("cubines", cubines, frame = 1) 
+  assign("coefsave", coefsave, frame = 1) 
+  assign("hor", hor, frame = 1) 
+  assign("vert", vert, frame = 1) 
+  assign("ci", ci, frame = 1) 
+  assign(".est", NULL, frame = 0) 
+  if(length(layout) == 1) layout <- rep(layout, 2) 
+  n <- prod(layout) 
+  classes <- equal.count(data$age, n, overlap = overlap) 
+  if(n == 1) form <- ~ data$z 
+  else form <- ~ data$z | classes 
+  print.trellis(qqmath(form, layout = layout, aspect = 1, strip = F, sub = list (sub, cex = 0.5), xlab = list("Unit normal quantile", cex = 0.75), ylab = list("Deviation", cex = 0.75), panel = panel)) 
+  if (labels) agetext(classes, layout, cex = 0.6, dx = 0.06, dy = 0.02) 
+  return(list(classes = classes, .est = get(".est", frame = 0))) 
+} 
+ciplot <- function(n, level = 0.95, lz =-2.75, hz = 2.75, dz = 0.25) 
+{ 
+  # adds confidence interval to Q–Q plot panel 
+  z <- seq(lz, hz, dz) 
+  p <- pnorm(z) 
+  se <- (1/dnorm(z)) * (sqrt(p*(1-p)/n)) 
+  low <- qnorm(1- level)/2*se 
+               high <- -low 
+               lines(z, low, lty=2) 
+               lines(z, high, lty=2) 
+}
+  
+  
+```
+
+
+We expect the residuals to be close to the middle horizontal line and 95% of them to lie between the upper and lower dotted curves, which act as 95% pointwise confidence intervals. In this case, the worm plot looks fine to me indicating that the Weibull distribution is an adequate fit.
+
+
+
+
+
+
+
+
+
+
+
+
+

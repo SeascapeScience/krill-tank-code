@@ -157,10 +157,21 @@ par(mar= c(4,4,2,1))
 par(mfrow=c(2,2))
 
 ################################ Flow Rate ########################
+str(CC.TotalData)
 levels(CC.TotalData$Flow.rate)
 
-kd1 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="0"])
+kd1 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="0"], na.rm= T)
 plot(kd1, xlim = c(5,175), ylim = c(0, 0.030), col='blue', lwd=2, main = "Turn Angles Vs Flow Rate")
+
+mean(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="0"], na.rm = T)
+# Create the function.
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+getmode(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="0"])
+median(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="0"], na.rm = T)
+
 
 kd2 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="0.6"])
 lines(kd2, col='light blue', lwd=2)
