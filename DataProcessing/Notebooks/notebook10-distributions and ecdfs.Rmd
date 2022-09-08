@@ -111,6 +111,8 @@ This confirms our graphical conclusion that the sample is compatible with a Weib
 As explained here, we can use bootstrapping to add pointwise confidence intervals to the estimated Weibull PDF or CDF:
 
 ```{r}
+
+xs <- seq(10, 65, len=500)
 true.weibull <- rweibull(1e6, shape= fit.weibull$estimate["shape"]
                          , scale = fit.weibull$estimate["scale"])
 
@@ -273,6 +275,8 @@ ciplot <- function(n, level = 0.95, lz =-2.75, hz = 2.75, dz = 0.25)
 
 
 We expect the residuals to be close to the middle horizontal line and 95% of them to lie between the upper and lower dotted curves, which act as 95% pointwise confidence intervals. In this case, the worm plot looks fine to me indicating that the Weibull distribution is an adequate fit.
+
+```{r}
 
 
 
