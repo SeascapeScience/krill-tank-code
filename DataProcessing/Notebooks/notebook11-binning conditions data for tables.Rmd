@@ -1,0 +1,2764 @@
+---
+title: "notebook11-Binning data for Tables"
+output: html_notebook
+---
+
+Load data
+```{r}
+rm(list=ls(all=TRUE))
+load("~/Post-doc/Data/Total Merged Data File (Sep 2 2022).RData")
+
+CC.TotalData$turn.anglexy <- atan2(CC.TotalData$X, CC.TotalData$Y)
+CC.TotalData$turn.angleyz <- atan2(CC.TotalData$Y, CC.TotalData$Z)
+
+
+lth <- dim(CC.TotalData)[1]
+dx1 <- CC.TotalData$dx[1:(lth-1)]
+dx2 <- CC.TotalData$dx[2:lth]
+dy1 <- CC.TotalData$dy[1:(lth-1)]
+dy2 <- CC.TotalData$dy[2:lth]
+dz1 <- CC.TotalData$dz[1:(lth-1)]
+dz2 <- CC.TotalData$dz[2:lth]
+D <- (dx1*dx2)+(dy1*dy2)+(dz1*dz2)
+d1 <- sqrt(dx1^2 + dy1^2 +dz1^2)
+d2 <- sqrt(dx2^2 + dy2^2 +dz2^2)
+
+dd <- D/d1/d2
+hist(acos(dd)/pi*180)
+
+CC.TotalData$turn.angle <- c(NA, acos(D/d1/d2))/pi*180
+```
+
+Change factor levels to N, L M H E, etc
+```{r}
+##CC.TD <- na.omit(CC.TotalData)
+data <- CC.TotalData
+str(data)
+levels(data$Flow.rate) <- c("No Flow","Low Flow","Medium Flow", "High Flow","Extreme Flow")
+plot(data$Flow.rate, data$turn.angle, xlab = "Flow rate (cm s-1)", ylab = "Turn Angles (degrees)", ylim = c(0, 180))
+
+levels(data$Chlorophyll) <- c("No Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll",  "Medium Chlorophyll",  "Medium Chlorophyll", "High Chlorophyll")
+plot(data$Chlorophyll, data$vel.flow)
+
+library(ggplot2)
+ggplot(data,aes(x=Flow.rate, y=pitch.perfect, fill=Chlorophyll))+
+  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  labs(size= "",x = "Flow Rate (cm s-1)", y = "Pitch (degrees)", title = "Light") +
+  scale_fill_manual(values=c("greenyellow", "yellowgreen","lightgreen", "green", "green3", "green4", "darkgreen"),name = "Chlorophyll (mg L-1)",
+                    labels=c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll"))+
+  facet_grid(~Light, scales = "free_x", space = "free")
+
+
+
+```
+
+aggregate data by factor levels
+Find max, min, mean and sd for v and vel.flow
+```{r}
+str (CC.TotalData)
+### aggregate data
+
+agg.data <- aggregate(data, by = list(data$Light, data$Flow.rate, data$Chlorophyll, data$Guano), FUN = mean)
+head(agg.data)
+agg.data <- agg.data[ -c(5:6, 10:17) ]
+head(agg.data)
+colnames(agg.data) <- c("Light", "Flow.rate", "Chlorophyll", "Guano", "X", "Y", "Z", "dx", "dy", "dz", "d", "vx", "vy", "vz", "v", "heading", "pitch", "vel.turn.angle", "vel.flow", "trim.X", "xsmooth", "ysmooth", "zsmooth", "smooth.dx", "smooth.dy", "smooth.dz", "smooth.d", "smooth.vx", "smooth.vy", "smooth.vz", "smooth.v", "smooth.heading", "heading.pi", "smooth.pitch", "pitch.perfect", "turn.anglexysmooth",  "turn.angleyzsmooth", "turn.angle.smooth", "vel.turn.angle.smooth", "turn.anglexy", "turn.angleyz", "turn.angle")
+head(agg.data)
+tail(agg.data)
+
+
+### means, sd, min and max for v and vel flow
+
+library(dplyr)
+data %>% group_by(Light, Flow.rate, Chlorophyll, Guano) %>% summarise_at(vars(v), funs(min, max, mean, sd))
+
+data %>% group_by(Light, Flow.rate, Chlorophyll, Guano) %>% summarise_at(vars(vel.flow), funs(min, max, mean, sd))
+
+```
+
+Circular stats for angle data
+Total angles
+```{r}
+### circular stats for angles
+range(data$turn.angle)
+library(circular)
+
+circ <- circular(data$turn.angle, type = c("angles"),
+          units = c("degrees"),
+          template = c("geographics"))
+
+## S3 method for class 'circular'
+## as(circ, control.circular=list(), ...) ## NOT WORKING CURRENTLY
+
+## S3 method for class 'circular'
+is(circ)
+
+## S3 method for class 'circular'
+print(circ, info=TRUE)
+
+
+## S3 method for class 'circular'
+plot(circ, pch = 16, cex = 1, stack = TRUE,
+axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,   ### larger stack number = more zoomed out
+bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
+col = NULL, tol = 0.04, uin = NULL,
+xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
+template = NULL, zero = NULL, rotation = NULL,
+main = NULL, sub=NULL, xlab = "", ylab = "",
+control.circle=circle.control())
+
+
+### calculating mean vector from circular data
+mean(circ)
+
+## calculating variance of the vector from circular data
+var(circ)
+
+## calculating mean deviation from circular data
+meandeviation(circ)
+
+# Compute summary statistics of a random sample of observations. 
+summary(circ) 
+
+## ANOVA using circular stats
+aov.circular(circ, CC.TotalData$Light) ## working but unsure
+
+```
+
+Sub-setting factors into separate data sets to calculate mean vectors and dispersion for angle data
+```{r}
+## Subset each column (each treatment), and assign as circular data
+library(circular)
+#####################################################################
+
+   ##  Light On, NO Flow
+
+####################################################################
+
+LNN<-data[data$Light=="Present",]
+LNN <- LNN[LNN$Flow.rate=="No Flow",]
+LNN <- LNN[LNN$Chlorophyll=="No Chlorophyll",]
+LNN <- LNN[LNN$Guano=="Absent",]
+
+LNL<-data[data$Light=="Present",]
+LNL <- LNL[LNL$Flow.rate=="No Flow",]
+LNL <- LNL[LNL$Chlorophyll=="Low Chlorophyll",]
+LNL <- LNL[LNL$Guano=="Absent",]
+
+LNM<-data[data$Light=="Present",]
+LNM <- LNM[LNM$Flow.rate=="No Flow",]
+LNM <- LNM[LNM$Chlorophyll=="Medium Chlorophyll",]
+LNM <- LNM[LNM$Guano=="Absent",]
+
+LNH<-data[data$Light=="Present",]
+LNH <- LNH[LNH$Flow.rate=="No Flow",]
+LNH <- LNH[LNH$Chlorophyll=="High Chlorophyll",]
+LNH <- LNH[LNH$Guano=="Absent",]
+
+LNG<-data[data$Light=="Present",]
+LNG <- LNG[LNG$Flow.rate=="No Flow",]
+LNG <- LNG[LNG$Chlorophyll=="No Chlorophyll",]
+LNG <- LNG[LNG$Guano=="Present",]
+##############################################################
+
+##    Lights On, Low Flow
+
+###############################################################
+
+LLN<-data[data$Light=="Present",]
+LLN <- LLN[LLN$Flow.rate=="Low Flow",]
+LLN <- LLN[LLN$Chlorophyll=="No Chlorophyll",]
+LLN <- LLN[LLN$Guano=="Absent",]
+
+LLL<-data[data$Light=="Present",]
+LLL <- LLL[LLL$Flow.rate=="Low Flow",]
+LLL <- LLL[LLL$Chlorophyll=="Low Chlorophyll",]
+LLL <- LLL[LLL$Guano=="Absent",]
+
+LLM<-data[data$Light=="Present",]
+LLM <- LLM[LLM$Flow.rate=="Low Flow",]
+LLM <- LLM[LLM$Chlorophyll=="Medium Chlorophyll",]
+LLM <- LLM[LLM$Guano=="Absent",]
+
+LLH<-data[data$Light=="Present",]
+LLH <- LLH[LLH$Flow.rate=="Low Flow",]
+LLH <- LLH[LLH$Chlorophyll=="High Chlorophyll",]
+LLH <- LLH[LLH$Guano=="Absent",]
+
+LLG<-data[data$Light=="Present",]
+LLG <- LLG[LLG$Flow.rate=="Low Flow",]
+LLG <- LLG[LLG$Chlorophyll=="No Chlorophyll",]
+LLG <- LLG[LLG$Guano=="Present",]
+#####################################################################
+
+##    Light On, Medium Flow
+
+######################################################################
+
+LMN<-data[data$Light=="Present",]
+LMN <- LMN[LMN$Flow.rate=="Medium Flow",]
+LMN <- LMN[LMN$Chlorophyll=="No Chlorophyll",]
+LMN <- LMN[LMN$Guano=="Absent",]
+
+LML<-data[data$Light=="Present",]
+LML <- LML[LML$Flow.rate=="Medium Flow",]
+LML <- LML[LML$Chlorophyll=="Low Chlorophyll",]
+LML <- LML[LML$Guano=="Absent",]
+
+LMM<-data[data$Light=="Present",]
+LMM <- LMM[LMM$Flow.rate=="Medium Flow",]
+LMM <- LMM[LMM$Chlorophyll=="Medium Chlorophyll",]
+LMM <- LMM[LMM$Guano=="Absent",]
+
+LMH<-data[data$Light=="Present",]
+LMH <- LMH[LMH$Flow.rate=="Medium Flow",]
+LMH <- LMH[LMH$Chlorophyll=="High Chlorophyll",]
+LMH <- LMH[LMH$Guano=="Absent",]
+
+LMG<-data[data$Light=="Present",]
+LMG <- LMG[LMG$Flow.rate=="Medium Flow",]
+LMG <- LMG[LMG$Chlorophyll=="No Chlorophyll",]
+LMG <- LMG[LMG$Guano=="Present",]
+################################################################
+
+###    Light On, High Flow
+
+####################################################################
+
+LHN<-data[data$Light=="Present",]
+LHN <- LHN[LHN$Flow.rate=="High Flow",]
+LHN <- LHN[LHN$Chlorophyll=="No Chlorophyll",]
+LHN <- LHN[LHN$Guano=="Absent",]
+
+LHL<-data[data$Light=="Present",]
+LHL <- LHL[LHL$Flow.rate=="High Flow",]
+LHL <- LHL[LHL$Chlorophyll=="Low Chlorophyll",]
+LHL <- LHL[LHL$Guano=="Absent",]
+
+LHM<-data[data$Light=="Present",]
+LHM <- LHM[LHM$Flow.rate=="High Flow",]
+LHM <- LHM[LHM$Chlorophyll=="Medium Chlorophyll",]
+LHM <- LHM[LHM$Guano=="Absent",]
+
+LHH<-data[data$Light=="Present",]
+LHH <- LHH[LHH$Flow.rate=="High Flow",]
+LHH <- LHH[LHH$Chlorophyll=="High Chlorophyll",]
+LHH <- LHH[LHH$Guano=="Absent",]
+
+LHG<-data[data$Light=="Present",]
+LHG <- LHG[LHG$Flow.rate=="High Flow",]
+LHG <- LHG[LHG$Chlorophyll=="No Chlorophyll",]
+LHG <- LHG[LHG$Guano=="Present",]
+################################################################
+
+
+###    Light On, Extreme Flow
+
+####################################################################
+
+LEN<-data[data$Light=="Present",]
+LEN <- LEN[LEN$Flow.rate=="Extreme Flow",]
+LEN <- LEN[LEN$Chlorophyll=="No Chlorophyll",]
+LEN <- LEN[LEN$Guano=="Absent",]
+
+LEL<-data[data$Light=="Present",]
+LEL <- LEL[LEL$Flow.rate=="Extreme Flow",]
+LEL <- LEL[LEL$Chlorophyll=="Low Chlorophyll",]
+LEL <- LEL[LEL$Guano=="Absent",]
+
+LEM<-data[data$Light=="Present",]
+LEM <- LEM[LEM$Flow.rate=="Extreme Flow",]
+LEM <- LEM[LEM$Chlorophyll=="Medium Chlorophyll",]
+LEM <- LEM[LEM$Guano=="Absent",]
+
+LEH<-data[data$Light=="Present",]
+LEH <- LEH[LEH$Flow.rate=="Extreme Flow",]
+LEH <- LEH[LEH$Chlorophyll=="High Chlorophyll",]
+LEH <- LEH[LEH$Guano=="Absent",]
+
+LEG<-data[data$Light=="Present",]
+LEG <- LEG[LEG$Flow.rate=="Extreme Flow",]
+LEG <- LEG[LEG$Chlorophyll=="No Chlorophyll",]
+LEG <- LEG[LEG$Guano=="Present",]
+################################################################
+
+#####################################################################
+
+   ##  Light Off, NO Flow
+
+####################################################################
+
+DNN<-data[data$Light=="Absent",]
+DNN <- DNN[DNN$Flow.rate=="No Flow",]
+DNN <- DNN[DNN$Chlorophyll=="No Chlorophyll",]
+DNN <- DNN[DNN$Guano=="Absent",]
+
+DNL<-data[data$Light=="Absent",]
+DNL <- DNL[DNL$Flow.rate=="No Flow",]
+DNL <- DNL[DNL$Chlorophyll=="Low Chlorophyll",]
+DNL <- DNL[DNL$Guano=="Absent",]
+
+DNM<-data[data$Light=="Absent",]
+DNM <- DNM[DNM$Flow.rate=="No Flow",]
+DNM <- DNM[DNM$Chlorophyll=="Medium Chlorophyll",]
+DNM <- DNM[DNM$Guano=="Absent",]
+
+DNH <-data[data$Light=="Absent",]
+DNH <- DNH[DNH$Flow.rate=="No Flow",]
+DNH <- DNH[DNH$Chlorophyll=="High Chlorophyll",]
+DNH <- DNH[DNH$Guano=="Absent",]
+
+DNG<-data[data$Light=="Absent",]
+DNG <- DNG[DNG$Flow.rate=="No Flow",]
+DNG <- DNG[DNG$Chlorophyll=="No Chlorophyll",]
+DNG <- DNG[DNG$Guano=="Present",]
+##############################################################
+
+##    Lights Off, Low Flow
+
+###############################################################
+
+DLN <-data[data$Light=="Absent",]
+DLN <- DLN[DLN$Flow.rate=="Low Flow",]
+DLN <- DLN[DLN$Chlorophyll=="No Chlorophyll",]
+DLN <- DLN[DLN$Guano=="Absent",]
+
+DLL <-data[data$Light=="Absent",]
+DLL <- DLL[DLL$Flow.rate=="Low Flow",]
+DLL <- DLL[DLL$Chlorophyll=="Low Chlorophyll",]
+DLL <- DLL[DLL$Guano=="Absent",]
+
+DLM <-data[data$Light=="Absent",]
+DLM <- DLM[DLM$Flow.rate=="Low Flow",]
+DLM <- DLM[DLM$Chlorophyll=="Medium Chlorophyll",]
+DLM <- DLM[DLM$Guano=="Absent",]
+
+DLH <-data[data$Light=="Absent",]
+DLH <- DLH[DLH$Flow.rate=="Low Flow",]
+DLH <- DLH[DLH$Chlorophyll=="High Chlorophyll",]
+DLH <- DLH[DLH$Guano=="Absent",]
+
+DLG <-data[data$Light=="Absent",]
+DLG <- DLG[DLG$Flow.rate=="Low Flow",]
+DLG <- DLG[DLG$Chlorophyll=="No Chlorophyll",]
+DLG <- DLG[DLG$Guano=="Present",]
+#####################################################################
+
+##    Light Off, Medium Flow
+
+######################################################################
+
+DMN <-data[data$Light=="Absent",]
+DMN <- DMN[DMN$Flow.rate=="Medium Flow",]
+DMN <- DMN[DMN$Chlorophyll=="No Chlorophyll",]
+DMN <- DMN[DMN$Guano=="Absent",]
+
+DML <-data[data$Light=="Absent",]
+DML <- DML[DML$Flow.rate=="Medium Flow",]
+DML <- DML[DML$Chlorophyll=="Low Chlorophyll",]
+DML <- DML[DML$Guano=="Absent",]
+
+DMM <-data[data$Light=="Absent",]
+DMM <- DMM[DMM$Flow.rate=="Medium Flow",]
+DMM <- DMM[DMM$Chlorophyll=="Medium Chlorophyll",]
+DMM <- DMM[DMM$Guano=="Absent",]
+
+DMH <-data[data$Light=="Absent",]
+DMH <- DMH[DMH$Flow.rate=="Medium Flow",]
+DMH <- DMH[DMH$Chlorophyll=="High Chlorophyll",]
+DMH <- DMH[DMH$Guano=="Absent",]
+
+DMG <-data[data$Light=="Absent",]
+DMG <- DMG[DMG$Flow.rate=="Medium Flow",]
+DMG <- DMG[DMG$Chlorophyll=="No Chlorophyll",]
+DMG <- DMG[DMG$Guano=="Present",]
+################################################################
+
+###    Light Off, High Flow
+
+####################################################################
+
+DHN<-data[data$Light=="Absent",]
+DHN <- DHN[DHN$Flow.rate=="High Flow",]
+DHN <- DHN[DHN$Chlorophyll=="No Chlorophyll",]
+DHN <- DHN[DHN$Guano=="Absent",]
+
+DHL<-data[data$Light=="Absent",]
+DHL <- DHL[DHL$Flow.rate=="High Flow",]
+DHL <- DHL[DHL$Chlorophyll=="Low Chlorophyll",]
+DHL <- DHL[DHL$Guano=="Absent",]
+
+DHM<-data[data$Light=="Absent",]
+DHM <- DHM[DHM$Flow.rate=="High Flow",]
+DHM <- DHM[DHM$Chlorophyll=="Medium Chlorophyll",]
+DHM <- DHM[DHM$Guano=="Absent",]
+
+DHH<-data[data$Light=="Absent",]
+DHH <- DHH[DHH$Flow.rate=="High Flow",]
+DHH <- DHH[DHH$Chlorophyll=="High Chlorophyll",]
+DHH <- DHH[DHH$Guano=="Absent",]
+
+DHG<-data[data$Light=="Absent",]
+DHG <- DHG[DHG$Flow.rate=="High Flow",]
+DHG <- DHG[DHG$Chlorophyll=="No Chlorophyll",]
+DHG <- DHG[DHG$Guano=="Present",]
+################################################################
+
+
+###    Light Off, Extreme Flow
+
+####################################################################
+
+DEN<-data[data$Light=="Absent",]
+DEN <- DEN[DEN$Flow.rate=="Extreme Flow",]
+DEN <- DEN[DEN$Chlorophyll=="No Chlorophyll",]
+DEN <- DEN[DEN$Guano=="Absent",]
+
+DEL<-data[data$Light=="Absent",]
+DEL <- DEL[DEL$Flow.rate=="Extreme Flow",]
+DEL <- DEL[DEL$Chlorophyll=="Low Chlorophyll",]
+DEL <- DEL[DEL$Guano=="Absent",]
+
+DEM<-data[data$Light=="Absent",]
+DEM <- DEM[DEM$Flow.rate=="Extreme Flow",]
+DEM <- DEM[DEM$Chlorophyll=="Medium Chlorophyll",]
+DEM <- DEM[DEM$Guano=="Absent",]
+
+DEH<-data[data$Light=="Absent",]
+DEH <- DEH[DEH$Flow.rate=="Extreme Flow",]
+DEH <- DEH[DEH$Chlorophyll=="High Chlorophyll",]
+DEH <- DEH[DEH$Guano=="Absent",]
+
+DEG<-data[data$Light=="Absent",]
+DEG <- DEG[DEG$Flow.rate=="Extreme Flow",]
+DEG <- DEG[DEG$Chlorophyll=="No Chlorophyll",]
+DEG <- DEG[DEG$Guano=="Present",]
+################################################################
+  ### setting data as circular
+##   Lights on
+
+LNN <- circular(LNN$turn.angle, units="degrees", template="geographics") #assign LNN subset to "LNN" variable
+LNL <- circular(LNL$turn.angle, units="degrees", template="geographics") #LNL
+LNM <- circular(LNM$turn.angle, units="degrees", template="geographics") #LNM
+LNH <- circular(LNH$turn.angle, units="degrees", template="geographics") #LNH
+LNG <- circular(LNG$turn.angle, units="degrees", template="geographics") #LNG
+
+LLN <- circular(LLN$turn.angle, units="degrees", template="geographics") #LLN
+LLL <- circular(LLL$turn.angle, units="degrees", template="geographics") #LLL
+LLM <- circular(LLM$turn.angle, units="degrees", template="geographics") #LLM
+LLH <- circular(LLH$turn.angle, units="degrees", template="geographics") #LLH
+LLG <- circular(LLG$turn.angle, units="degrees", template="geographics") #LLG
+
+LMN <- circular(LMN$turn.angle, units="degrees", template="geographics") #LMN
+LML <- circular(LML$turn.angle, units="degrees", template="geographics") #LML
+LMM <- circular(LMM$turn.angle, units="degrees", template="geographics") #LMM
+LMH <- circular(LMH$turn.angle, units="degrees", template="geographics") #LMH
+LMG <- circular(LMG$turn.angle, units="degrees", template="geographics") #LMG
+
+LHN <- circular(LHN$turn.angle, units="degrees", template="geographics") #LHN
+LHL <- circular(LHL$turn.angle, units="degrees", template="geographics") #LHL
+LHM <- circular(LHM$turn.angle, units="degrees", template="geographics") #LHM
+LHH <- circular(LHH$turn.angle, units="degrees", template="geographics") #LHH
+LHG <- circular(LHG$turn.angle, units="degrees", template="geographics") #LHG
+
+LEN <- circular(LEN$turn.angle, units="degrees", template="geographics") #LEN
+LEL <- circular(LEL$turn.angle, units="degrees", template="geographics") #LEL
+LEM <- circular(LEM$turn.angle, units="degrees", template="geographics") #LEM
+LEH <- circular(LEH$turn.angle, units="degrees", template="geographics") #LEH
+LEG <- circular(LEG$turn.angle, units="degrees", template="geographics") #LEG
+
+############  Lights Off
+
+DNN <- circular(DNN$turn.angle, units="degrees", template="geographics") #DNN
+DNL <- circular(DNL$turn.angle, units="degrees", template="geographics") #DNL
+DNM <- circular(DNM$turn.angle, units="degrees", template="geographics") #DNM
+DNH <- circular(DNH$turn.angle, units="degrees", template="geographics") #DNH
+DNG <- circular(DNG$turn.angle, units="degrees", template="geographics") #DNG
+
+DLN <- circular(DLN$turn.angle, units="degrees", template="geographics") #DLN
+DLL <- circular(DLL$turn.angle, units="degrees", template="geographics") #DLL
+DLM <- circular(DLM$turn.angle, units="degrees", template="geographics") #DLM
+DLH <- circular(DLH$turn.angle, units="degrees", template="geographics") #DLH
+DLG <- circular(DLG$turn.angle, units="degrees", template="geographics") #DLG
+
+DMN <- circular(DMN$turn.angle, units="degrees", template="geographics") #DMN
+DML <- circular(DML$turn.angle, units="degrees", template="geographics") #DML
+DMM <- circular(DMM$turn.angle, units="degrees", template="geographics") #DMM
+DMH <- circular(DMH$turn.angle, units="degrees", template="geographics") #DMH
+DMG <- circular(DMG$turn.angle, units="degrees", template="geographics") #DMG
+
+DHN <- circular(DHN$turn.angle, units="degrees", template="geographics") #DHN
+DHL <- circular(DHL$turn.angle, units="degrees", template="geographics") #DHL
+DHM <- circular(DHM$turn.angle, units="degrees", template="geographics") #DHM
+DHH <- circular(DHH$turn.angle, units="degrees", template="geographics") #DHH
+DHG <- circular(DHG$turn.angle, units="degrees", template="geographics") #DHG
+
+DEN <- circular(DEN$turn.angle, units="degrees", template="geographics") #DEN
+DEL <- circular(DEL$turn.angle, units="degrees", template="geographics") #DEL
+DEM <- circular(DEM$turn.angle, units="degrees", template="geographics") #DEM
+DEH <- circular(DEH$turn.angle, units="degrees", template="geographics") #DEH
+DEG <- circular(DEG$turn.angle, units="degrees", template="geographics") #DEG
+######################################################################################
+
+#check that the data was subsetted correctly (south & ambient, too if did already)
+print(LNN)
+print(LNL)
+print(LNM)
+
+```
+
+Now that data is subsetted, find the means... and plot circular plot with mean vector
+
+Lights On first...
+
+```{r}
+#########################################################################
+      ## Lights On No Flow
+
+############################################################################
+mean(LNN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LNN, na.rm = TRUE)
+meandeviation(LNN, na.rm=TRUE)
+summary(LNN, na.rm=TRUE) 
+LNN.mean <- mean(LNN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LNN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)  ### larger stack number = more zoomed out
+arrows.circular(LNN.mean) #add mean to plot
+###########################################################################
+
+mean(LNL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LNL, na.rm = TRUE)
+meandeviation(LNL, na.rm=TRUE)
+summary(LNL, na.rm=TRUE) 
+LNL.mean <- mean(LNL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LNL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LNL.mean) #add mean to plot
+###########################################################################
+
+mean(LNM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LNM, na.rm = TRUE)
+meandeviation(LNM, na.rm=TRUE)
+summary(LNM, na.rm=TRUE) 
+LNM.mean <- mean(LNM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LNM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LNM.mean) #add mean to plot
+###########################################################################
+
+mean(LNH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LNH, na.rm = TRUE)
+meandeviation(LNH, na.rm=TRUE)
+summary(LNH, na.rm=TRUE) 
+LNH.mean <- mean(LNH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LNH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LNH.mean) #add mean to plot
+###########################################################################
+
+mean(LNG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LNG, na.rm = TRUE)
+meandeviation(LNG, na.rm=TRUE)
+summary(LNG, na.rm=TRUE) 
+LNG.mean <- mean(LNG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LNG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LNG.mean) #add mean to plot
+###########################################################################
+
+#########################################################################
+      ## Lights On Low Flow
+
+############################################################################
+mean(LLN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LLN, na.rm = TRUE)
+meandeviation(LLN, na.rm=TRUE)
+summary(LLN, na.rm=TRUE) 
+LLN.mean <- mean(LLN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LLN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LLN.mean) #add mean to plot
+###########################################################################
+
+mean(LLL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LLL, na.rm = TRUE)
+meandeviation(LLL, na.rm=TRUE)
+summary(LLL, na.rm=TRUE) 
+LLL.mean <- mean(LLL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LLL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LLL.mean) #add mean to plot
+###########################################################################
+
+mean(LLM, na.rm = TRUE) #remove NAs from dataset, then find mean
+var(LLM, na.rm = TRUE)
+meandeviation(LLM, na.rm=TRUE)
+summary(LLM, na.rm=TRUE) 
+LLM.mean <- mean(LLM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LLM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LLM.mean) #add mean to plot
+###########################################################################
+
+mean(LLH, na.rm = TRUE) #remove NAs from dataset, then find mean
+var(LLH, na.rm = TRUE)
+meandeviation(LLH, na.rm=TRUE)
+summary(LLH, na.rm=TRUE) 
+LLH.mean <- mean(LLH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LLH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LLH.mean) #add mean to plot
+###########################################################################
+
+mean(LLG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LLG, na.rm = TRUE)
+meandeviation(LLG, na.rm=TRUE)
+summary(LLG, na.rm=TRUE) 
+LLG.mean <- mean(LLG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LLG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LLG.mean) #add mean to plot
+###########################################################################
+
+
+#########################################################################
+      ## Lights On Medium Flow
+
+############################################################################
+mean(LMN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LMN, na.rm = TRUE)
+meandeviation(LMN, na.rm=TRUE)
+summary(LMN, na.rm=TRUE) 
+LMN.mean <- mean(LMN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LMN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LMN.mean) #add mean to plot
+###########################################################################
+
+mean(LML, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LML, na.rm = TRUE)
+meandeviation(LML, na.rm=TRUE)
+summary(LML, na.rm=TRUE)
+LML.mean <- mean(LML, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LML, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LML.mean) #add mean to plot
+###########################################################################
+
+mean(LMM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LMM, na.rm = TRUE)
+meandeviation(LMM, na.rm=TRUE)
+summary(LMM, na.rm=TRUE)
+LMM.mean <- mean(LMM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LMM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LMM.mean) #add mean to plot
+###########################################################################
+
+mean(LMH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LMH, na.rm = TRUE)
+meandeviation(LMH, na.rm=TRUE)
+summary(LMH, na.rm=TRUE)
+LMH.mean <- mean(LMH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LMH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LMH.mean) #add mean to plot
+###########################################################################
+
+mean(LMG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LMG, na.rm = TRUE)
+meandeviation(LMG, na.rm=TRUE)
+summary(LMG, na.rm=TRUE)
+LMG.mean <- mean(LMG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LMG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LMG.mean) #add mean to plot
+###########################################################################
+
+
+#########################################################################
+      ## Lights On High Flow
+
+############################################################################
+mean(LHN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LHN, na.rm = TRUE)
+meandeviation(LHN, na.rm=TRUE)
+summary(LHN, na.rm=TRUE)
+LHN.mean <- mean(LHN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LHN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LHN.mean) #add mean to plot
+###########################################################################
+
+mean(LHL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LHL, na.rm = TRUE)
+meandeviation(LHL, na.rm=TRUE)
+summary(LHL, na.rm=TRUE)
+LHL.mean <- mean(LHL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LHL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LHL.mean) #add mean to plot
+###########################################################################
+
+mean(LHM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LHM, na.rm = TRUE)
+meandeviation(LHM, na.rm=TRUE)
+summary(LHM, na.rm=TRUE)
+LHM.mean <- mean(LHM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LHM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LHM.mean) #add mean to plot
+###########################################################################
+
+mean(LHH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LHH, na.rm = TRUE)
+meandeviation(LHH, na.rm=TRUE)
+summary(LHH, na.rm=TRUE)
+LHH.mean <- mean(LHH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LHH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LHH.mean) #add mean to plot
+###########################################################################
+
+mean(LHG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LHG, na.rm = TRUE)
+meandeviation(LHG, na.rm=TRUE)
+summary(LHG, na.rm=TRUE)
+LHG.mean <- mean(LHG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LHG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LHG.mean) #add mean to plot
+###########################################################################
+
+
+
+#########################################################################
+      ## Lights On Extreme Flow
+
+############################################################################
+mean(LEN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LEN, na.rm = TRUE)
+meandeviation(LEN, na.rm=TRUE)
+summary(LEN, na.rm=TRUE)
+LEN.mean <- mean(LEN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LEN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LEN.mean) #add mean to plot
+###########################################################################
+
+mean(LEL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LEL, na.rm = TRUE)
+meandeviation(LEL, na.rm=TRUE)
+summary(LEL, na.rm=TRUE)
+LEL.mean <- mean(LEL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LEL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LEL.mean) #add mean to plot
+###########################################################################
+
+mean(LEM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LEM, na.rm = TRUE)
+meandeviation(LEM, na.rm=TRUE)
+summary(LEM, na.rm=TRUE)
+LEM.mean <- mean(LEM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LEM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LEM.mean) #add mean to plot
+###########################################################################
+
+mean(LEH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LEH, na.rm = TRUE)
+meandeviation(LEH, na.rm=TRUE)
+summary(LEH, na.rm=TRUE)
+LEH.mean <- mean(LEH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LEH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LEH.mean) #add mean to plot
+###########################################################################
+
+mean(LEG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(LEG, na.rm = TRUE)
+meandeviation(LEG, na.rm=TRUE)
+summary(LEG, na.rm=TRUE)
+LEG.mean <- mean(LEG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LEG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LEG.mean) #add mean to plot
+###########################################################################
+
+
+```
+Now for lights off AKA Dark
+
+```{r}
+#########################################################################
+      ## Lights Off No Flow
+
+############################################################################
+mean(DNN, na.rm = TRUE) #remove NAs from dataset, then find mean
+var(DNN, na.rm = TRUE)
+meandeviation(DNN, na.rm=TRUE)
+summary(DNN, na.rm=TRUE)
+DNN.mean <- mean(DNN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DNN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)  ### larger stack number = more zoomed out
+arrows.circular(DNN.mean) #add mean to plot
+###########################################################################
+
+mean(DNL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DNL, na.rm = TRUE)
+meandeviation(DNL, na.rm=TRUE)
+summary(DNL, na.rm=TRUE)
+DNL.mean <- mean(DNL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DNL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DNL.mean) #add mean to plot
+###########################################################################
+
+mean(DNM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DNM, na.rm = TRUE)
+meandeviation(DNM, na.rm=TRUE)
+summary(DNM, na.rm=TRUE)
+DNM.mean <- mean(DNM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DNM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DNM.mean) #add mean to plot
+###########################################################################
+
+mean(DNH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DNH, na.rm = TRUE)
+meandeviation(DNH, na.rm=TRUE)
+summary(DNH, na.rm=TRUE)
+DNH.mean <- mean(DNH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DNH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DNH.mean) #add mean to plot
+###########################################################################
+
+mean(DNG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DNG, na.rm = TRUE)
+meandeviation(DNG, na.rm=TRUE)
+summary(DNG, na.rm=TRUE)
+DNG.mean <- mean(DNG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DNG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DNG.mean) #add mean to plot
+###########################################################################
+
+#########################################################################
+      ## Lights Off Low Flow
+
+############################################################################
+mean(DLN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DLN, na.rm = TRUE)
+meandeviation(DLN, na.rm=TRUE)
+summary(DLN, na.rm=TRUE)
+DLN.mean <- mean(DLN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DLN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DLN.mean) #add mean to plot
+###########################################################################
+
+mean(DLL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DLL, na.rm = TRUE)
+meandeviation(DLL, na.rm=TRUE)
+summary(DLL, na.rm=TRUE)
+DLL.mean <- mean(DLL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DLL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DLL.mean) #add mean to plot
+###########################################################################
+
+mean(DLM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DLM, na.rm = TRUE)
+meandeviation(DLM, na.rm=TRUE)
+summary(DLM, na.rm=TRUE)
+DLM.mean <- mean(DLM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DLM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DLM.mean) #add mean to plot
+###########################################################################
+
+mean(DLH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DLH, na.rm = TRUE)
+meandeviation(DLH, na.rm=TRUE)
+summary(DLH, na.rm=TRUE)
+DLH.mean <- mean(DLH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DLH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DLH.mean) #add mean to plot
+###########################################################################
+
+mean(DLG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DLG, na.rm = TRUE)
+meandeviation(DLG, na.rm=TRUE)
+summary(DLG, na.rm=TRUE)
+DLG.mean <- mean(DLG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DLG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DLG.mean) #add mean to plot
+###########################################################################
+
+
+#########################################################################
+      ## Lights On Medium Flow
+
+############################################################################
+mean(DMN, na.rm = TRUE) #remove NAs from dataset, then find mean
+var(DMN, na.rm = TRUE)
+meandeviation(DMN, na.rm=TRUE)
+summary(DMN, na.rm=TRUE)
+DMN.mean <- mean(DMN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DMN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DMN.mean) #add mean to plot
+###########################################################################
+
+mean(DML, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DML, na.rm = TRUE)
+meandeviation(DML, na.rm=TRUE)
+summary(DML, na.rm=TRUE)
+DML.mean <- mean(DML, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DML, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DML.mean) #add mean to plot
+###########################################################################
+
+mean(DMM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DMM, na.rm = TRUE)
+meandeviation(DMM, na.rm=TRUE)
+summary(DMM, na.rm=TRUE)
+DMM.mean <- mean(DMM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DMM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DMM.mean) #add mean to plot
+###########################################################################
+
+mean(DMH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DMH, na.rm = TRUE)
+meandeviation(DMH, na.rm=TRUE)
+summary(DMH, na.rm=TRUE)
+DMH.mean <- mean(DMH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DMH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DMH.mean) #add mean to plot
+###########################################################################
+
+mean(DMG, na.rm = TRUE) #remove NAs from dataset, then find mean
+var(DMG, na.rm = TRUE)
+meandeviation(DMG, na.rm=TRUE)
+summary(DMG, na.rm=TRUE)
+DMG.mean <- mean(DMG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DMG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DMG.mean) #add mean to plot
+###########################################################################
+
+
+#########################################################################
+      ## Lights Off High Flow
+
+############################################################################
+mean(DHN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DHN, na.rm = TRUE)
+meandeviation(DHN, na.rm=TRUE)
+summary(DHN, na.rm=TRUE)
+DHN.mean <- mean(DHN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DHN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DHN.mean) #add mean to plot
+###########################################################################
+
+mean(DHL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DHL, na.rm = TRUE)
+meandeviation(DHL, na.rm=TRUE)
+summary(DHL, na.rm=TRUE)
+DHL.mean <- mean(DHL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DHL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DHL.mean) #add mean to plot
+###########################################################################
+
+mean(DHM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DHM, na.rm = TRUE)
+meandeviation(DHM, na.rm=TRUE)
+summary(DHM, na.rm=TRUE)
+DHM.mean <- mean(DHM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DHM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DHM.mean) #add mean to plot
+###########################################################################
+
+mean(DHH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DHH, na.rm = TRUE)
+meandeviation(DHH, na.rm=TRUE)
+summary(DHH, na.rm=TRUE)
+DHH.mean <- mean(DHH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DHH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DHH.mean) #add mean to plot
+###########################################################################
+
+mean(DHG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DHG, na.rm = TRUE)
+meandeviation(DHG, na.rm=TRUE)
+summary(DHG, na.rm=TRUE)
+DHG.mean <- mean(DHG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DHG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DHG.mean) #add mean to plot
+###########################################################################
+
+#########################################################################
+      ## Lights Off Extreme Flow
+
+############################################################################
+mean(DEN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DEN, na.rm = TRUE)
+meandeviation(DEN, na.rm=TRUE)
+summary(DEN, na.rm=TRUE)
+DEN.mean <- mean(DEN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DEN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DEN.mean) #add mean to plot
+###########################################################################
+
+mean(DEL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DEL, na.rm = TRUE)
+meandeviation(DEL, na.rm=TRUE)
+summary(DEL, na.rm=TRUE)
+DEL.mean <- mean(DEL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DEL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DEL.mean) #add mean to plot
+###########################################################################
+
+mean(DEM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DEM, na.rm = TRUE)
+meandeviation(DEM, na.rm=TRUE)
+summary(DEM, na.rm=TRUE)
+DEM.mean <- mean(DEM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DEM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DEM.mean) #add mean to plot
+###########################################################################
+
+mean(DEH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DEH, na.rm = TRUE)
+meandeviation(DEH, na.rm=TRUE)
+summary(DEH, na.rm=TRUE)
+DEH.mean <- mean(DEH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DEH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DEH.mean) #add mean to plot
+###########################################################################
+
+mean(DEG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+var(DEG, na.rm = TRUE)
+meandeviation(DEG, na.rm=TRUE)
+summary(DEG, na.rm=TRUE)
+DEG.mean <- mean(DEG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DEG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DEG.mean) #add mean to plot
+###########################################################################
+
+```
+
+
+Test if mean vectors are significantly different...
+
+```{r}
+
+
+##  A Rayleigh Test is a test for significant unimodal orientation (e.g. Is everyone in the treatment going the same direction?).
+
+rayleigh.test(LNN)  ## if significant shows non-uniformity of direction  (No flow vs extreme flow)
+rayleigh.test(LEN)  ## if significant shows non-uniformity of direction
+
+# Test whether LNN and LEN (etc) orient differently  
+
+##  A Watson Test determines if two groups’ orientations are significantly different from each other. 
+watson.two.test(LNN, LEN)
+
+```
+
+Do it all again for headings.....
+```{r}
+LNN<-data[data$Light=="Present",]
+LNN <- LNN[LNN$Flow.rate=="No Flow",]
+LNN <- LNN[LNN$Chlorophyll=="No Chlorophyll",]
+LNN <- LNN[LNN$Guano=="Absent",]
+
+LNL<-data[data$Light=="Present",]
+LNL <- LNL[LNL$Flow.rate=="No Flow",]
+LNL <- LNL[LNL$Chlorophyll=="Low Chlorophyll",]
+LNL <- LNL[LNL$Guano=="Absent",]
+
+LNM<-data[data$Light=="Present",]
+LNM <- LNM[LNM$Flow.rate=="No Flow",]
+LNM <- LNM[LNM$Chlorophyll=="Medium Chlorophyll",]
+LNM <- LNM[LNM$Guano=="Absent",]
+
+LNH<-data[data$Light=="Present",]
+LNH <- LNH[LNH$Flow.rate=="No Flow",]
+LNH <- LNH[LNH$Chlorophyll=="High Chlorophyll",]
+LNH <- LNH[LNH$Guano=="Absent",]
+
+LNG<-data[data$Light=="Present",]
+LNG <- LNG[LNG$Flow.rate=="No Flow",]
+LNG <- LNG[LNG$Chlorophyll=="No Chlorophyll",]
+LNG <- LNG[LNG$Guano=="Present",]
+##############################################################
+
+##    Lights On, Low Flow
+
+###############################################################
+
+LLN<-data[data$Light=="Present",]
+LLN <- LLN[LLN$Flow.rate=="Low Flow",]
+LLN <- LLN[LLN$Chlorophyll=="No Chlorophyll",]
+LLN <- LLN[LLN$Guano=="Absent",]
+
+LLL<-data[data$Light=="Present",]
+LLL <- LLL[LLL$Flow.rate=="Low Flow",]
+LLL <- LLL[LLL$Chlorophyll=="Low Chlorophyll",]
+LLL <- LLL[LLL$Guano=="Absent",]
+
+LLM<-data[data$Light=="Present",]
+LLM <- LLM[LLM$Flow.rate=="Low Flow",]
+LLM <- LLM[LLM$Chlorophyll=="Medium Chlorophyll",]
+LLM <- LLM[LLM$Guano=="Absent",]
+
+LLH<-data[data$Light=="Present",]
+LLH <- LLH[LLH$Flow.rate=="Low Flow",]
+LLH <- LLH[LLH$Chlorophyll=="High Chlorophyll",]
+LLH <- LLH[LLH$Guano=="Absent",]
+
+LLG<-data[data$Light=="Present",]
+LLG <- LLG[LLG$Flow.rate=="Low Flow",]
+LLG <- LLG[LLG$Chlorophyll=="No Chlorophyll",]
+LLG <- LLG[LLG$Guano=="Present",]
+#####################################################################
+
+##    Light On, Medium Flow
+
+######################################################################
+
+LMN<-data[data$Light=="Present",]
+LMN <- LMN[LMN$Flow.rate=="Medium Flow",]
+LMN <- LMN[LMN$Chlorophyll=="No Chlorophyll",]
+LMN <- LMN[LMN$Guano=="Absent",]
+
+LML<-data[data$Light=="Present",]
+LML <- LML[LML$Flow.rate=="Medium Flow",]
+LML <- LML[LML$Chlorophyll=="Low Chlorophyll",]
+LML <- LML[LML$Guano=="Absent",]
+
+LMM<-data[data$Light=="Present",]
+LMM <- LMM[LMM$Flow.rate=="Medium Flow",]
+LMM <- LMM[LMM$Chlorophyll=="Medium Chlorophyll",]
+LMM <- LMM[LMM$Guano=="Absent",]
+
+LMH<-data[data$Light=="Present",]
+LMH <- LMH[LMH$Flow.rate=="Medium Flow",]
+LMH <- LMH[LMH$Chlorophyll=="High Chlorophyll",]
+LMH <- LMH[LMH$Guano=="Absent",]
+
+LMG<-data[data$Light=="Present",]
+LMG <- LMG[LMG$Flow.rate=="Medium Flow",]
+LMG <- LMG[LMG$Chlorophyll=="No Chlorophyll",]
+LMG <- LMG[LMG$Guano=="Present",]
+################################################################
+
+###    Light On, High Flow
+
+####################################################################
+
+LHN<-data[data$Light=="Present",]
+LHN <- LHN[LHN$Flow.rate=="High Flow",]
+LHN <- LHN[LHN$Chlorophyll=="No Chlorophyll",]
+LHN <- LHN[LHN$Guano=="Absent",]
+
+LHL<-data[data$Light=="Present",]
+LHL <- LHL[LHL$Flow.rate=="High Flow",]
+LHL <- LHL[LHL$Chlorophyll=="Low Chlorophyll",]
+LHL <- LHL[LHL$Guano=="Absent",]
+
+LHM<-data[data$Light=="Present",]
+LHM <- LHM[LHM$Flow.rate=="High Flow",]
+LHM <- LHM[LHM$Chlorophyll=="Medium Chlorophyll",]
+LHM <- LHM[LHM$Guano=="Absent",]
+
+LHH<-data[data$Light=="Present",]
+LHH <- LHH[LHH$Flow.rate=="High Flow",]
+LHH <- LHH[LHH$Chlorophyll=="High Chlorophyll",]
+LHH <- LHH[LHH$Guano=="Absent",]
+
+LHG<-data[data$Light=="Present",]
+LHG <- LHG[LHG$Flow.rate=="High Flow",]
+LHG <- LHG[LHG$Chlorophyll=="No Chlorophyll",]
+LHG <- LHG[LHG$Guano=="Present",]
+################################################################
+
+
+###    Light On, Extreme Flow
+
+####################################################################
+
+LEN<-data[data$Light=="Present",]
+LEN <- LEN[LEN$Flow.rate=="Extreme Flow",]
+LEN <- LEN[LEN$Chlorophyll=="No Chlorophyll",]
+LEN <- LEN[LEN$Guano=="Absent",]
+
+LEL<-data[data$Light=="Present",]
+LEL <- LEL[LEL$Flow.rate=="Extreme Flow",]
+LEL <- LEL[LEL$Chlorophyll=="Low Chlorophyll",]
+LEL <- LEL[LEL$Guano=="Absent",]
+
+LEM<-data[data$Light=="Present",]
+LEM <- LEM[LEM$Flow.rate=="Extreme Flow",]
+LEM <- LEM[LEM$Chlorophyll=="Medium Chlorophyll",]
+LEM <- LEM[LEM$Guano=="Absent",]
+
+LEH<-data[data$Light=="Present",]
+LEH <- LEH[LEH$Flow.rate=="Extreme Flow",]
+LEH <- LEH[LEH$Chlorophyll=="High Chlorophyll",]
+LEH <- LEH[LEH$Guano=="Absent",]
+
+LEG<-data[data$Light=="Present",]
+LEG <- LEG[LEG$Flow.rate=="Extreme Flow",]
+LEG <- LEG[LEG$Chlorophyll=="No Chlorophyll",]
+LEG <- LEG[LEG$Guano=="Present",]
+################################################################
+
+#####################################################################
+
+   ##  Light Off, NO Flow
+
+####################################################################
+
+DNN<-data[data$Light=="Absent",]
+DNN <- DNN[DNN$Flow.rate=="No Flow",]
+DNN <- DNN[DNN$Chlorophyll=="No Chlorophyll",]
+DNN <- DNN[DNN$Guano=="Absent",]
+
+DNL<-data[data$Light=="Absent",]
+DNL <- DNL[DNL$Flow.rate=="No Flow",]
+DNL <- DNL[DNL$Chlorophyll=="Low Chlorophyll",]
+DNL <- DNL[DNL$Guano=="Absent",]
+
+DNM<-data[data$Light=="Absent",]
+DNM <- DNM[DNM$Flow.rate=="No Flow",]
+DNM <- DNM[DNM$Chlorophyll=="Medium Chlorophyll",]
+DNM <- DNM[DNM$Guano=="Absent",]
+
+DNH <-data[data$Light=="Absent",]
+DNH <- DNH[DNH$Flow.rate=="No Flow",]
+DNH <- DNH[DNH$Chlorophyll=="High Chlorophyll",]
+DNH <- DNH[DNH$Guano=="Absent",]
+
+DNG<-data[data$Light=="Absent",]
+DNG <- DNG[DNG$Flow.rate=="No Flow",]
+DNG <- DNG[DNG$Chlorophyll=="No Chlorophyll",]
+DNG <- DNG[DNG$Guano=="Present",]
+##############################################################
+
+##    Lights Off, Low Flow
+
+###############################################################
+
+DLN <-data[data$Light=="Absent",]
+DLN <- DLN[DLN$Flow.rate=="Low Flow",]
+DLN <- DLN[DLN$Chlorophyll=="No Chlorophyll",]
+DLN <- DLN[DLN$Guano=="Absent",]
+
+DLL <-data[data$Light=="Absent",]
+DLL <- DLL[DLL$Flow.rate=="Low Flow",]
+DLL <- DLL[DLL$Chlorophyll=="Low Chlorophyll",]
+DLL <- DLL[DLL$Guano=="Absent",]
+
+DLM <-data[data$Light=="Absent",]
+DLM <- DLM[DLM$Flow.rate=="Low Flow",]
+DLM <- DLM[DLM$Chlorophyll=="Medium Chlorophyll",]
+DLM <- DLM[DLM$Guano=="Absent",]
+
+DLH <-data[data$Light=="Absent",]
+DLH <- DLH[DLH$Flow.rate=="Low Flow",]
+DLH <- DLH[DLH$Chlorophyll=="High Chlorophyll",]
+DLH <- DLH[DLH$Guano=="Absent",]
+
+DLG <-data[data$Light=="Absent",]
+DLG <- DLG[DLG$Flow.rate=="Low Flow",]
+DLG <- DLG[DLG$Chlorophyll=="No Chlorophyll",]
+DLG <- DLG[DLG$Guano=="Present",]
+#####################################################################
+
+##    Light Off, Medium Flow
+
+######################################################################
+
+DMN <-data[data$Light=="Absent",]
+DMN <- DMN[DMN$Flow.rate=="Medium Flow",]
+DMN <- DMN[DMN$Chlorophyll=="No Chlorophyll",]
+DMN <- DMN[DMN$Guano=="Absent",]
+
+DML <-data[data$Light=="Absent",]
+DML <- DML[DML$Flow.rate=="Medium Flow",]
+DML <- DML[DML$Chlorophyll=="Low Chlorophyll",]
+DML <- DML[DML$Guano=="Absent",]
+
+DMM <-data[data$Light=="Absent",]
+DMM <- DMM[DMM$Flow.rate=="Medium Flow",]
+DMM <- DMM[DMM$Chlorophyll=="Medium Chlorophyll",]
+DMM <- DMM[DMM$Guano=="Absent",]
+
+DMH <-data[data$Light=="Absent",]
+DMH <- DMH[DMH$Flow.rate=="Medium Flow",]
+DMH <- DMH[DMH$Chlorophyll=="High Chlorophyll",]
+DMH <- DMH[DMH$Guano=="Absent",]
+
+DMG <-data[data$Light=="Absent",]
+DMG <- DMG[DMG$Flow.rate=="Medium Flow",]
+DMG <- DMG[DMG$Chlorophyll=="No Chlorophyll",]
+DMG <- DMG[DMG$Guano=="Present",]
+################################################################
+
+###    Light Off, High Flow
+
+####################################################################
+
+DHN<-data[data$Light=="Absent",]
+DHN <- DHN[DHN$Flow.rate=="High Flow",]
+DHN <- DHN[DHN$Chlorophyll=="No Chlorophyll",]
+DHN <- DHN[DHN$Guano=="Absent",]
+
+DHL<-data[data$Light=="Absent",]
+DHL <- DHL[DHL$Flow.rate=="High Flow",]
+DHL <- DHL[DHL$Chlorophyll=="Low Chlorophyll",]
+DHL <- DHL[DHL$Guano=="Absent",]
+
+DHM<-data[data$Light=="Absent",]
+DHM <- DHM[DHM$Flow.rate=="High Flow",]
+DHM <- DHM[DHM$Chlorophyll=="Medium Chlorophyll",]
+DHM <- DHM[DHM$Guano=="Absent",]
+
+DHH<-data[data$Light=="Absent",]
+DHH <- DHH[DHH$Flow.rate=="High Flow",]
+DHH <- DHH[DHH$Chlorophyll=="High Chlorophyll",]
+DHH <- DHH[DHH$Guano=="Absent",]
+
+DHG<-data[data$Light=="Absent",]
+DHG <- DHG[DHG$Flow.rate=="High Flow",]
+DHG <- DHG[DHG$Chlorophyll=="No Chlorophyll",]
+DHG <- DHG[DHG$Guano=="Present",]
+################################################################
+
+
+###    Light Off, Extreme Flow
+
+####################################################################
+
+DEN<-data[data$Light=="Absent",]
+DEN <- DEN[DEN$Flow.rate=="Extreme Flow",]
+DEN <- DEN[DEN$Chlorophyll=="No Chlorophyll",]
+DEN <- DEN[DEN$Guano=="Absent",]
+
+DEL<-data[data$Light=="Absent",]
+DEL <- DEL[DEL$Flow.rate=="Extreme Flow",]
+DEL <- DEL[DEL$Chlorophyll=="Low Chlorophyll",]
+DEL <- DEL[DEL$Guano=="Absent",]
+
+DEM<-data[data$Light=="Absent",]
+DEM <- DEM[DEM$Flow.rate=="Extreme Flow",]
+DEM <- DEM[DEM$Chlorophyll=="Medium Chlorophyll",]
+DEM <- DEM[DEM$Guano=="Absent",]
+
+DEH<-data[data$Light=="Absent",]
+DEH <- DEH[DEH$Flow.rate=="Extreme Flow",]
+DEH <- DEH[DEH$Chlorophyll=="High Chlorophyll",]
+DEH <- DEH[DEH$Guano=="Absent",]
+
+DEG<-data[data$Light=="Absent",]
+DEG <- DEG[DEG$Flow.rate=="Extreme Flow",]
+DEG <- DEG[DEG$Chlorophyll=="No Chlorophyll",]
+DEG <- DEG[DEG$Guano=="Present",]
+
+```
+Run Loop for each set of conditions
+
+Below section has rm for conditions and droplevels for factors at end
+
+```{r}
+##########################################################################
+##Run Loop for each set of conditions
+
+library(dplyr)
+DEN_calculate <- data.frame()
+for (dvt in unique(DEN$D_V_T)) {
+  data <- DEN %>% subset(D_V_T==dvt)
+  for (i in 2:nrow(data)) {
+    subdata <- data[((i-1):i),]
+    rel_point_x <- subdata[1,"X"]
+    rel_point_y <- subdata[1,"Y"]
+    cal_point_x <- subdata[2,"X"]
+    cal_point_y <- subdata[2,"Y"]
+    slope <- (cal_point_y- rel_point_y)/(cal_point_x- rel_point_x)
+    angle <- atan(slope)*360/pi
+    tmp <- data.frame(D_V_T=dvt,i,rel_point_x,rel_point_y,cal_point_x,cal_point_y,slope,angle)
+    DEN_calculate <- rbind(DEN_calculate,tmp)
+  }
+  print(dvt)
+}
+
+
+###########################################################################
+library(circular)
+DEN_calculate <- circular(DEN_calculate$angle, units="degrees", template ="geographics")
+DEN_calculate <- DEN_calculate*pi/180   ## converts to radians
+DEN_calculate.mean <- mean(DEN_calculate*180/pi, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+
+
+                         
+head(LEN_calculate)
+LNL_calculate <- LNL_calculate*pi/180   ## converts to radians
+mean(LNN_calculate, na.rm = TRUE) #remove NAs from dataset, then find mean 
+
+0.0316*180/pi  ## converts back to degrees
+
+## still in radians below
+var(LEN_calculate, na.rm = TRUE)
+meandeviation(LEN_calculate, na.rm=TRUE)
+summary(LEN_calculate)
+
+LNL_calculate.mean <- mean(LNL_calculate*180/pi, na.rm = TRUE) #assigns to the 'LNN.mean' object
+plot.circular(LEN_calculate, stack = T, pch = 20, sep = 0.08, shrink = 3.6)  ### larger stack number = more zoomed out
+arrows.circular(LEN_calculate.mean) #add mean to plot
+
+
+
+####################################################
+
+##  Save mean headings for each set of conditions
+
+####################################################
+
+
+rm(DEG, DEH, DEL, DEM, DHG, DHH, DHL, DHM, DHN, DLG, DLH, DLL, DLM, DMG, DMH, DML, DMM, DMN, DNG, DNL, LEG, LEH, LEL, LEM, LHG, LHH, LHL, LHM, LLH, LMH, LML, LMM)
+##rm(D, d1, d2, dd, dotprod, doty, dotx, dotz, dx1, dx2, dy1, dy2, dz1, dz2, list2, list3, list4, list5, lth, smoothx1, smoothx2, smoothy1, smoothy2)
+##rm(smoothz1, smoothz2, v1, v2, vx1, vx2, vy1, vy2, vz1, vz2, x1, x2, y1, y2, z1, z2)
+
+LNN <- droplevels(LNN)
+str(LNN)
+
+```
+
+Above section has rm for conditions and droplevels for factors at end
+
+```{r}
+##############################################################################
+ ### setting data as circular
+##   Lights on
+
+head(LNN)
+
+LNN <- circular(LNN$heading.pi, units="degrees", template="geographics") #assign LNN subset to "LNN" variable
+LNL <- circular(LNL$heading.pi, units="degrees", template="geographics") #LNL
+LNM <- circular(LNM$heading.pi, units="degrees", template="geographics") #LNM
+LNH <- circular(LNH$heading.pi, units="degrees", template="geographics") #LNH
+LNG <- circular(LNG$heading.pi, units="degrees", template="geographics") #LNG
+
+LLN <- circular(LLN$heading.pi, units="degrees", template="geographics") #LLN
+LLL <- circular(LLL$heading.pi, units="degrees", template="geographics") #LLL
+LLM <- circular(LLM$heading.pi, units="degrees", template="geographics") #LLM
+LLH <- circular(LLH$heading.pi, units="degrees", template="geographics") #LLH
+LLG <- circular(LLG$heading.pi, units="degrees", template="geographics") #LLG
+
+LMN <- circular(LMN$heading.pi, units="degrees", template="geographics") #LMN
+LML <- circular(LML$heading.pi, units="degrees", template="geographics") #LML
+LMM <- circular(LMM$heading.pi, units="degrees", template="geographics") #LMM
+LMH <- circular(LMH$heading.pi, units="degrees", template="geographics") #LMH
+LMG <- circular(LMG$heading.pi, units="degrees", template="geographics") #LMG
+
+LHN <- circular(LHN$heading.pi, units="degrees", template="geographics") #LHN
+LHL <- circular(LHL$heading.pi, units="degrees", template="geographics") #LHL
+LHM <- circular(LHM$heading.pi, units="degrees", template="geographics") #LHM
+LHH <- circular(LHH$heading.pi, units="degrees", template="geographics") #LHH
+LHG <- circular(LHG$heading.pi, units="degrees", template="geographics") #LHG
+
+LEN <- circular(LEN$heading.pi, units="degrees", template="geographics") #LEN
+LEL <- circular(LEL$heading.pi, units="degrees", template="geographics") #LEL
+LEM <- circular(LEM$heading.pi, units="degrees", template="geographics") #LEM
+LEH <- circular(LEH$heading.pi, units="degrees", template="geographics") #LEH
+LEG <- circular(LEG$heading.pi, units="degrees", template="geographics") #LEG
+
+############  Lights Off
+
+DNN <- circular(DNN$heading.pi, units="degrees", template="geographics") #DNN
+DNL <- circular(DNL$heading.pi, units="degrees", template="geographics") #DNL
+DNM <- circular(DNM$heading.pi, units="degrees", template="geographics") #DNM
+DNH <- circular(DNH$heading.pi, units="degrees", template="geographics") #DNH
+DNG <- circular(DNG$heading.pi, units="degrees", template="geographics") #DNG
+
+DLN <- circular(DLN$heading.pi, units="degrees", template="geographics") #DLN
+DLL <- circular(DLL$heading.pi, units="degrees", template="geographics") #DLL
+DLM <- circular(DLM$heading.pi, units="degrees", template="geographics") #DLM
+DLH <- circular(DLH$heading.pi, units="degrees", template="geographics") #DLH
+DLG <- circular(DLG$heading.pi, units="degrees", template="geographics") #DLG
+
+DMN <- circular(DMN$heading.pi, units="degrees", template="geographics") #DMN
+DML <- circular(DML$heading.pi, units="degrees", template="geographics") #DML
+DMM <- circular(DMM$heading.pi, units="degrees", template="geographics") #DMM
+DMH <- circular(DMH$heading.pi, units="degrees", template="geographics") #DMH
+DMG <- circular(DMG$heading.pi, units="degrees", template="geographics") #DMG
+
+DHN <- circular(DHN$heading.pi, units="degrees", template="geographics") #DHN
+DHL <- circular(DHL$heading.pi, units="degrees", template="geographics") #DHL
+DHM <- circular(DHM$heading.pi, units="degrees", template="geographics") #DHM
+DHH <- circular(DHH$heading.pi, units="degrees", template="geographics") #DHH
+DHG <- circular(DHG$heading.pi, units="degrees", template="geographics") #DHG
+
+DEN <- circular(DEN$heading.pi, units="degrees", template="geographics") #DEN
+DEL <- circular(DEL$heading.pi, units="degrees", template="geographics") #DEL
+DEM <- circular(DEM$heading.pi, units="degrees", template="geographics") #DEM
+DEH <- circular(DEH$heading.pi, units="degrees", template="geographics") #DEH
+DEG <- circular(DEG$heading.pi, units="degrees", template="geographics") #DEG
+######################################################################################
+
+```
+
+
+```{r}
+############################################################################
+mean(LNN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LNN.mean <- mean(LNN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LNN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)  ### larger stack number = more zoomed out
+arrows.circular(LNN.mean) #add mean to plot
+###########################################################################
+
+mean(LNL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LNL.mean <- mean(LNL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LNL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LNL.mean) #add mean to plot
+###########################################################################
+
+mean(LNM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LNM.mean <- mean(LNM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LNM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LNM.mean) #add mean to plot
+###########################################################################
+
+mean(LNH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LNH.mean <- mean(LNH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LNH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LNH.mean) #add mean to plot
+###########################################################################
+
+mean(LNG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LNG.mean <- mean(LNG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LNG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LNG.mean) #add mean to plot
+###########################################################################
+
+#########################################################################
+      ## Lights On Low Flow
+
+############################################################################
+mean(LLN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LLN.mean <- mean(LLN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LLN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LLN.mean) #add mean to plot
+###########################################################################
+
+mean(LLL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LLL.mean <- mean(LLL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LLL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LLL.mean) #add mean to plot
+###########################################################################
+
+mean(LLM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LLM.mean <- mean(LLM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LLM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LLM.mean) #add mean to plot
+###########################################################################
+
+mean(LLH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LLH.mean <- mean(LLH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LLH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LLH.mean) #add mean to plot
+###########################################################################
+
+mean(LLG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LLG.mean <- mean(LLG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LLG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LLG.mean) #add mean to plot
+###########################################################################
+
+
+#########################################################################
+      ## Lights On Medium Flow
+
+############################################################################
+mean(LMN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LMN.mean <- mean(LMN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LMN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LMN.mean) #add mean to plot
+###########################################################################
+
+mean(LML, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LML.mean <- mean(LML, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LML, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LML.mean) #add mean to plot
+###########################################################################
+
+mean(LMM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LMM.mean <- mean(LMM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LMM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LMM.mean) #add mean to plot
+###########################################################################
+
+mean(LMH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LMH.mean <- mean(LMH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LMH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LMH.mean) #add mean to plot
+###########################################################################
+
+mean(LMG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LMG.mean <- mean(LMG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LMG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LMG.mean) #add mean to plot
+###########################################################################
+
+
+#########################################################################
+      ## Lights On High Flow
+
+############################################################################
+mean(LHN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LHN.mean <- mean(LHN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LHN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LHN.mean) #add mean to plot
+###########################################################################
+
+mean(LHL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LHL.mean <- mean(LHL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LHL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LHL.mean) #add mean to plot
+###########################################################################
+
+mean(LHM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LHM.mean <- mean(LHM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LHM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LHM.mean) #add mean to plot
+###########################################################################
+
+mean(LHH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LHH.mean <- mean(LHH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LHH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LHH.mean) #add mean to plot
+###########################################################################
+
+mean(LHG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LHG.mean <- mean(LHG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LHG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LHG.mean) #add mean to plot
+###########################################################################
+
+
+
+#########################################################################
+      ## Lights On Extreme Flow
+
+############################################################################
+mean(LEN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LEN.mean <- mean(LEN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LEN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LEN.mean) #add mean to plot
+###########################################################################
+
+mean(LEL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LEL.mean <- mean(LEL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LEL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LEL.mean) #add mean to plot
+###########################################################################
+
+mean(LEM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LEM.mean <- mean(LEM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LEM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LEM.mean) #add mean to plot
+###########################################################################
+
+mean(LEH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LEH.mean <- mean(LEH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LEH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LEH.mean) #add mean to plot
+###########################################################################
+
+mean(LEG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LEG.mean <- mean(LEG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LEG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LEG.mean) #add mean to plot
+###########################################################################
+
+#########################################################################
+      ## Lights Off No Flow
+
+############################################################################
+mean(DNN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DNN.mean <- mean(DNN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DNN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)  ### larger stack number = more zoomed out
+arrows.circular(DNN.mean) #add mean to plot
+###########################################################################
+
+mean(DNL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DNL.mean <- mean(DNL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DNL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DNL.mean) #add mean to plot
+###########################################################################
+
+mean(DNM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DNM.mean <- mean(DNM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DNM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DNM.mean) #add mean to plot
+###########################################################################
+
+mean(DNH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DNH.mean <- mean(DNH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DNH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DNH.mean) #add mean to plot
+###########################################################################
+
+mean(DNG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DNG.mean <- mean(DNG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DNG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DNG.mean) #add mean to plot
+###########################################################################
+
+#########################################################################
+      ## Lights Off Low Flow
+
+############################################################################
+mean(DLN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DLN.mean <- mean(DLN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DLN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DLN.mean) #add mean to plot
+###########################################################################
+
+mean(DLL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DLL.mean <- mean(DLL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DLL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DLL.mean) #add mean to plot
+###########################################################################
+
+mean(DLM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DLM.mean <- mean(DLM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DLM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DLM.mean) #add mean to plot
+###########################################################################
+
+mean(DLH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DLH.mean <- mean(DLH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DLH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DLH.mean) #add mean to plot
+###########################################################################
+
+mean(DLG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DLG.mean <- mean(DLG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DLG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DLG.mean) #add mean to plot
+###########################################################################
+
+
+#########################################################################
+      ## Lights On Medium Flow
+
+############################################################################
+mean(DMN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DMN.mean <- mean(DMN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DMN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DMN.mean) #add mean to plot
+###########################################################################
+
+mean(DML, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DML.mean <- mean(DML, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DML, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DML.mean) #add mean to plot
+###########################################################################
+
+mean(DMM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DMM.mean <- mean(DMM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DMM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DMM.mean) #add mean to plot
+###########################################################################
+
+mean(DMH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DMH.mean <- mean(DMH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DMH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DMH.mean) #add mean to plot
+###########################################################################
+
+mean(DMG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DMG.mean <- mean(DMG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DMG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DMG.mean) #add mean to plot
+###########################################################################
+
+
+#########################################################################
+      ## Lights Off High Flow
+
+############################################################################
+mean(DHN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DHN.mean <- mean(DHN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DHN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DHN.mean) #add mean to plot
+###########################################################################
+
+mean(DHL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DHL.mean <- mean(DHL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DHL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DHL.mean) #add mean to plot
+###########################################################################
+
+mean(DHM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DHM.mean <- mean(DHM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DHM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DHM.mean) #add mean to plot
+###########################################################################
+
+mean(DHH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DHH.mean <- mean(DHH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DHH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DHH.mean) #add mean to plot
+###########################################################################
+
+mean(DHG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DHG.mean <- mean(DHG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DHG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DHG.mean) #add mean to plot
+###########################################################################
+
+#########################################################################
+      ## Lights On Extreme Flow
+
+############################################################################
+mean(DEN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DEN.mean <- mean(DEN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DEN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DEN.mean) #add mean to plot
+###########################################################################
+
+mean(DEL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DEL.mean <- mean(DEL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DEL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DEL.mean) #add mean to plot
+###########################################################################
+
+mean(DEM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DEM.mean <- mean(DEM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DEM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DEM.mean) #add mean to plot
+###########################################################################
+
+mean(DEH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DEH.mean <- mean(DEH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DEH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DEH.mean) #add mean to plot
+###########################################################################
+
+mean(DEG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DEG.mean <- mean(DEG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DEG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)  ### larger stack number = more zoomed out
+arrows.circular(DEG.mean) #add mean to plot
+###########################################################################
+```
+
+and pitch......
+```{r}
+LNN<-data[data$Light=="Present",]
+LNN <- LNN[LNN$Flow.rate=="No Flow",]
+LNN <- LNN[LNN$Chlorophyll=="No Chlorophyll",]
+LNN <- LNN[LNN$Guano=="Absent",]
+
+LNL<-data[data$Light=="Present",]
+LNL <- LNL[LNL$Flow.rate=="No Flow",]
+LNL <- LNL[LNL$Chlorophyll=="Low Chlorophyll",]
+LNL <- LNL[LNL$Guano=="Absent",]
+
+LNM<-data[data$Light=="Present",]
+LNM <- LNM[LNM$Flow.rate=="No Flow",]
+LNM <- LNM[LNM$Chlorophyll=="Medium Chlorophyll",]
+LNM <- LNM[LNM$Guano=="Absent",]
+
+LNH<-data[data$Light=="Present",]
+LNH <- LNH[LNH$Flow.rate=="No Flow",]
+LNH <- LNH[LNH$Chlorophyll=="High Chlorophyll",]
+LNH <- LNH[LNH$Guano=="Absent",]
+
+LNG<-data[data$Light=="Present",]
+LNG <- LNG[LNG$Flow.rate=="No Flow",]
+LNG <- LNG[LNG$Chlorophyll=="No Chlorophyll",]
+LNG <- LNG[LNG$Guano=="Present",]
+##############################################################
+
+##    Lights On, Low Flow
+
+###############################################################
+
+LLN<-data[data$Light=="Present",]
+LLN <- LLN[LLN$Flow.rate=="Low Flow",]
+LLN <- LLN[LLN$Chlorophyll=="No Chlorophyll",]
+LLN <- LLN[LLN$Guano=="Absent",]
+
+LLL<-data[data$Light=="Present",]
+LLL <- LLL[LLL$Flow.rate=="Low Flow",]
+LLL <- LLL[LLL$Chlorophyll=="Low Chlorophyll",]
+LLL <- LLL[LLL$Guano=="Absent",]
+
+LLM<-data[data$Light=="Present",]
+LLM <- LLM[LLM$Flow.rate=="Low Flow",]
+LLM <- LLM[LLM$Chlorophyll=="Medium Chlorophyll",]
+LLM <- LLM[LLM$Guano=="Absent",]
+
+LLH<-data[data$Light=="Present",]
+LLH <- LLH[LLH$Flow.rate=="Low Flow",]
+LLH <- LLH[LLH$Chlorophyll=="High Chlorophyll",]
+LLH <- LLH[LLH$Guano=="Absent",]
+
+LLG<-data[data$Light=="Present",]
+LLG <- LLG[LLG$Flow.rate=="Low Flow",]
+LLG <- LLG[LLG$Chlorophyll=="No Chlorophyll",]
+LLG <- LLG[LLG$Guano=="Present",]
+#####################################################################
+
+##    Light On, Medium Flow
+
+######################################################################
+
+LMN<-data[data$Light=="Present",]
+LMN <- LMN[LMN$Flow.rate=="Medium Flow",]
+LMN <- LMN[LMN$Chlorophyll=="No Chlorophyll",]
+LMN <- LMN[LMN$Guano=="Absent",]
+
+LML<-data[data$Light=="Present",]
+LML <- LML[LML$Flow.rate=="Medium Flow",]
+LML <- LML[LML$Chlorophyll=="Low Chlorophyll",]
+LML <- LML[LML$Guano=="Absent",]
+
+LMM<-data[data$Light=="Present",]
+LMM <- LMM[LMM$Flow.rate=="Medium Flow",]
+LMM <- LMM[LMM$Chlorophyll=="Medium Chlorophyll",]
+LMM <- LMM[LMM$Guano=="Absent",]
+
+LMH<-data[data$Light=="Present",]
+LMH <- LMH[LMH$Flow.rate=="Medium Flow",]
+LMH <- LMH[LMH$Chlorophyll=="High Chlorophyll",]
+LMH <- LMH[LMH$Guano=="Absent",]
+
+LMG<-data[data$Light=="Present",]
+LMG <- LMG[LMG$Flow.rate=="Medium Flow",]
+LMG <- LMG[LMG$Chlorophyll=="No Chlorophyll",]
+LMG <- LMG[LMG$Guano=="Present",]
+################################################################
+
+###    Light On, High Flow
+
+####################################################################
+
+LHN<-data[data$Light=="Present",]
+LHN <- LHN[LHN$Flow.rate=="High Flow",]
+LHN <- LHN[LHN$Chlorophyll=="No Chlorophyll",]
+LHN <- LHN[LHN$Guano=="Absent",]
+
+LHL<-data[data$Light=="Present",]
+LHL <- LHL[LHL$Flow.rate=="High Flow",]
+LHL <- LHL[LHL$Chlorophyll=="Low Chlorophyll",]
+LHL <- LHL[LHL$Guano=="Absent",]
+
+LHM<-data[data$Light=="Present",]
+LHM <- LHM[LHM$Flow.rate=="High Flow",]
+LHM <- LHM[LHM$Chlorophyll=="Medium Chlorophyll",]
+LHM <- LHM[LHM$Guano=="Absent",]
+
+LHH<-data[data$Light=="Present",]
+LHH <- LHH[LHH$Flow.rate=="High Flow",]
+LHH <- LHH[LHH$Chlorophyll=="High Chlorophyll",]
+LHH <- LHH[LHH$Guano=="Absent",]
+
+LHG<-data[data$Light=="Present",]
+LHG <- LHG[LHG$Flow.rate=="High Flow",]
+LHG <- LHG[LHG$Chlorophyll=="No Chlorophyll",]
+LHG <- LHG[LHG$Guano=="Present",]
+################################################################
+
+
+###    Light On, Extreme Flow
+
+####################################################################
+
+LEN<-data[data$Light=="Present",]
+LEN <- LEN[LEN$Flow.rate=="Extreme Flow",]
+LEN <- LEN[LEN$Chlorophyll=="No Chlorophyll",]
+LEN <- LEN[LEN$Guano=="Absent",]
+
+LEL<-data[data$Light=="Present",]
+LEL <- LEL[LEL$Flow.rate=="Extreme Flow",]
+LEL <- LEL[LEL$Chlorophyll=="Low Chlorophyll",]
+LEL <- LEL[LEL$Guano=="Absent",]
+
+LEM<-data[data$Light=="Present",]
+LEM <- LEM[LEM$Flow.rate=="Extreme Flow",]
+LEM <- LEM[LEM$Chlorophyll=="Medium Chlorophyll",]
+LEM <- LEM[LEM$Guano=="Absent",]
+
+LEH<-data[data$Light=="Present",]
+LEH <- LEH[LEH$Flow.rate=="Extreme Flow",]
+LEH <- LEH[LEH$Chlorophyll=="High Chlorophyll",]
+LEH <- LEH[LEH$Guano=="Absent",]
+
+LEG<-data[data$Light=="Present",]
+LEG <- LEG[LEG$Flow.rate=="Extreme Flow",]
+LEG <- LEG[LEG$Chlorophyll=="No Chlorophyll",]
+LEG <- LEG[LEG$Guano=="Present",]
+################################################################
+
+#####################################################################
+
+   ##  Light Off, NO Flow
+
+####################################################################
+
+DNN<-data[data$Light=="Absent",]
+DNN <- DNN[DNN$Flow.rate=="No Flow",]
+DNN <- DNN[DNN$Chlorophyll=="No Chlorophyll",]
+DNN <- DNN[DNN$Guano=="Absent",]
+
+DNL<-data[data$Light=="Absent",]
+DNL <- DNL[DNL$Flow.rate=="No Flow",]
+DNL <- DNL[DNL$Chlorophyll=="Low Chlorophyll",]
+DNL <- DNL[DNL$Guano=="Absent",]
+
+DNM<-data[data$Light=="Absent",]
+DNM <- DNM[DNM$Flow.rate=="No Flow",]
+DNM <- DNM[DNM$Chlorophyll=="Medium Chlorophyll",]
+DNM <- DNM[DNM$Guano=="Absent",]
+
+DNH <-data[data$Light=="Absent",]
+DNH <- DNH[DNH$Flow.rate=="No Flow",]
+DNH <- DNH[DNH$Chlorophyll=="High Chlorophyll",]
+DNH <- DNH[DNH$Guano=="Absent",]
+
+DNG<-data[data$Light=="Absent",]
+DNG <- DNG[DNG$Flow.rate=="No Flow",]
+DNG <- DNG[DNG$Chlorophyll=="No Chlorophyll",]
+DNG <- DNG[DNG$Guano=="Present",]
+##############################################################
+
+##    Lights Off, Low Flow
+
+###############################################################
+
+DLN <-data[data$Light=="Absent",]
+DLN <- DLN[DLN$Flow.rate=="Low Flow",]
+DLN <- DLN[DLN$Chlorophyll=="No Chlorophyll",]
+DLN <- DLN[DLN$Guano=="Absent",]
+
+DLL <-data[data$Light=="Absent",]
+DLL <- DLL[DLL$Flow.rate=="Low Flow",]
+DLL <- DLL[DLL$Chlorophyll=="Low Chlorophyll",]
+DLL <- DLL[DLL$Guano=="Absent",]
+
+DLM <-data[data$Light=="Absent",]
+DLM <- DLM[DLM$Flow.rate=="Low Flow",]
+DLM <- DLM[DLM$Chlorophyll=="Medium Chlorophyll",]
+DLM <- DLM[DLM$Guano=="Absent",]
+
+DLH <-data[data$Light=="Absent",]
+DLH <- DLH[DLH$Flow.rate=="Low Flow",]
+DLH <- DLH[DLH$Chlorophyll=="High Chlorophyll",]
+DLH <- DLH[DLH$Guano=="Absent",]
+
+DLG <-data[data$Light=="Absent",]
+DLG <- DLG[DLG$Flow.rate=="Low Flow",]
+DLG <- DLG[DLG$Chlorophyll=="No Chlorophyll",]
+DLG <- DLG[DLG$Guano=="Present",]
+#####################################################################
+
+##    Light Off, Medium Flow
+
+######################################################################
+
+DMN <-data[data$Light=="Absent",]
+DMN <- DMN[DMN$Flow.rate=="Medium Flow",]
+DMN <- DMN[DMN$Chlorophyll=="No Chlorophyll",]
+DMN <- DMN[DMN$Guano=="Absent",]
+
+DML <-data[data$Light=="Absent",]
+DML <- DML[DML$Flow.rate=="Medium Flow",]
+DML <- DML[DML$Chlorophyll=="Low Chlorophyll",]
+DML <- DML[DML$Guano=="Absent",]
+
+DMM <-data[data$Light=="Absent",]
+DMM <- DMM[DMM$Flow.rate=="Medium Flow",]
+DMM <- DMM[DMM$Chlorophyll=="Medium Chlorophyll",]
+DMM <- DMM[DMM$Guano=="Absent",]
+
+DMH <-data[data$Light=="Absent",]
+DMH <- DMH[DMH$Flow.rate=="Medium Flow",]
+DMH <- DMH[DMH$Chlorophyll=="High Chlorophyll",]
+DMH <- DMH[DMH$Guano=="Absent",]
+
+DMG <-data[data$Light=="Absent",]
+DMG <- DMG[DMG$Flow.rate=="Medium Flow",]
+DMG <- DMG[DMG$Chlorophyll=="No Chlorophyll",]
+DMG <- DMG[DMG$Guano=="Present",]
+################################################################
+
+###    Light Off, High Flow
+
+####################################################################
+
+DHN<-data[data$Light=="Absent",]
+DHN <- DHN[DHN$Flow.rate=="High Flow",]
+DHN <- DHN[DHN$Chlorophyll=="No Chlorophyll",]
+DHN <- DHN[DHN$Guano=="Absent",]
+
+DHL<-data[data$Light=="Absent",]
+DHL <- DHL[DHL$Flow.rate=="High Flow",]
+DHL <- DHL[DHL$Chlorophyll=="Low Chlorophyll",]
+DHL <- DHL[DHL$Guano=="Absent",]
+
+DHM<-data[data$Light=="Absent",]
+DHM <- DHM[DHM$Flow.rate=="High Flow",]
+DHM <- DHM[DHM$Chlorophyll=="Medium Chlorophyll",]
+DHM <- DHM[DHM$Guano=="Absent",]
+
+DHH<-data[data$Light=="Absent",]
+DHH <- DHH[DHH$Flow.rate=="High Flow",]
+DHH <- DHH[DHH$Chlorophyll=="High Chlorophyll",]
+DHH <- DHH[DHH$Guano=="Absent",]
+
+DHG<-data[data$Light=="Absent",]
+DHG <- DHG[DHG$Flow.rate=="High Flow",]
+DHG <- DHG[DHG$Chlorophyll=="No Chlorophyll",]
+DHG <- DHG[DHG$Guano=="Present",]
+################################################################
+
+
+###    Light Off, Extreme Flow
+
+####################################################################
+
+DEN<-data[data$Light=="Absent",]
+DEN <- DEN[DEN$Flow.rate=="Extreme Flow",]
+DEN <- DEN[DEN$Chlorophyll=="No Chlorophyll",]
+DEN <- DEN[DEN$Guano=="Absent",]
+
+DEL<-data[data$Light=="Absent",]
+DEL <- DEL[DEL$Flow.rate=="Extreme Flow",]
+DEL <- DEL[DEL$Chlorophyll=="Low Chlorophyll",]
+DEL <- DEL[DEL$Guano=="Absent",]
+
+DEM<-data[data$Light=="Absent",]
+DEM <- DEM[DEM$Flow.rate=="Extreme Flow",]
+DEM <- DEM[DEM$Chlorophyll=="Medium Chlorophyll",]
+DEM <- DEM[DEM$Guano=="Absent",]
+
+DEH<-data[data$Light=="Absent",]
+DEH <- DEH[DEH$Flow.rate=="Extreme Flow",]
+DEH <- DEH[DEH$Chlorophyll=="High Chlorophyll",]
+DEH <- DEH[DEH$Guano=="Absent",]
+
+DEG<-data[data$Light=="Absent",]
+DEG <- DEG[DEG$Flow.rate=="Extreme Flow",]
+DEG <- DEG[DEG$Chlorophyll=="No Chlorophyll",]
+DEG <- DEG[DEG$Guano=="Present",]
+
+##########################################################################
+
+##############################################################################
+ ### setting data as circular
+##   Lights on
+
+head(LNN)
+
+LNN <- circular(LNN$pitch.perfect, units="degrees", template="geographics") #assign LNN subset to "LNN" variable
+LNL <- circular(LNL$pitch.perfect, units="degrees", template="geographics") #LNL
+LNM <- circular(LNM$pitch.perfect, units="degrees", template="geographics") #LNM
+LNH <- circular(LNH$pitch.perfect, units="degrees", template="geographics") #LNH
+LNG <- circular(LNG$pitch.perfect, units="degrees", template="geographics") #LNG
+
+LLN <- circular(LLN$pitch.perfect, units="degrees", template="geographics") #LLN
+LLL <- circular(LLL$pitch.perfect, units="degrees", template="geographics") #LLL
+LLM <- circular(LLM$pitch.perfect, units="degrees", template="geographics") #LLM
+LLH <- circular(LLH$pitch.perfect, units="degrees", template="geographics") #LLH
+LLG <- circular(LLG$pitch.perfect, units="degrees", template="geographics") #LLG
+
+LMN <- circular(LMN$pitch.perfect, units="degrees", template="geographics") #LMN
+LML <- circular(LML$pitch.perfect, units="degrees", template="geographics") #LML
+LMM <- circular(LMM$pitch.perfect, units="degrees", template="geographics") #LMM
+LMH <- circular(LMH$pitch.perfect, units="degrees", template="geographics") #LMH
+LMG <- circular(LMG$pitch.perfect, units="degrees", template="geographics") #LMG
+
+LHN <- circular(LHN$pitch.perfect, units="degrees", template="geographics") #LHN
+LHL <- circular(LHL$pitch.perfect, units="degrees", template="geographics") #LHL
+LHM <- circular(LHM$pitch.perfect, units="degrees", template="geographics") #LHM
+LHH <- circular(LHH$pitch.perfect, units="degrees", template="geographics") #LHH
+LHG <- circular(LHG$pitch.perfect, units="degrees", template="geographics") #LHG
+
+LEN <- circular(LEN$pitch.perfect, units="degrees", template="geographics") #LEN
+LEL <- circular(LEL$pitch.perfect, units="degrees", template="geographics") #LEL
+LEM <- circular(LEM$pitch.perfect, units="degrees", template="geographics") #LEM
+LEH <- circular(LEH$pitch.perfect, units="degrees", template="geographics") #LEH
+LEG <- circular(LEG$pitch.perfect, units="degrees", template="geographics") #LEG
+
+############  Lights Off
+
+DNN <- circular(DNN$pitch.perfect, units="degrees", template="geographics") #DNN
+DNL <- circular(DNL$pitch.perfect, units="degrees", template="geographics") #DNL
+DNM <- circular(DNM$pitch.perfect, units="degrees", template="geographics") #DNM
+DNH <- circular(DNH$pitch.perfect, units="degrees", template="geographics") #DNH
+DNG <- circular(DNG$pitch.perfect, units="degrees", template="geographics") #DNG
+
+DLN <- circular(DLN$pitch.perfect, units="degrees", template="geographics") #DLN
+DLL <- circular(DLL$pitch.perfect, units="degrees", template="geographics") #DLL
+DLM <- circular(DLM$pitch.perfect, units="degrees", template="geographics") #DLM
+DLH <- circular(DLH$pitch.perfect, units="degrees", template="geographics") #DLH
+DLG <- circular(DLG$pitch.perfect, units="degrees", template="geographics") #DLG
+
+DMN <- circular(DMN$pitch.perfect, units="degrees", template="geographics") #DMN
+DML <- circular(DML$pitch.perfect, units="degrees", template="geographics") #DML
+DMM <- circular(DMM$pitch.perfect, units="degrees", template="geographics") #DMM
+DMH <- circular(DMH$pitch.perfect, units="degrees", template="geographics") #DMH
+DMG <- circular(DMG$pitch.perfect, units="degrees", template="geographics") #DMG
+
+DHN <- circular(DHN$pitch.perfect, units="degrees", template="geographics") #DHN
+DHL <- circular(DHL$pitch.perfect, units="degrees", template="geographics") #DHL
+DHM <- circular(DHM$pitch.perfect, units="degrees", template="geographics") #DHM
+DHH <- circular(DHH$pitch.perfect, units="degrees", template="geographics") #DHH
+DHG <- circular(DHG$pitch.perfect, units="degrees", template="geographics") #DHG
+
+DEN <- circular(DEN$pitch.perfect, units="degrees", template="geographics") #DEN
+DEL <- circular(DEL$pitch.perfect, units="degrees", template="geographics") #DEL
+DEM <- circular(DEM$pitch.perfect, units="degrees", template="geographics") #DEM
+DEH <- circular(DEH$pitch.perfect, units="degrees", template="geographics") #DEH
+DEG <- circular(DEG$pitch.perfect, units="degrees", template="geographics") #DEG
+######################################################################################
+
+############################################################################
+mean(LNN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LNN.mean <- mean(LNN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LNN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)  ### larger stack number = more zoomed out
+arrows.circular(LNN.mean) #add mean to plot
+###########################################################################
+
+mean(LNL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LNL.mean <- mean(LNL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LNL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LNL.mean) #add mean to plot
+###########################################################################
+
+mean(LNM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LNM.mean <- mean(LNM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LNM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LNM.mean) #add mean to plot
+###########################################################################
+
+mean(LNH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LNH.mean <- mean(LNH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LNH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LNH.mean) #add mean to plot
+###########################################################################
+
+mean(LNG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LNG.mean <- mean(LNG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LNG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LNG.mean) #add mean to plot
+###########################################################################
+
+#########################################################################
+      ## Lights On Low Flow
+
+############################################################################
+mean(LLN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LLN.mean <- mean(LLN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LLN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LLN.mean) #add mean to plot
+###########################################################################
+
+mean(LLL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LLL.mean <- mean(LLL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LLL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LLL.mean) #add mean to plot
+###########################################################################
+
+mean(LLM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LLM.mean <- mean(LLM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LLM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LLM.mean) #add mean to plot
+###########################################################################
+
+mean(LLH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LLH.mean <- mean(LLH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LLH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LLH.mean) #add mean to plot
+###########################################################################
+
+mean(LLG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LLG.mean <- mean(LLG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LLG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LLG.mean) #add mean to plot
+###########################################################################
+
+
+#########################################################################
+      ## Lights On Medium Flow
+
+############################################################################
+mean(LMN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LMN.mean <- mean(LMN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LMN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LMN.mean) #add mean to plot
+###########################################################################
+
+mean(LML, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LML.mean <- mean(LML, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LML, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LML.mean) #add mean to plot
+###########################################################################
+
+mean(LMM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LMM.mean <- mean(LMM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LMM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LMM.mean) #add mean to plot
+###########################################################################
+
+mean(LMH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LMH.mean <- mean(LMH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LMH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LMH.mean) #add mean to plot
+###########################################################################
+
+mean(LMG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LMG.mean <- mean(LMG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LMG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LMG.mean) #add mean to plot
+###########################################################################
+
+
+#########################################################################
+      ## Lights On High Flow
+
+############################################################################
+mean(LHN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LHN.mean <- mean(LHN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LHN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LHN.mean) #add mean to plot
+###########################################################################
+
+mean(LHL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LHL.mean <- mean(LHL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LHL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LHL.mean) #add mean to plot
+###########################################################################
+
+mean(LHM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LHM.mean <- mean(LHM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LHM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LHM.mean) #add mean to plot
+###########################################################################
+
+mean(LHH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LHH.mean <- mean(LHH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LHH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LHH.mean) #add mean to plot
+###########################################################################
+
+mean(LHG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LHG.mean <- mean(LHG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LHG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LHG.mean) #add mean to plot
+###########################################################################
+
+
+
+#########################################################################
+      ## Lights On Extreme Flow
+
+############################################################################
+mean(LEN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LEN.mean <- mean(LEN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LEN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LEN.mean) #add mean to plot
+###########################################################################
+
+mean(LEL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LEL.mean <- mean(LEL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LEL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LEL.mean) #add mean to plot
+###########################################################################
+
+mean(LEM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LEM.mean <- mean(LEM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LEM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LEM.mean) #add mean to plot
+###########################################################################
+
+mean(LEH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LEH.mean <- mean(LEH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LEH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LEH.mean) #add mean to plot
+###########################################################################
+
+mean(LEG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+LEG.mean <- mean(LEG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(LEG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(LEG.mean) #add mean to plot
+###########################################################################
+
+#########################################################################
+      ## Lights Off No Flow
+
+############################################################################
+mean(DNN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DNN.mean <- mean(DNN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DNN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)  ### larger stack number = more zoomed out
+arrows.circular(DNN.mean) #add mean to plot
+###########################################################################
+
+mean(DNL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DNL.mean <- mean(DNL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DNL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DNL.mean) #add mean to plot
+###########################################################################
+
+mean(DNM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DNM.mean <- mean(DNM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DNM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DNM.mean) #add mean to plot
+###########################################################################
+
+mean(DNH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DNH.mean <- mean(DNH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DNH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DNH.mean) #add mean to plot
+###########################################################################
+
+mean(DNG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DNG.mean <- mean(DNG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DNG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DNG.mean) #add mean to plot
+###########################################################################
+
+#########################################################################
+      ## Lights Off Low Flow
+
+############################################################################
+mean(DLN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DLN.mean <- mean(DLN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DLN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DLN.mean) #add mean to plot
+###########################################################################
+
+mean(DLL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DLL.mean <- mean(DLL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DLL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DLL.mean) #add mean to plot
+###########################################################################
+
+mean(DLM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DLM.mean <- mean(DLM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DLM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DLM.mean) #add mean to plot
+###########################################################################
+
+mean(DLH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DLH.mean <- mean(DLH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DLH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DLH.mean) #add mean to plot
+###########################################################################
+
+mean(DLG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DLG.mean <- mean(DLG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DLG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DLG.mean) #add mean to plot
+###########################################################################
+
+
+#########################################################################
+      ## Lights On Medium Flow
+
+############################################################################
+mean(DMN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DMN.mean <- mean(DMN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DMN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DMN.mean) #add mean to plot
+###########################################################################
+
+mean(DML, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DML.mean <- mean(DML, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DML, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DML.mean) #add mean to plot
+###########################################################################
+
+mean(DMM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DMM.mean <- mean(DMM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DMM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DMM.mean) #add mean to plot
+###########################################################################
+
+mean(DMH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DMH.mean <- mean(DMH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DMH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DMH.mean) #add mean to plot
+###########################################################################
+
+mean(DMG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DMG.mean <- mean(DMG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DMG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DMG.mean) #add mean to plot
+###########################################################################
+
+
+#########################################################################
+      ## Lights Off High Flow
+
+############################################################################
+mean(DHN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DHN.mean <- mean(DHN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DHN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DHN.mean) #add mean to plot
+###########################################################################
+
+mean(DHL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DHL.mean <- mean(DHL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DHL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DHL.mean) #add mean to plot
+###########################################################################
+
+mean(DHM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DHM.mean <- mean(DHM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DHM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DHM.mean) #add mean to plot
+###########################################################################
+
+mean(DHH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DHH.mean <- mean(DHH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DHH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DHH.mean) #add mean to plot
+###########################################################################
+
+mean(DHG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DHG.mean <- mean(DHG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DHG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DHG.mean) #add mean to plot
+###########################################################################
+
+#########################################################################
+      ## Lights On Extreme Flow
+
+############################################################################
+mean(DEN, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DEN.mean <- mean(DEN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DEN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DEN.mean) #add mean to plot
+###########################################################################
+
+mean(DEL, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DEL.mean <- mean(DEL, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DEL, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DEL.mean) #add mean to plot
+###########################################################################
+
+mean(DEM, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DEM.mean <- mean(DEM, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DEM, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DEM.mean) #add mean to plot
+###########################################################################
+
+mean(DEH, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DEH.mean <- mean(DEH, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DEH, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(DEH.mean) #add mean to plot
+###########################################################################
+
+mean(DEG, na.rm = TRUE) #remove NAs from dataset, then find mean 
+DEG.mean <- mean(DEG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+
+plot.circular(DEG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)  ### larger stack number = more zoomed out
+arrows.circular(DEG.mean) #add mean to plot
+###########################################################################
+
+
+```
+
+```{r}
+str(CC.TotalData)
+
+levels(CC.TotalData$D_V)
+```
+
+Tests against each other
+
+```{r}   
+################################################### Example of testing means of groups against each other
+# Ant orientation from Duelli and Wehner (1973) 
+# Example used in Batschelet (1981) 
+data1 <- list( exp = circular(rep(c(-20,-10, 0), c(1,7,2)), units="degrees", template="geographics"), control = circular(rep(c(-10, 0, 10, 20), c(3,3,3,1)), units="degrees", template="geographics")
+          ) 
+watson.williams.test(data1)
+
+
+
+
+```
+
+Saving Data.frames as csv files
+```{r}
+write.csv(agg.data, file = "~/Post-doc/Data/agg.data.Sep.5.2022.csv", row.names = FALSE)
+
+write.csv(CC.TotalData, file = "~/Post-doc/Data/CC.TotalData.Sep.5.2022.csv", row.names = FALSE)
+
+write.csv(data, file = "~/Post-doc/Data/data.Sep.5.2022.csv", row.names = FALSE)
+
+#### Dark conditions save files
+
+write.csv(DEN, file = "~/Post-doc/Data/Conditions Level Data/DEN.csv", row.names = FALSE)
+write.csv(DLN, file = "~/Post-doc/Data/Conditions Level Data/DLN.csv", row.names = FALSE)
+write.csv(DNH, file = "~/Post-doc/Data/Conditions Level Data/DNH.csv", row.names = FALSE)
+write.csv(DNM, file = "~/Post-doc/Data/Conditions Level Data/DNM.csv", row.names = FALSE)
+write.csv(DNN, file = "~/Post-doc/Data/Conditions Level Data/DNN.csv", row.names = FALSE)
+
+#### Light conditions save files
+
+write.csv(LNN, file = "~/Post-doc/Data/Conditions Level Data/LNN.csv", row.names = FALSE)
+write.csv(LNL, file = "~/Post-doc/Data/Conditions Level Data/LNL.csv", row.names = FALSE)
+write.csv(LNM, file = "~/Post-doc/Data/Conditions Level Data/LNM.csv", row.names = FALSE)
+write.csv(LNH, file = "~/Post-doc/Data/Conditions Level Data/LNH.csv", row.names = FALSE)
+write.csv(LNG, file = "~/Post-doc/Data/Conditions Level Data/LNG.csv", row.names = FALSE)
+
+write.csv(LLN, file = "~/Post-doc/Data/Conditions Level Data/LLN.csv", row.names = FALSE)
+write.csv(LLL, file = "~/Post-doc/Data/Conditions Level Data/LLL.csv", row.names = FALSE)
+write.csv(LLM, file = "~/Post-doc/Data/Conditions Level Data/LLM.csv", row.names = FALSE)
+write.csv(LLG, file = "~/Post-doc/Data/Conditions Level Data/LLG.csv", row.names = FALSE)
+
+
+write.csv(LMN, file = "~/Post-doc/Data/Conditions Level Data/LMN.csv", row.names = FALSE)
+write.csv(LMG, file = "~/Post-doc/Data/Conditions Level Data/LMG.csv", row.names = FALSE)
+
+
+write.csv(LHN, file = "~/Post-doc/Data/Conditions Level Data/LHN.csv", row.names = FALSE)
+
+
+write.csv(LEN, file = "~/Post-doc/Data/Conditions Level Data/LEN.csv", row.names = FALSE)
+
+
+```
+
+
+
+
+
