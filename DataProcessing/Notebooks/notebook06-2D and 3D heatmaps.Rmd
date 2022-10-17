@@ -327,7 +327,7 @@ library(fields)
 
 ## E.g. but with variables instead
 s = smooth.2d(CC.TotalData$Z, x=cbind(CC.TotalData$X, CC.TotalData$Y), theta=0.3)
-image.plot(s, axes=TRUE, xlab = "X", ylab = "Y", legend.lab = "Z", legend.width = .5, legend.line = 3)
+image.plot(s, axes=TRUE, xlab = "X", ylab = "Y", legend.lab = "Z", legend.width = .4, legend.line = -1.5)
 
 
 
