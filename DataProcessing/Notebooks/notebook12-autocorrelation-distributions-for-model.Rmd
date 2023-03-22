@@ -1,0 +1,75 @@
+---
+title: "notebook12-autocorrelation-distribution-for-models"
+output:
+  html_document:
+    df_print: paged
+---
+
+Load data
+```{r}
+rm(list=ls(all=TRUE))
+#load("~/Post-doc/Data/Total Merged Data File (Sep 2 2022).RData")
+load('~/Work/Data/Antarctic/CC.TotalData.2022.07.20.RData')
+library(ggplot2)
+library(GGally)
+library(hexbin)
+```
+
+```{r}
+# Values of conditions to test
+flow.rate <- .6  # 0 0.6 3 5.9 8.9
+chlorophyll <- 13.5 # 0 4.3 4.6 5.5 6.1 7.6 13.5 19
+guano <- 1 # Absent=1 Present=2
+light <- 2 # Absent=1 Present=2
+
+# Vectors of all possible conditions combinations
+frs <- as.numeric(as.character(unique(CC.TotalData$Flow.rate)))
+chls <- as.numeric(as.character(unique(CC.TotalData$Chlorophyll)))
+guans <- c(1,2)
+light <- c(1,2)
+conditions <- expand.grid(frs,chls,guans,light)
+```
+
+```{r}
+
+
+
+```
+
+Autocorrelation looking at linear regression and residuals. Note that residuals are not normally distributed.
+```{r}
+velocity <- CC.TotalData$v[
+  (CC.TotalData$Flow.rate==flow.rate & 
+     CC.TotalData$Chlorophyll==chlorophyll & 
+     as.numeric(CC.TotalData$Guano)==guano &
+     as.numeric(CC.TotalData$Light)==light)]
+
+x <- log10(velocity[1:length(velocity)-1])
+y <- log10(velocity[2:length(velocity)])
+
+
+vel.auto.lm <- lm(x ~ y)
+summary(vel.auto.lm)
+
+#par(mfrow = c(1, 1))
+plot(hexbin(x,
+            y,
+            xbins = 100),
+     xlab='Log velocity (m/s)',
+     ylab='Log velocity (m/s) next time step',
+     legend = 0)
+#plot(c(min(x),max(x)),
+#     vel.auto.lm$coefficients[1]+vel.auto.lm$coefficients[2]*c(min(x),max(x)),
+#     type='l')
+
+#lines(log10(velocity),vel.auto.lm$coefficients[1]+vel.auto.lm$coefficients[2]*log10(velocity))
+
+hist(log10(velocity),100)
+hist(vel.auto.lm$residuals,100)
+qqnorm(vel.auto.lm$residuals,main="Normal Q-Q plot")
+qqline(vel.auto.lm$residuals)
+ks.test(vel.auto.lm$residuals,'pnorm')
+
+```
+
+
