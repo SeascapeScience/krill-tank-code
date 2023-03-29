@@ -21,7 +21,7 @@ library(diptest)
 flow.rate <- 0  # 0 0.6 3 5.9 8.9
 chlorophyll <- 0 # 0 4.3 4.6 5.5 6.1 7.6 13.5 19
 guano <- 1 # Absent=1 Present=2
-light <- 2 # Absent=1 Present=2
+light <- 1 # Absent=1 Present=2
 
 # Vectors of all possible conditions combinations
 frs <- as.numeric(as.character(unique(CC.TotalData$Flow.rate)))
@@ -83,6 +83,10 @@ for (i in 1:dim(conditions)[1])
         fit <- lm(v1 ~ v0 + 1, data = df)
         conditions[i,6] <- fit$coefficients[1]
         conditions[i,7] <- fit$coefficients[2]
+        d <- dip.test(velocity)
+        conditions[i,8] <- d$p.value
+        hist(log10(velocity),100,
+             main=d$p.value)
   }  
 }
 ```
