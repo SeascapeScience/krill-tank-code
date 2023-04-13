@@ -14,6 +14,8 @@ library(ggplot2)
 library(GGally)
 library(hexbin)
 library(diptest)
+library(tidymodels)
+library(randomForest)
 ```
 
 ```{r}
@@ -89,4 +91,69 @@ for (i in 1:dim(conditions)[1])
              main=d$p.value)
   }  
 }
+conditions <- setNames(conditions,c("flow.rate","chlorophyll","guano","light","corr.val","slope","intercept","dip.test"))
+```
+
+
+Using tidymodels to fit the missing values
+
+```{r}
+Idata <- which(!is.na(conditions[,5])) # Index of data
+Iblank <- which(is.na(conditions[,5])) # Index of blank data
+
+conditions_data <- conditions[Idata,]
+conditions_blank <- conditions[Iblank,]
+
+
+# Tidy Models version
+#data_split <- initial_split(conditions_data, prop = 0.6)
+#data_test <- testing(data_split)
+#data_train <- training(data_split)
+#data_folds <- vfold_cv(data_train, 
+#                       v = 5, # number of partitions in dataset 
+#                       repeats = 1)
+#mc_split <- mc_cv(data_train, 
+#                  prop = 9/10, # proportion to use per resample
+#                  times = 20) # number of resamples
+#template_data <- training(data_split)
+
+
+# Random forest package version
+conditions.rf <- randomForest(dip.test ~ .,
+                              data=select(conditions_data,c(1,2,3,4,8)),
+                              importance=TRUE,
+                              proximity=TRUE)
+#print(conditions.rf)
+#round(importance(conditions.rf), 2)
+#sqrt(conditions.rf$mse[which.min(conditions.rf$mse)]) 
+plot(conditions.rf)
+varImpPlot(conditions.rf)
+conditions_blank$dip.test <- predict(conditions.rf,conditions_blank[,1:4])
+fit.dip.test <- predict(conditions.rf,conditions_data[,1:4])
+plot(fit.dip.test,conditions_data$dip.test)
+plot(conditions_blank$chlorophyll,conditions_blank$dip.test)
+plot(conditions_blank$flow.rate,conditions_blank$dip.test)
+plot(conditions_blank$light,conditions_blank$dip.test)
+plot(conditions_blank$guano,conditions_blank$dip.test)
+
+```
+
+Random forest test for corr
+```{r}
+conditions.rf <- randomForest(corr.val ~ .,
+                              data=select(conditions_data,c(1,2,3,4,5)),
+                              importance=TRUE,
+                              proximity=TRUE)
+#print(conditions.rf)
+#round(importance(conditions.rf), 2)
+#sqrt(conditions.rf$mse[which.min(conditions.rf$mse)]) 
+plot(conditions.rf)
+varImpPlot(conditions.rf)
+conditions_blank$corr.val <- predict(conditions.rf,conditions_blank[,1:4])
+fit.corr.val <- predict(conditions.rf,conditions_data[,1:4])
+plot(fit.corr.val,conditions_data$corr.val)
+plot(conditions_blank$chlorophyll,conditions_blank$corr.val)
+plot(conditions_blank$flow.rate,conditions_blank$corr.val)
+plot(conditions_blank$light,conditions_blank$corr.val)
+plot(conditions_blank$guano,conditions_blank$corr.val)
 ```
