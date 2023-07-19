@@ -1,0 +1,22 @@
+---
+title: "notebook13-autocorrelation-selection-for-model"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+Load data
+```{r echo=F}
+library(ggplot2)
+library(GGally)
+library(hexbin)
+library(diptest)
+library(tidymodels)
+library(randomForest)
+
+rm(list=ls(all=TRUE))
+#load("~/Post-doc/Data/Total Merged Data File (Sep 2 2022).RData")
+#load('~/Work/Data/Antarctic/CC.TotalData.2022.07.20.RData')
+load('~/Work/Data/Antarctic/TotalMergedDataFile.2023.04.12.RData')
+```

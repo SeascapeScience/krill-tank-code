@@ -9,7 +9,8 @@ Load data
 ```{r echo=F}
 rm(list=ls(all=TRUE))
 #load("~/Post-doc/Data/Total Merged Data File (Sep 2 2022).RData")
-load('~/Work/Data/Antarctic/CC.TotalData.2022.07.20.RData')
+#load('~/Work/Data/Antarctic/CC.TotalData.2022.07.20.RData')
+load('~/Work/Data/Antarctic/TotalMergedDataFile.2023.04.12.RData')
 library(ggplot2)
 library(GGally)
 library(hexbin)
@@ -95,7 +96,7 @@ conditions <- setNames(conditions,c("flow.rate","chlorophyll","guano","light","c
 ```
 
 
-Using tidymodels to fit the missing values
+Using random forest to fit the missing values
 
 ```{r}
 Idata <- which(!is.na(conditions[,5])) # Index of data
@@ -118,7 +119,7 @@ conditions_blank <- conditions[Iblank,]
 #template_data <- training(data_split)
 
 
-# Random forest package version
+# Random forest package version - doing dip test
 conditions.rf <- randomForest(dip.test ~ .,
                               data=select(conditions_data,c(1,2,3,4,8)),
                               importance=TRUE,
