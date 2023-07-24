@@ -8,7 +8,7 @@ output: html_notebook
 ```{r}
 # This is a work in progress....
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (August 17 2022).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Sep 14 2022).Rdata")
 #load('~/Work/Data/Antarctic/Total Merged Data File (July 11 2022).RData')
 ##load('~/Work/Data/Antarctic/CC.TotalData.2022.07.20.RData')
 #head(TotalData) ## all rows of data from TotalData
@@ -23,8 +23,8 @@ light <- 2 # Absent=1 Present=2
 frs <- as.numeric(as.character(unique(CC.TotalData$Flow.rate)))
 chls <- as.numeric(as.character(unique(CC.TotalData$Chlorophyll)))
 guans <- c(1,2)
-light <- c(1,2)
-conditions <- expand.grid(frs,chls,guans,light)
+lighs <- c(1,2)
+conditions <- expand.grid(frs,chls,guans,lighs)
 velocity <- CC.TotalData$v[
   (CC.TotalData$Flow.rate==flow.rate & 
      CC.TotalData$Chlorophyll==chlorophyll & 
@@ -94,7 +94,7 @@ plot(hexbin(turn.angleyz[1:length(turn.angleyz)-1],
 
 ###############################################################################
 
-####     Not working
+####     Now working!!
      
 C <- NA
 chls <- as.numeric(as.character(unique(CC.TotalData$Chlorophyll)))
@@ -133,6 +133,11 @@ for (i in 1:dim(conditions)[1])
         conditions[i,7] <- fit$coefficients[2]
   }  
 }
+
+print(C)
+print(c)
+
+
 #####
 ggpairs(CC.TotalData[
   (CC.TotalData$Flow.rate==flow.rate & 

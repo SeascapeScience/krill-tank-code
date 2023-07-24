@@ -4,7 +4,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (July 11 2022).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (July 24 2023).Rdata")
 ```
 
 Remove ends of tank and clean data
@@ -53,12 +53,9 @@ plot(CC.TotalData$zsmooth[1000:10000])
 ```
 
 ```{r}
-rm(alldata, df, TotalData, D, d1, d2, dd, dotprod, dotx, doty, dotz, dx1, dx2, dy1, dy2, dz1, dz2, list2, list3, list4, list5, v1, v2, vx1, vx2, vy1, vy2, vz1, vz2, x1, x2, y1, y2, z1, z2)
-rm(lth, l, ind, i, files)
-rm(metadata, ldf, prob, freq, m, path)
-rm( tab, tab_AGG, AGG_TD)
+rm( metadata, tab, tab_AGG, AGG_TD)
 ##rm(ChlA0, ChlA4.3, ChlA4.6, ChlA5.5, ChlA6, ChlA7, ChlA13, ChlA19, f0, f.6, f3, f5, f8, l0, l1, g0, g1, kd1, kd2, kd3, kd4, kd5, kd6, kd7, kd8)
-save.image("~/Post-doc/Data/Factor levels working correctly (July 13 2022).RData")
+save.image("~/Post-doc/Data/Factor levels working correctly (July 24 2023).RData")
 ```
 
 
@@ -126,6 +123,7 @@ dd <- D/d1/d2
 hist(acos(dd)/pi*180)
 
 CC.TotalData$turn.angle.smooth <- c(NA, acos(D/d1/d2))/pi*180
+hist(CC.TotalData$turn.angle.smooth, breaks = 50)
 
 ```
 
@@ -182,8 +180,8 @@ Don't forget to remake each factor level dataframe (E.g., CHlA0, f0, l0, g0, etc
 It's in Notebook 06
 
 ```{r}
-rm(D, d1, d2, dd, dotprod, dotx, doty, dotz, dx1, dx2, dy1, dy2, dz1, dz2, list2, list3, list4, list5, v1, v2, vx1, vx2, vy1, vy2, vz1, vz2, x1, x2, y1, y2, z1, z2, l, lth)
-save.image("~/Post-doc/Data/Updated Factor Levels Data File (July 12 2022).RData")
+rm(D, d1, d2, dd, dotprod, dotx, doty, dotz, dx1, dx2, dy1, dy2, dz1, dz2, list2, list3, list4, list5, v1, v2, vx1, vx2, vy1, vy2, vz1, vz2, x1, x2, y1, y2, z1, z2, l, lth, smoothx1, smoothx2, smoothy1, smoothy2, smoothz1, smoothz2)
+save.image("~/Post-doc/Data/Total Merged Data File (July 24 2023).RData")
 ```
 
 

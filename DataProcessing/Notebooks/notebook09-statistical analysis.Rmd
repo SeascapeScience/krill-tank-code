@@ -5,7 +5,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("~/Post-doc/Data/Total Merged Data File (August 17 2022).RData")
+load("~/Post-doc/Data/Total Merged Data File (July 24 2023).RData")
 str(CC.TotalData)
 ```
 
@@ -173,16 +173,16 @@ getmode(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="0"])
 median(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="0"], na.rm = T)
 
 
-kd2 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="0.6"])
+kd2 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="0.6"], na.rm = T)
 lines(kd2, col='light blue', lwd=2)
 
-kd3 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="3"])
+kd3 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="3"], na.rm = T)
 lines(kd3, col='yellow', lwd=2)
 
-kd4 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="5.9"])
+kd4 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="5.9"], na.rm = T)
 lines(kd4, col='orange', lwd=2)
 
-kd5 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="8.9"])
+kd5 <- density(CC.TotalData$turn.angle[CC.TotalData$Flow.rate=="8.9"], na.rm = T)
 lines(kd5, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -193,43 +193,31 @@ legend("topright",                                  # Add legend to density
 ################################ Chlorophyll ########################
 levels(CC.TotalData$Chlorophyll)
 
-kd1 <- density(l1$turn.angle[l1$Chlorophyll=="0"])
+kd1 <- density(CC.TotalData$turn.angle[CC.TotalData$Chlorophyll=="No Chlorophyll"], na.rm= T)
 plot(kd1, xlim = c(5,175), ylim = c(0, 0.030), col='blue', lwd=2, main = "Turn Angles Vs Chlorophyll, Lights On")
 
-kd2 <- density(l1$turn.angle[l1$Chlorophyll=="4.3"])
-lines(kd2, col='light blue', lwd=2)
+kd2 <- density(CC.TotalData$turn.angle[CC.TotalData$Chlorophyll=="Low Chlorophyll"], na.rm= T)
+lines(kd2, col='lightgreen', lwd=2)
 
-kd3 <- density(l1$turn.angle[l1$Chlorophyll=="4.6"])
-lines(kd3, col='yellow', lwd=2)
+kd3 <- density(CC.TotalData$turn.angle[CC.TotalData$Chlorophyll=="Medium Chlorophyll"], na.rm= T)
+lines(kd3, col='green', lwd=2)
 
-kd8 <- density(l1$turn.angle[l1$Chlorophyll=="5.5"])
-lines(kd8, col='orange', lwd=2)
+kd4 <- density(CC.TotalData$turn.angle[CC.TotalData$Chlorophyll=="High Chlorophyll"], na.rm= T)
+lines(kd4, col='darkgreen', lwd=2)
 
-kd4 <- density(l1$turn.angle[l1$Chlorophyll=="6.1"])
-lines(kd4, col='red', lwd=2)
-
-kd5 <- density(l1$turn.angle[l1$Chlorophyll=="7.6"])
-lines(kd5, col='dark red', lwd=2)
-
-kd6 <- density(l1$turn.angle[l1$Chlorophyll=="13.5"])
-lines(kd6, col='purple', lwd=2)
-
-kd7 <- density(l1$turn.angle[l1$Chlorophyll=="19"])
-lines(kd7, col='black', lwd=2)
 
 legend("topright",                                  # Add legend to density
-       legend = c("Chlorophyll  0", "Chlorophyll 4.3", "Chlorophyll 4.6", "Chlorophyll 5.5", "Chlorophyll 6.1", 
-                  "Chlorophyll 7.6", "Chlorophyll 13.5", 'Chlorophyll 19'),
-       col = c("blue", "light blue", "yellow", "orange", "red", "dark red", "purple", "black"),
+       legend = c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll"),
+       col = c("blue", "lightgreen", "green", "darkgreen"),
        lty = 1)
 
 ################################ Guano ########################
 levels(CC.TotalData$Guano)
 
-kd1 <- density(l1$turn.angle[l1$Guano=="Present"])
+kd1 <- density(CC.TotalData$turn.angle[CC.TotalData$Guano=="Present"], na.rm = T)
 plot(kd1, xlim = c(5,175), ylim = c(0, 0.030), col='blue', lwd=2, main = "Turn Angles Vs Guano, Lights On")
 
-kd2 <- density(l1$turn.angle[l1$Guano=="Absent"])
+kd2 <- density(CC.TotalData$turn.angle[CC.TotalData$Guano=="Absent"], na.rm = T)
 lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -240,10 +228,10 @@ legend("topright",                                  # Add legend to density
 ################################ Light ########################
 levels(CC.TotalData$Light)
 
-kd1 <- density(l1$turn.angle[l1$Light=="Present"])
+kd1 <- density(CC.TotalData$turn.angle[CC.TotalData$Light=="Present"], na.rm = T)
 plot(kd1, xlim = c(5,175), ylim = c(0, 0.030), col='blue', lwd=2, main = "Turn Angles Vs Light")
 
-kd2 <- density(l0$turn.angle[l0$Light=="Absent"])
+kd2 <- density(CC.TotalData$turn.angle[CC.TotalData$Light=="Absent"], na.rm = T)
 lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -270,19 +258,19 @@ par(mar= c(4,4,2,1))
 par(mfrow=c(2,2))
 
 
-kd1 <- density(l1$vel.flow[l1$Flow.rate=="0"])
-plot(kd1, xlim = c(-12,12), ylim = c(0, 6), col='blue', lwd=2, main = "Velocity (in relation to flow, not logged) Vs Flow Rate, Lights On")
+kd1 <- density(CC.TotalData$vel.flow[CC.TotalData$Flow.rate=="0"], na.rm = T)
+plot(kd1, xlim = c(-15,22), ylim = c(0, 170), col='blue', lwd=2, main = "Velocity (in relation to flow, not logged) Vs Flow Rate, Lights On")
 
-kd2 <- density(l1$vel.flow[l1$Flow.rate=="0.6"])
+kd2 <- density(CC.TotalData$vel.flow[CC.TotalData$Flow.rate=="0.6"], na.rm = T)
 lines(kd2, col='light blue', lwd=2)
 
-kd3 <- density(l1$vel.flow[l1$Flow.rate=="3"])
+kd3 <- density(CC.TotalData$vel.flow[CC.TotalData$Flow.rate=="3"], na.rm = T)
 lines(kd3, col='yellow', lwd=2)
 
-kd4 <- density(l1$vel.flow[l1$Flow.rate=="5.9"])
+kd4 <- density(CC.TotalData$vel.flow[CC.TotalData$Flow.rate=="5.9"], na.rm = T)
 lines(kd4, col='orange', lwd=2)
 
-kd5 <- density(l1$vel.flow[l1$Flow.rate=="8.9"])
+kd5 <- density(CC.TotalData$vel.flow[CC.TotalData$Flow.rate=="8.9"], na.rm = T)
 lines(kd5, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -293,42 +281,30 @@ legend("topright",                                  # Add legend to density
 ################################ Chlorophyll ########################
 levels(CC.TotalData$Chlorophyll)
 
-kd1 <- density(l1$vel.flow[l1$Chlorophyll=="0"])
-plot(kd1, xlim = c(-12,12), ylim = c(0, 6), col='blue', lwd=2, main = "Velocity (in relation to flow, not logged) Vs Chlorophyll, Lights On")
+kd1 <- density(CC.TotalData$vel.flow[CC.TotalData$Chlorophyll=="No Chlorophyll"], na.rm = T)
+plot(kd1, xlim = c(-15,22), ylim = c(0, 170), col='blue', lwd=2, main = "Velocity (in relation to flow, not logged) Vs Chlorophyll, Lights On")
 
-kd2 <- density(l1$vel.flow[l1$Chlorophyll=="4.3"])
-lines(kd2, col='light blue', lwd=2)
+kd2 <- density(CC.TotalData$vel.flow[CC.TotalData$Chlorophyll=="Low Chlorophyll"], na.rm = T)
+lines(kd2, col='lightgreen', lwd=2)
 
-kd3 <- density(l1$vel.flow[l1$Chlorophyll=="4.6"])
-lines(kd3, col='yellow', lwd=2)
+kd3 <- density(CC.TotalData$vel.flow[CC.TotalData$Chlorophyll=="Medium Chlorophyll"], na.rm = T)
+lines(kd3, col='green', lwd=2)
 
-kd8 <- density(l1$vel.flow[l1$Chlorophyll=="5.5"])
-lines(kd8, col='orange', lwd=2)
-
-kd4 <- density(l1$vel.flow[l1$Chlorophyll=="6.1"])
-lines(kd4, col='red', lwd=2)
-
-kd5 <- density(l1$vel.flow[l1$Chlorophyll=="7.6"])
-lines(kd5, col='dark red', lwd=2)
-
-kd6 <- density(l1$vel.flow[l1$Chlorophyll=="13.5"])
-lines(kd6, col='purple', lwd=2)
-
-kd7 <- density(l1$vel.flow[l1$Chlorophyll=="19"])
-lines(kd7, col='black', lwd=2)
+kd4 <- density(CC.TotalData$vel.flow[CC.TotalData$Chlorophyll=="High  Chlorophyll"], na.rm = T)
+lines(kd4, col='darkgreen', lwd=2)
 
 legend("topright",                                  # Add legend to density
-       legend = c("Chlorophyll  0", "Chlorophyll 4.3", "Chlorophyll 4.6", "Chlorophyll 5.5", "Chlorophyll 6.1", "Chlorophyll 7.6", "Chlorophyll 13.5", 'Chlorophyll 19'),
-       col = c("blue", "light blue", "yellow", "orange", "red","dark red", "purple", "black"),
+       legend = c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll"),
+       col = c("blue", "lightgreen", "green", "darkgreen"),
        lty = 1)
 
 ################################ Guano ########################
 levels(CC.TotalData$Guano)
 
-kd1 <- density(l1$vel.flow[l1$Guano=="Present"])
-plot(kd1, xlim = c(-12,12), ylim = c(0, 6), col='blue', lwd=2, main = "Velocity (in relation to flow, not logged) Vs Guano, Lights On")
+kd1 <- density(CC.TotalData$vel.flow[CC.TotalData$Guano=="Present"], na.rm = T)
+plot(kd1, xlim = c(-15,22), ylim = c(0, 6), col='blue', lwd=2, main = "Velocity (in relation to flow, not logged) Vs Guano, Lights On")
 
-kd2 <- density(l1$vel.flow[l1$Guano=="Absent"])
+kd2 <- density(CC.TotalData$vel.flow[CC.TotalData$Guano=="Absent"], na.rm = T)
 lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -339,10 +315,10 @@ legend("topright",                                  # Add legend to density
 ################################ Light ########################
 levels(CC.TotalData$Light)
 
-kd1 <- density(l1$vel.flow[l1$Light=="Present"])
-plot(kd1, xlim = c(-12,12), ylim = c(0, 6), col='blue', lwd=2, main = "Velocity (in relation to flow, not logged) Vs Light")
+kd1 <- density(CC.TotalData$vel.flow[CC.TotalData$Light=="Present"], na.rm = T)
+plot(kd1, xlim = c(-15,22), ylim = c(0, 180), col='blue', lwd=2, main = "Velocity (in relation to flow, not logged) Vs Light")
 
-kd2 <- density(l1$vel.flow[l1$Light=="Absent"])
+kd2 <- density(CC.TotalData$vel.flow[CC.TotalData$Light=="Absent"], na.rm = T)
 lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -355,19 +331,9 @@ legend("topright",                                  # Add legend to density
 Now for headings.....
 
 ```{r}
-## copied from notebook00-merging files and adding columns
-##CC.TotalData$heading <- atan(CC.TotalData$dx/CC.TotalData$dy)
-## this is how it was calculated
-range(CC.TotalData$heading)  ## gives -1.57 to 1.57
-range(l1$heading.pi[l1$Flow.rate=="0"])  ## gives -90 to 90  (why not -180, to 180??)
-## should be
-##l1$heading <- atan2(l1$dx, l1$dy)
-range(l1$heading)
-l1$heading.pi <- l1$heading/(2*pi)*360
-range(CC.TotalData$heading)  ## gives -3.14 to 3.14
-range(l1$heading.pi)  ## gives -180 to 180  
+## use CC.TotalDat$heading.pi
 
-rm(kd1, kd2, kd3, kd4, kd5, kd6, kd7, kd8)
+rm(kd1, kd2, kd3, kd4, kd5)
 
 
 ### Kernel density plots ################### Headings
@@ -377,19 +343,19 @@ par(mfrow=c(2,2))
 ################################ Flow Rate ########################
 levels(CC.TotalData$Flow.rate)
 
-kd1 <- density(l1$heading.pi[l1$Flow.rate=="0"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.015), col='blue', lwd=2, main = "Heading Vs Flow Rate, Lights On")
+kd1 <- density(CC.TotalData$heading.pi[CC.TotalData$Flow.rate=="0"], na.rm=T)
+plot(kd1, xlim = c(-180,180), ylim = c(0, 0.03), col='blue', lwd=2, main = "Heading Vs Flow Rate, Lights On")
 
-kd2 <- density(l1$heading.pi[l1$Flow.rate=="0.6"])
+kd2 <- density(CC.TotalData$heading.pi[CC.TotalData$Flow.rate=="0.6"], na.rm=T)
 lines(kd2, col='light blue', lwd=2)
 
-kd3 <- density(l1$heading.pi[l1$Flow.rate=="3"])
+kd3 <- density(CC.TotalData$heading.pi[CC.TotalData$Flow.rate=="3"], na.rm=T)
 lines(kd3, col='yellow', lwd=2)
 
-kd4 <- density(l1$heading.pi[l1$Flow.rate=="5.9"])
+kd4 <- density(CC.TotalData$heading.pi[CC.TotalData$Flow.rate=="5.9"], na.rm=T)
 lines(kd4, col='orange', lwd=2)
 
-kd5 <- density(l1$heading.pi[l1$Flow.rate=="8.9"])
+kd5 <- density(CC.TotalData$heading.pi[CC.TotalData$Flow.rate=="8.9"], na.rm=T)
 lines(kd5, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -400,42 +366,30 @@ legend("topright",                                  # Add legend to density
 ################################ Chlorophyll ########################
 levels(CC.TotalData$Chlorophyll)
 
-kd1 <- density(l1$heading.pi[l1$Chlorophyll=="0"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.015), col='blue', lwd=2, main = "Heading Vs Chlorophyll, Lights On")
+kd1 <- density(CC.TotalData$heading.pi[CC.TotalData$Chlorophyll=="No Chlorophyll"], na.rm=T)
+plot(kd1, xlim = c(-180,180), ylim = c(0, 0.03), col='blue', lwd=2, main = "Heading Vs Chlorophyll, Lights On")
 
-kd2 <- density(l1$heading.pi[l1$Chlorophyll=="4.3"])
-lines(kd2, col='light blue', lwd=2)
+kd2 <- density(CC.TotalData$heading.pi[CC.TotalData$Chlorophyll=="Low Chlorophyll"], na.rm=T)
+lines(kd2, col='lightgreen', lwd=2)
 
-kd3 <- density(l1$heading.pi[l1$Chlorophyll=="4.6"])
-lines(kd3, col='yellow', lwd=2)
+kd3 <- density(CC.TotalData$heading.pi[CC.TotalData$Chlorophyll=="Medium Chlorophyll"], na.rm=T)
+lines(kd3, col='green', lwd=2)
 
-kd8 <- density(l1$heading.pi[l1$Chlorophyll=="5.5"])
-lines(kd8, col='orange', lwd=2)
-
-kd4 <- density(l1$heading.pi[l1$Chlorophyll=="6.1"])
-lines(kd4, col='red', lwd=2)
-
-kd5 <- density(l1$heading.pi[l1$Chlorophyll=="7.6"])
-lines(kd5, col='dark red', lwd=2)
-
-kd6 <- density(l1$heading.pi[l1$Chlorophyll=="13.5"])
-lines(kd6, col='purple', lwd=2)
-
-kd7 <- density(l1$heading.pi[l1$Chlorophyll=="19"])
-lines(kd7, col='black', lwd=2)
+kd4 <- density(CC.TotalData$heading.pi[CC.TotalData$Chlorophyll=="High Chlorophyll"], na.rm=T)
+lines(kd4, col='darkgreen', lwd=2)
 
 legend("topright",                                  # Add legend to density
-       legend = c("Chlorophyll  0", "Chlorophyll 4.3", "Chlorophyll 4.6", "Chlorophyll 5.5", "Chlorophyll 6.1", "Chlorophyll 7.6", "Chlorophyll 13.5", 'Chlorophyll 19'),
-       col = c("blue", "light blue", "yellow", "orange", "red", "dark red", "purple", "black"),
+       legend = c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll"),
+       col = c("blue", "lightgreen", "green", "darkgreen"),
        lty = 1)
 
 ################################ Guano ########################
 levels(CC.TotalData$Guano)
 
-kd1 <- density(l1$heading.pi[l1$Guano=="Present"])
-plot(kd1,  xlim = c(-180,180), ylim = c(0, 0.015), col='blue', lwd=2, main = "Heading Vs Guano, Lights On")
+kd1 <- density(CC.TotalData$heading.pi[CC.TotalData$Guano=="Present"], na.rm=T)
+plot(kd1,  xlim = c(-180,180), ylim = c(0, 0.03), col='blue', lwd=2, main = "Heading Vs Guano, Lights On")
 
-kd2 <- density(l1$heading.pi[l1$Guano=="Absent"])
+kd2 <- density(CC.TotalData$heading.pi[CC.TotalData$Guano=="Absent"], na.rm=T)
 lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -446,10 +400,10 @@ legend("topright",                                  # Add legend to density
 ################################ Light ########################
 levels(CC.TotalData$Light)
 
-kd1 <- density(l1$heading.pi[l1$Light=="Present"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.015), col='blue', lwd=2, main = "Heading Vs Light")
+kd1 <- density(CC.TotalData$heading.pi[CC.TotalData$Light=="Present"], na.rm=T)
+plot(kd1, xlim = c(-180,180), ylim = c(0, 0.04), col='blue', lwd=2, main = "Heading Vs Light")
 
-kd2 <- density(l0$heading.pi[l0$Light=="Absent"])
+kd2 <- density(CC.TotalData$heading.pi[CC.TotalData$Light=="Absent"], na.rm=T)
 lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -462,27 +416,29 @@ legend("topright",                                  # Add legend to density
 Now for pitch....
 
 ```{r}
+##Use CC.TotalData$pitch.perfect
+head(CC.TotalData)
+
 ### Kernel density plots ################### Pitch
 par(mar= c(4,4,2,1))
 par(mfrow=c(2,2))
 
-CC.TotalData$pitch.perfect <- CC.TotalData$pitch/(2*pi)*360
 ################################ Flow Rate ########################
 levels(CC.TotalData$Flow.rate)
 
-kd1 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Flow.rate=="0"])
-plot(kd1, xlim = c(-90,90), ylim = c(0, 0.06), col='blue', lwd=2, main = "Pitch Vs Flow Rate")
+kd1 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Flow.rate=="0"], na.rm=T)
+plot(kd1, xlim = c(-90,90), ylim = c(0, 0.1), col='blue', lwd=2, main = "Pitch Vs Flow Rate")
 
-kd2 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Flow.rate=="0.6"])
+kd2 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Flow.rate=="0.6"], na.rm=T)
 lines(kd2, col='light blue', lwd=2)
 
-kd3 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Flow.rate=="3"])
+kd3 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Flow.rate=="3"], na.rm=T)
 lines(kd3, col='yellow', lwd=2)
 
-kd4 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Flow.rate=="5.9"])
+kd4 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Flow.rate=="5.9"], na.rm=T)
 lines(kd4, col='orange', lwd=2)
 
-kd5 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Flow.rate=="8.9"])
+kd5 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Flow.rate=="8.9"], na.rm=T)
 lines(kd5, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -493,42 +449,31 @@ legend("topright",                                  # Add legend to density
 ################################ Chlorophyll ########################
 levels(CC.TotalData$Chlorophyll)
 
-kd1 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="0"])
-plot(kd1, xlim = c(-90,90), ylim = c(0, 0.06), col='blue', lwd=2, main = "Pitch Vs Chlorophyll")
+kd1 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="No Chlorophyll"], na.rm=T)
+plot(kd1, xlim = c(-90,90), ylim = c(0, 0.1), col='blue', lwd=2, main = "Pitch Vs Chlorophyll")
 
-kd2 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="4.3"])
-lines(kd2, col='light blue', lwd=2)
+kd2 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="Low Chlorophyll"], na.rm=T)
+lines(kd2, col='lightgreen', lwd=2)
 
-kd3 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="4.6"])
-lines(kd3, col='yellow', lwd=2)
+kd3 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="Medium Chlorophyll"], na.rm=T)
+lines(kd3, col='green', lwd=2)
 
-kd8 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="5.5"])
-lines(kd8, col='orange', lwd=2)
+kd4 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="High Chlorophyll"], na.rm=T)
+lines(kd4, col='darkgreen', lwd=2)
 
-kd4 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="6.1"])
-lines(kd4, col='red', lwd=2)
-
-kd5 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="7.6"])
-lines(kd5, col='dark red', lwd=2)
-
-kd6 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="13.5"])
-lines(kd6, col='purple', lwd=2)
-
-kd7 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Chlorophyll=="19"])
-lines(kd7, col='black', lwd=2)
 
 legend("topright",                                  # Add legend to density
-       legend = c("Chlorophyll  0", "Chlorophyll 4.3", "Chlorophyll 4.6", "Chlorophyll 5.5", "Chlorophyll 6.1", "Chlorophyll 7.6", "Chlorophyll 13.5", 'Chlorophyll 19'),
-       col = c("blue", "light blue", "yellow", "orange", "red", "dark red", "purple", "black"),
+       legend = c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll"),
+       col = c("blue", "lightgreen", "green", "darkgreen"),
        lty = 1)
 
 ################################ Guano ########################
 levels(CC.TotalData$Guano)
 
-kd1 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Guano=="Present"])
-plot(kd1, xlim = c(-90,90), ylim = c(0, 0.06), col='blue', lwd=2, main = "Pitch Vs Guano")
+kd1 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Guano=="Present"], na.rm=T)
+plot(kd1, xlim = c(-90,90), ylim = c(0, 0.1), col='blue', lwd=2, main = "Pitch Vs Guano")
 
-kd2 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Guano=="Absent"])
+kd2 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Guano=="Absent"], na.rm=T)
 lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -539,10 +484,10 @@ legend("topright",                                  # Add legend to density
 ################################ Light ########################
 levels(CC.TotalData$Light)
 
-kd1 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Light=="Present"])
-plot(kd1, xlim = c(-90,90), ylim = c(0, 0.06), col='blue', lwd=2, main = "Pitch Vs Light")
+kd1 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Light=="Present"], na.rm=T)
+plot(kd1, xlim = c(-90,90), ylim = c(0, 0.1), col='blue', lwd=2, main = "Pitch Vs Light")
 
-kd2 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Light=="Absent"])
+kd2 <- density(CC.TotalData$pitch.perfect[CC.TotalData$Light=="Absent"], na.rm=T)
 lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -555,171 +500,119 @@ legend("topright",                                  # Add legend to density
 For each level of Flow
 
 ```{r}
+##For flow = 0
+f0 <- CC.TotalData[CC.TotalData$Flow.rate=="0",]
+f.6 <- CC.TotalData[CC.TotalData$Flow.rate=="0.6",]
+f3 <- CC.TotalData[CC.TotalData$Flow.rate=="3",]
+f5.9 <- CC.TotalData[CC.TotalData$Flow.rate=="5.9",]
+f8.9 <- CC.TotalData[CC.TotalData$Flow.rate=="8.9",]
+
 
 ### Kernel density plots ################### Turn Angles
 par(mar= c(4,4,2,1))
-par(mfrow=c(1,2))
+par(mfrow=c(3,2))
 
 ################################ Chlorophyll ########################
 levels(f0$Chlorophyll)
 
-kd1 <- density(f0$turn.angle[f0$Chlorophyll=="0"])
+##Flow = 0
+
+kd1 <- density(f0$turn.angle[f0$Chlorophyll=="No Chlorophyll"], na.rm=T)
 plot(kd1, xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Chlorophyll, Flow = 0")
 
-##kd2 <- density(f0$turn.angle[f0$Chlorophyll=="4.3"])
-##lines(kd2, col='light blue', lwd=2)
+kd2 <- density(f0$turn.angle[f0$Chlorophyll=="Low Chlorophyll"], na.rm=T)
+lines(kd2, col='lightgreen', lwd=2)
 
-kd3 <- density(f0$turn.angle[f0$Chlorophyll=="4.6"])
-lines(kd3, col='yellow', lwd=2)
+kd3 <- density(f0$turn.angle[f0$Chlorophyll=="Medium Chlorophyll"], na.rm=T)
+lines(kd3, col='green', lwd=2)
 
-kd8 <- density(f0$turn.angle[f0$Chlorophyll=="5.5"])
-lines(kd8, col='orange', lwd=2)
-
-##kd4 <- density(f0$turn.angle[f0$Chlorophyll=="6.1"])
-##lines(kd4, col='red', lwd=2)
-
-kd5 <- density(f0$turn.angle[f0$Chlorophyll=="7.6"])
-lines(kd5, col='dark red', lwd=2)
-
-##kd6 <- density(f0$turn.angle[f0$Chlorophyll=="13.5"])
-##lines(kd6, col='purple', lwd=2)
-
-kd7 <- density(f0$turn.angle[f0$Chlorophyll=="19"])
-lines(kd7, col='black', lwd=2)
+kd4 <- density(f0$turn.angle[f0$Chlorophyll=="High Chlorophyll"], na.rm=T)
+lines(kd4, col='darkgreen', lwd=2)
 
 legend("topright",                                  # Add legend to density
-       legend = c("Chlorophyll  0", "Chlorophyll 4.3", "Chlorophyll 4.6", "Chlorophyll 5.5", "Chlorophyll 6.1", 
-                  "Chlorophyll 7.6", "Chlorophyll 13.5", 'Chlorophyll 19'),
-       col = c("blue", "light blue", "yellow", "orange", "red", "dark red", "purple", "black"),
+       legend = c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll"),
+       col = c("blue", "lightgreen", "green", "darkgreen"),
+       lty = 1)
+
+##Flow = 0.6
+
+
+kd1 <- density(f.6$turn.angle[f.6$Chlorophyll=="No Chlorophyll"], na.rm=T)
+plot(kd1, xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Chlorophyll, Flow = 0.6")
+
+kd2 <- density(f.6$turn.angle[f.6$Chlorophyll=="Low Chlorophyll"], na.rm=T)
+lines(kd2, col='lightgreen', lwd=2)
+
+kd3 <- density(f.6$turn.angle[f.6$Chlorophyll=="Medium Chlorophyll"], na.rm=T)
+lines(kd3, col='green', lwd=2)
+
+kd4 <- density(f.6$turn.angle[f.6$Chlorophyll=="High Chlorophyll"], na.rm=T)
+lines(kd4, col='darkgreen', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll"),
+       col = c("blue", "lightgreen", "green", "darkgreen"),
        lty = 1)
 
 
+##Flow = 3
 
-kd1 <- density(f.6$turn.angle[f.6$Chlorophyll=="0"])
-plot(kd1,xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Chlorophyll, Flow = 0.6")
+kd1 <- density(f3$turn.angle[f3$Chlorophyll=="No Chlorophyll"], na.rm=T)
+plot(kd1, xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Chlorophyll, Flow = 3")
 
-kd2 <- density(f.6$turn.angle[f.6$Chlorophyll=="4.3"])
-lines(kd2, col='light blue', lwd=2)
+kd2 <- density(f3$turn.angle[f3$Chlorophyll=="Low Chlorophyll"], na.rm=T)
+lines(kd2, col='lightgreen', lwd=2)
 
-kd3 <- density(f.6$turn.angle[f.6$Chlorophyll=="4.6"])
-lines(kd3, col='yellow', lwd=2)
+kd3 <- density(f3$turn.angle[f3$Chlorophyll=="Medium Chlorophyll"], na.rm=T)
+lines(kd3, col='green', lwd=2)
 
-##kd8 <- density(f.6$turn.angle[f.6$Chlorophyll=="5.5"])
-##lines(kd8, col='orange', lwd=2)
-
-kd4 <- density(f.6$turn.angle[f.6$Chlorophyll=="6.1"])
-lines(kd4, col='red', lwd=2)
-
-##kd5 <- density(f.6$turn.angle[f.6$Chlorophyll=="7.6"])
-##lines(kd5, col='dark red', lwd=2)
-
-kd6 <- density(f.6$turn.angle[f.6$Chlorophyll=="13.5"])
-lines(kd6, col='purple', lwd=2)
-
-##kd7 <- density(f.6$turn.angle[f.6$Chlorophyll=="19"])
-##lines(kd7, col='black', lwd=2)
+kd4 <- density(f3$turn.angle[f3$Chlorophyll=="High Chlorophyll"], na.rm=T)
+lines(kd4, col='darkgreen', lwd=2)
 
 legend("topright",                                  # Add legend to density
-       legend = c("Chlorophyll  0", "Chlorophyll 4.3", "Chlorophyll 4.6", "Chlorophyll 5.5", "Chlorophyll 6.1", 
-                  "Chlorophyll 7.6", "Chlorophyll 13.5", 'Chlorophyll 19'),
-       col = c("blue", "light blue", "yellow", "orange", "red", "dark red", "purple", "black"),
+       legend = c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll"),
+       col = c("blue", "lightgreen", "green", "darkgreen"),
        lty = 1)
 
 
-kd1 <- density(f3$turn.angle[f3$Chlorophyll=="0"])
-plot(kd1,xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Chlorophyll, Flow = 3")
+##Flow = 5.9
 
-##kd2 <- density(f3$turn.angle[f3$Chlorophyll=="4.3"])
-##lines(kd2, col='light blue', lwd=2)
+kd1 <- density(f5.9$turn.angle[f5.9$Chlorophyll=="No Chlorophyll"], na.rm=T)
+plot(kd1, xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Chlorophyll, Flow = 5.9")
 
-##kd3 <- density(f3$turn.angle[f3$Chlorophyll=="4.6"])
-##lines(kd3, col='yellow', lwd=2)
+kd2 <- density(f5.9$turn.angle[f5.9$Chlorophyll=="Low Chlorophyll"], na.rm=T)
+lines(kd2, col='lightgreen', lwd=2)
 
-##kd8 <- density(f3$turn.angle[f3$Chlorophyll=="5.5"])
-##lines(kd8, col='orange', lwd=2)
+kd3 <- density(f5.9$turn.angle[f5.9$Chlorophyll=="Medium Chlorophyll"], na.rm=T)
+lines(kd3, col='green', lwd=2)
 
-##kd4 <- density(f3$turn.angle[f3$Chlorophyll=="6.1"])
-##lines(kd4, col='red', lwd=2)
-
-##kd5 <- density(f3$turn.angle[f3$Chlorophyll=="7.6"])
-##lines(kd5, col='dark red', lwd=2)
-
-##kd6 <- density(f3$turn.angle[f3$Chlorophyll=="13.5"])
-##lines(kd6, col='purple', lwd=2)
-
-##kd7 <- density(f3$turn.angle[f3$Chlorophyll=="19"])
-##lines(kd7, col='black', lwd=2)
+kd4 <- density(f5.9$turn.angle[f5.9$Chlorophyll=="High Chlorophyll"], na.rm=T)
+lines(kd4, col='darkgreen', lwd=2)
 
 legend("topright",                                  # Add legend to density
-       legend = c("Chlorophyll  0", "Chlorophyll 4.3", "Chlorophyll 4.6", "Chlrophyll 5.5", "Chlorophyll 6.1", 
-                  "Chlorophyll 7.6", "Chlorophyll 13.5", 'Chlorophyll 19'),
-       col = c("blue", "light blue", "yellow", "orange", "red", "dark red", "purple", "black"),
+       legend = c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll"),
+       col = c("blue", "lightgreen", "green", "darkgreen"),
        lty = 1)
 
 
+##Flow = 8.9
 
-kd1 <- density(f5$turn.angle[f5$Chlorophyll=="0"])
-plot(kd1,xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Chlorophyll, Flow = 5.9")
+kd1 <- density(f8.9$turn.angle[f8.9$Chlorophyll=="No Chlorophyll"], na.rm=T)
+plot(kd1, xlim = c(5,175), ylim = c(0, 0.04), col='blue', lwd=2, main = "Turn Angles Vs Chlorophyll, Flow = 8.9")
 
-##kd2 <- density(f5$turn.angle[f5$Chlorophyll=="4.3"])
-##lines(kd2, col='light blue', lwd=2)
+kd2 <- density(f8.9$turn.angle[f8.9$Chlorophyll=="Low Chlorophyll"], na.rm=T)
+lines(kd2, col='lightgreen', lwd=2)
 
-##kd3 <- density(f5$turn.angle[f5$Chlorophyll=="4.6"])
-##lines(kd3, col='yellow', lwd=2)
+kd3 <- density(f8.9$turn.angle[f8.9$Chlorophyll=="Medium Chlorophyll"], na.rm=T)
+lines(kd3, col='green', lwd=2)
 
-##kd8 <- density(f5$turn.angle[f5$Chlorophyll=="5.5"])
-##lines(kd8, col='orange', lwd=2)
-
-##kd4 <- density(f5$turn.angle[f5$Chlorophyll=="6.1"])
-##lines(kd4, col='red', lwd=2)
-
-##kd5 <- density(f5$turn.angle[f5$Chlorophyll=="7.6"])
-##lines(kd5, col='dark red', lwd=2)
-
-##kd6 <- density(f5$turn.angle[f5$Chlorophyll=="13.5"])
-##lines(kd6, col='purple', lwd=2)
-
-##kd7 <- density(f5$turn.angle[f5$Chlorophyll=="19"])
-##lines(kd7, col='black', lwd=2)
+kd4 <- density(f8.9$turn.angle[f8.9$Chlorophyll=="High Chlorophyll"], na.rm=T)
+lines(kd4, col='darkgreen', lwd=2)
 
 legend("topright",                                  # Add legend to density
-       legend = c("Chlorophyll  0", "Chlorophyll 4.3", "Chlorophyll 4.6", "Chlorophyll 5.5", "Chlorophyll 6.1", 
-                  "Chlorophyll 7.6", "Chlorophyll 13.5", 'Chlorophyll 19'),
-       col = c("blue", "light blue", "yellow", "orange", "red", "dark red", "purple", "black"),
+       legend = c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll"),
+       col = c("blue", "lightgreen", "green", "darkgreen"),
        lty = 1)
-
-
-
-kd1 <- density(f8$turn.angle[f8$Chlorophyll=="0"])
-plot(kd1, xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Chlorophyll, Flow = 8.9")
-
-##kd2 <- density(f8$turn.angle[f8$Chlorophyll=="4.3"])
-##lines(kd2, col='light blue', lwd=2)
-
-##kd3 <- density(f8$turn.angle[f8$Chlorophyll=="4.6"])
-##lines(kd3, col='yellow', lwd=2)
-
-##kd8 <- density(f8$turn.angle[f8$Chlorophyll=="5.5"])
-##lines(kd8, col='orange', lwd=2)
-
-##kd4 <- density(f8$turn.angle[f8$Chlorophyll=="6.1"])
-##lines(kd4, col='red', lwd=2)
-
-##kd5 <- density(f8$turn.angle[f8$Chlorophyll=="7.6"])
-##lines(kd5, col='dark red', lwd=2)
-
-##kd6 <- density(f8$turn.angle[f8$Chlorophyll=="13.5"])
-##lines(kd6, col='purple', lwd=2)
-
-##kd7 <- density(f8$turn.angle[f8$Chlorophyll=="19"])
-##lines(kd7, col='black', lwd=2)
-
-legend("topright",                                  # Add legend to density
-       legend = c("Chlorophyll  0", "Chlorophyll 4.3", "Chlorophyll 4.6", "Chlorophyll 5.5", "Chlorophyll 6.1", 
-                  "Chlorophyll 7.6", "Chlorophyll 13.5", 'Chlorophyll 19'),
-       col = c("blue", "light blue", "yellow", "orange", "red", "dark red", "purple", "black"),
-       lty = 1)
-
 
 #####################################################################
 
@@ -729,12 +622,13 @@ legend("topright",                                  # Add legend to density
 
 par(mar= c(4,4,2,1))
 par(mfrow=c(3,2))
-levels(f0$Guano)
 
-kd1 <- density(f0$turn.angle[f0$Guano=="Present"])
-plot(kd1, xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Guano, Flow = 0")
+##Flow = 0
 
-kd2 <- density(f0$turn.angle[f0$Guano=="Absent"])
+kd1 <- density(f0$turn.angle[f0$Guano=="Present"], na.rm=T)
+plot(kd1, xlim = c(5,175), ylim = c(0, 0.02), col='blue', lwd=2, main = "Turn Angles Vs Guano, Flow = 0")
+
+kd2 <- density(f0$turn.angle[f0$Guano=="Absent"], na.rm=T)
 lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -742,13 +636,12 @@ legend("topright",                                  # Add legend to density
        col = c("blue", "red"),
        lty = 1)
 
+##Flow = 0.6
 
+kd1 <- density(f.6$turn.angle[f.6$Guano=="Present"], na.rm=T)
+plot(kd1, xlim = c(5,175), ylim = c(0, 0.02), col='blue', lwd=2, main = "Turn Angles Vs Guano, Flow = 0.6")
 
-##kd1 <- density(f.6$turn.angle[f.6$Guano=="Present"])
-##plot(kd1, xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Guano, Flow = 0.6")
-
-kd2 <- density(f.6$turn.angle[f.6$Guano=="Absent"])
-plot(kd2, xlim = c(5,175), ylim = c(0, 0.03), col='red', lwd=2, main = "Turn Angles Vs Guano, Flow = 0.6")
+kd2 <- density(f.6$turn.angle[f.6$Guano=="Absent"], na.rm=T)
 lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -756,13 +649,12 @@ legend("topright",                                  # Add legend to density
        col = c("blue", "red"),
        lty = 1)
 
+##Flow = 3
 
+kd1 <- density(f3$turn.angle[f3$Guano=="Present"], na.rm=T)
+plot(kd1, xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Guano, Flow = 3")
 
-##kd1 <- density(f3$turn.angle[f3$Guano=="Present"])
-##plot(kd1, xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Guano, Flow = 3")
-
-kd2 <- density(f3$turn.angle[f3$Guano=="Absent"])
-plot(kd2, xlim = c(5,175), ylim = c(0, 0.03), col='red', lwd=2, main = "Turn Angles Vs Guano, Flow = 3")
+kd2 <- density(f3$turn.angle[f3$Guano=="Absent"], na.rm=T)
 lines(kd2, col='red', lwd=2)
 
 legend("topright",                              # Add legend to density
@@ -770,28 +662,26 @@ legend("topright",                              # Add legend to density
        col = c("blue", "red"),
        lty = 1)
 
+##Flow = 5.9
 
+kd1 <- density(f5.9$turn.angle[f5.9$Guano=="Present"], na.rm=T)
+plot(kd1, xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Guano, Flow = 5.9")
 
-##kd1 <- density(f5$turn.angle[f5$Guano=="Present"])
-##plot(kd1, xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Guano, Flow = 5.9")
-
-kd2 <- density(f5$turn.angle[f5$Guano=="Absent"])
-plot(kd2, xlim = c(5,175), ylim = c(0, 0.03), col='red', lwd=2, main = "Turn Angles Vs Guano, Flow = 5.9")
-##lines(kd2, col='red', lwd=2)
+kd2 <- density(f5.9$turn.angle[f5.9$Guano=="Absent"], na.rm=T)
+lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
        legend = c("Guano Present", "Guano Absent"),
        col = c("blue", "red"),
        lty = 1)
 
+##Flow = 8.9
 
+kd1 <- density(f8.9$turn.angle[f8.9$Guano=="Present"], na.rm=T)
+plot(kd1, xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Guano, Flow = 8.9")
 
-##kd1 <- density(f8$turn.angle[f8$Guano=="Present"])
-##plot(kd1, xlim = c(5,175), ylim = c(0, 0.03), col='blue', lwd=2, main = "Turn Angles Vs Guano, Flow = 8.9")
-
-kd2 <- density(f8$turn.angle[f8$Guano=="Absent"])
-plot(kd2, xlim = c(5,175), ylim = c(0, 0.03), col='red', lwd=2, main = "Turn Angles Vs Guano, Flow = 8.9")
-##lines(kd2, col='red', lwd=2)
+kd2 <- density(f8.9$turn.angle[f8.9$Guano=="Absent"], na.rm=T)
+lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
        legend = c("Guano Present", "Guano Absent"),
@@ -810,10 +700,10 @@ par(mar= c(4,4,2,1))
 par(mfrow=c(3,2))
 levels(CC.TotalData$Light)
 
-kd1 <- density(f0$turn.angle[f0$Light=="Present"])
+kd1 <- density(f0$turn.angle[f0$Light=="Present"], na.rm=T)
 plot(kd1, xlim = c(5,175), ylim = c(0, 0.02), col='blue', lwd=2, main = "Turn Angles Vs Light, Flow = 0")
 
-kd2 <- density(f0$turn.angle[f0$Light=="Absent"])
+kd2 <- density(f0$turn.angle[f0$Light=="Absent"], na.rm=T)
 lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -823,10 +713,10 @@ legend("topright",                                  # Add legend to density
 
 
 
-kd1 <- density(f.6$turn.angle[f.6$Light=="Present"])
+kd1 <- density(f.6$turn.angle[f.6$Light=="Present"], na.rm=T)
 plot(kd1, xlim = c(5,175), ylim = c(0, 0.02), col='blue', lwd=2, main = "Turn Angles Vs Light, Flow = 0.6")
 
-kd2 <- density(f.6$turn.angle[f.6$Light=="Absent"])
+kd2 <- density(f.6$turn.angle[f.6$Light=="Absent"], na.rm=T)
 lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -836,11 +726,11 @@ legend("topright",                                  # Add legend to density
 
 
 
-kd1 <- density(f3$turn.angle[f3$Light=="Present"])
+kd1 <- density(f3$turn.angle[f3$Light=="Present"], na.rm=T)
 plot(kd1, xlim = c(5,175), ylim = c(0, 0.02), col='blue', lwd=2, main = "Turn Angles Vs Light, Flow = 3")
 
-##kd2 <- density(f3$turn.angle[f3$Light=="Absent"])
-##lines(kd2, col='red', lwd=2)
+kd2 <- density(f3$turn.angle[f3$Light=="Absent"], na.rm=T)
+lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
        legend = c("Light Present", "Light Absent"),
@@ -849,11 +739,11 @@ legend("topright",                                  # Add legend to density
 
 
 
-kd1 <- density(f5$turn.angle[f5$Light=="Present"])
+kd1 <- density(f5.9$turn.angle[f5.9$Light=="Present"], na.rm=T)
 plot(kd1, xlim = c(5,175), ylim = c(0, 0.02), col='blue', lwd=2, main = "Turn Angles Vs Light, Flow = 5.9")
 
-##kd2 <- density(f5$turn.angle[f5$Light=="Absent"])
-##lines(kd2, col='red', lwd=2)
+kd2 <- density(f5.9$turn.angle[f5.9$Light=="Absent"], na.rm=T)
+lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
        legend = c("Light Present", "Light Absent"),
@@ -862,10 +752,10 @@ legend("topright",                                  # Add legend to density
 
 
 
-kd1 <- density(f8$turn.angle[f8$Light=="Present"])
+kd1 <- density(f8.9$turn.angle[f8.9$Light=="Present"], na.rm=T)
 plot(kd1, xlim = c(5,175), ylim = c(0, 0.02), col='blue', lwd=2, main = "Turn Angles Vs Light, Flow = 8.9")
 
-kd2 <- density(f8$turn.angle[f8$Light=="Absent"])
+kd2 <- density(f8.9$turn.angle[f8.9$Light=="Absent"], na.rm=T)
 lines(kd2, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density

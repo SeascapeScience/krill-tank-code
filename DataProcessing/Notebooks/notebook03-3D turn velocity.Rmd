@@ -5,7 +5,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (July 12 2022).RData")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (July 24 2022).RData")
 
 head(TotalData) ## all Total Data rows
 head(CC.TotalData) ##only complete cases of Total Data 

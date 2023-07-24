@@ -1,0 +1,114 @@
+---
+title: "notebook12-autocorrelation-bins"
+output:
+  html_document:
+    df_print: paged
+---
+
+Load data
+```{r echo=F}
+#rm(list=ls(all=TRUE))
+#load("~/Post-doc/Data/Total Merged Data File (Sep 2 2022).RData")
+#load('~/Work/Data/Antarctic/CC.TotalData.2022.07.20.RData')
+library(ggplot2)
+library(GGally)
+library(hexbin)
+library(diptest)
+library("dplyr") 
+```
+
+```{r}
+# Values of conditions to test
+flow.rate <- 0  # 0 0.6 3 5.9 8.9
+chlorophyll <- 0 # 0 4.3 4.6 5.5 6.1 7.6 13.5 19
+guano <- 1 # Absent=1 Present=2
+light <- 1 # Absent=1 Present=2
+flow.dir <- 1 # No flow =1, Upwelling=2, Downwelling =3
+# Vectors of all possible conditions combinations
+frs <- as.numeric(as.character(unique(Up$Flow.rate)))
+chls <- as.numeric(as.character(unique(Up$Chlorophyll)))
+guans <- c(1,2)
+lights <- c(1,2)
+flow.dirs<- c(1:3)
+conditions <- expand.grid(frs,chls,guans,lights,flow.dirs)
+```
+
+Autocorrelation looking at linear regression and residuals. Note that residuals are not normally distributed.
+```{r}
+velocity <- Up$v[
+  (Up$Flow.rate==flow.rate & 
+     Up$Chlorophyll==chlorophyll & 
+     as.numeric(Up$Guano)==guano &
+     as.numeric(Up$Flow.Direction)==flow.dir &
+     as.numeric(Up$Light)==light)]
+
+velocity <- as.data.frame(velocity)
+
+#x <- slice(velocity, 1:(length(velocity) - 30))     # Apply slice & n functions
+#y <- slice(velocity, 30:(length(velocity)-1)) 
+
+#velocity <- as.numeric(unlist(velocity))
+#x <- as.numeric(unlist(x))  ## return to numeric vector
+#y <- as.numeric(unlist(y))
+
+#x <- log10(x)
+#y <- log10(y)
+
+x <- log10(velocity[1:length(velocity)]) ### take from first time point to next to last point
+## replace with loop index to make lag bigger
+y <- log10(velocity[2:length(velocity)-1]) ### take from line 2 to last point
+##same here to add time lag between points, then test with corr.test find correlation coefficient then plot
+
+vel.auto.lm <- lm(x ~ y + 1)
+summary(vel.auto.lm)
+par(mar= c(4,4,2,1))
+par(mfrow=c(2,2))
+plot(vel.auto.lm)
+
+par(mar= c(4,4,2,1))
+par(mfrow=c(2,2))
+plot(hexbin(x,
+            y,
+            xbins = 100),
+     xlab='Log velocity (cm/s)',
+     ylab='Log velocity (cm/s) next time step',
+     legend = 0)
+hist(log10(velocity),100)
+hist(vel.auto.lm$residuals,100)
+qqnorm(vel.auto.lm$residuals,main="Normal Q-Q plot")
+qqline(vel.auto.lm$residuals)
+ks.test(vel.auto.lm$residuals,'pnorm')
+cor.test(x,y)
+
+
+```
+
+
+Loop through combinations
+
+```{r}
+for (i in 1:dim(conditions)[1])
+{
+  velocity <- CC.TotalData$v[
+  (CC.TotalData$Flow.rate==conditions[i,1] & 
+     CC.TotalData$Chlorophyll==conditions[i,2] & 
+     as.numeric(CC.TotalData$Guano)==conditions[i,3] &
+     as.numeric(CC.TotalData$Light)==conditions[i,4])]
+  if (length(velocity) <= 1) {
+    conditions[i,5] <- NA } else {
+      c<-cor.test(log10(velocity[1:length(velocity)-1]),
+                  log10(velocity[2:length(velocity)]))
+      conditions[i,5] <- c$estimate
+        v0 <- log10(velocity[1:length(velocity)-1])
+        v1 <- log10(velocity[2:length(velocity)])
+        df <- data.frame(v0,v1)
+        fit <- lm(v1 ~ v0 + 1, data = df)
+        conditions[i,6] <- fit$coefficients[1]
+        conditions[i,7] <- fit$coefficients[2]
+        d <- dip.test(velocity)
+        conditions[i,8] <- d$p.value
+        hist(log10(velocity),100,
+             main=d$p.value)
+  }  
+}
+```

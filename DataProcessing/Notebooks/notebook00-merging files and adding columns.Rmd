@@ -9,8 +9,8 @@ Add the Date and View of the trail to seperate columns using the character strin
 
 ```{r}
 rm(list=ls(all=TRUE))
-setwd("~/Post-doc/Data/Processed MatLab Files")
-path <- "C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Processed MatLab Files\\"
+setwd("~/Post-doc/Data/Processed MatLab Files/Horizontal")
+path <- "C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Processed MatLab Files\\Horizontal\\"
 files <- list.files(path=path, pattern="*.csv")
 
 
@@ -30,11 +30,16 @@ ldf = lapply(files, function(x) {
 library(dplyr)
 df <- do.call("rbind", ldf)
 ## Date_view_track factor created
-df$D_V_T <- paste(ldf$Date, ldf$View, ldf$Track, sep='_')
-df$D_V_T <- as.factor(ldf$D_V_T)
+df$D_V_T <- paste(df$Date, df$View, df$Track, sep='_')
+df$D_V_T <- as.factor(df$D_V_T)
 ## Date_view factor created
-df$D_V <- paste(ldf$Date, ldf$View, sep='_') 
-df$D_V <- as.factor(ldf$D_V)
+df$D_V <- paste(df$Date, df$View, sep='_') 
+df$D_V <- as.factor(df$D_V)
+df$Track <- as.factor(df$Track)
+df$Date <- as.factor(df$Date)
+df$View <- as.factor(df$View)
+df$File.name <- as.factor(df$File.name)
+
 
 head(df)
 tail(df)
@@ -44,7 +49,7 @@ str(df)
 Add columns of metadata based on the D_V of each row
 
 ```{r}
-metadata <- read.csv("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Metadata flat file 2021.08.10.csv", header = T)
+metadata <- read.csv("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Metadata flat file 20230623.csv", header = T)
 head(metadata)
 tail(metadata)
 
@@ -58,9 +63,18 @@ delete.na <- function(DF, n=0) {
   DF[rowSums(is.na(DF)) <= n,]
 }
 
-TotalData <- delete.na(alldata, 2)
+TotalData <- delete.na(alldata, 3)
 head(TotalData)
 tail(TotalData)
+
+TotalData$Flow.rate <- as.factor(TotalData$Flow.rate)
+TotalData$Chlorophyll <- as.factor(TotalData$Chlorophyll)
+TotalData$Guano <- as.factor(TotalData$Guano)
+TotalData$Light <- as.factor(TotalData$Light)
+TotalData$Flume <- as.factor(TotalData$Flume)
+TotalData$Flow.Direction <- as.factor(TotalData$Flow.Direction)
+
+str(TotalData)
 
 ```
 
@@ -103,7 +117,8 @@ hist(TotalData$dx[abs(TotalData$dx)<.01],breaks = 100)
 ```
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (August 17 2022).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (July 24 2023).RData")
+
 
 ```
 

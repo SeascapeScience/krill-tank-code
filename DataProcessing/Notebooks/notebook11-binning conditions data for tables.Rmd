@@ -1396,10 +1396,13 @@ Below section has rm for conditions and droplevels for factors at end
 ##########################################################################
 ##Run Loop for each set of conditions
 
+LLL <- droplevels(LLL)
+str(LLL)
+
 library(dplyr)
-DEN_calculate <- data.frame()
-for (dvt in unique(DEN$D_V_T)) {
-  data <- DEN %>% subset(D_V_T==dvt)
+LLL_calculate <- data.frame()
+for (dvt in unique(LLL$D_V_T)) {
+  data <- LLL %>% subset(D_V_T==dvt)
   for (i in 2:nrow(data)) {
     subdata <- data[((i-1):i),]
     rel_point_x <- subdata[1,"X"]
@@ -1409,37 +1412,36 @@ for (dvt in unique(DEN$D_V_T)) {
     slope <- (cal_point_y- rel_point_y)/(cal_point_x- rel_point_x)
     angle <- atan(slope)*360/pi
     tmp <- data.frame(D_V_T=dvt,i,rel_point_x,rel_point_y,cal_point_x,cal_point_y,slope,angle)
-    DEN_calculate <- rbind(DEN_calculate,tmp)
+    LLL_calculate <- rbind(LLL_calculate,tmp)
   }
   print(dvt)
 }
 
-
 ###########################################################################
 library(circular)
-DEN_calculate <- circular(DEN_calculate$angle, units="degrees", template ="geographics")
-DEN_calculate <- DEN_calculate*pi/180   ## converts to radians
-DEN_calculate.mean <- mean(DEN_calculate*180/pi, na.rm = TRUE) #assigns to the 'LNN.mean' object
+LNH_calculate.deg <- circular(LNH_calculate$angle, units="degrees", template ="geographics")
+LNH_calculate.rad <- LNH_calculate.deg*pi/180   ## converts to radians
+LNH_calculate.mean <- mean(LNH_calculate.deg, na.rm = TRUE) #assigns to the 'LNN.mean' object
 
+LNH_calculate.mean  ##*180/pi
 
+plot.circular(DEN_calculate.deg, stack = T, pch = 20, sep = 0.08, shrink = 3.6)  ### larger stack number = more zoomed out
+arrows.circular(DEN_calculate.mean-180) #add mean to plot in degrees
 
-                         
-head(LEN_calculate)
-LNL_calculate <- LNL_calculate*pi/180   ## converts to radians
-mean(LNN_calculate, na.rm = TRUE) #remove NAs from dataset, then find mean 
+############################################################################################
 
-0.0316*180/pi  ## converts back to degrees
+## *180/pi
+## *pi/180                     
+##head(DEN_calculate)
+##DEN_calculate <- DEN_calculate*180/pi   ## converts back to degrees
+##mean(DEN_calculate, na.rm = TRUE) #remove NAs from dataset, then find mean 
+
+##-0.01458926*180/pi  ## converts back to degrees
 
 ## still in radians below
-var(LEN_calculate, na.rm = TRUE)
-meandeviation(LEN_calculate, na.rm=TRUE)
-summary(LEN_calculate)
-
-LNL_calculate.mean <- mean(LNL_calculate*180/pi, na.rm = TRUE) #assigns to the 'LNN.mean' object
-plot.circular(LEN_calculate, stack = T, pch = 20, sep = 0.08, shrink = 3.6)  ### larger stack number = more zoomed out
-arrows.circular(LEN_calculate.mean) #add mean to plot
-
-
+##var(DEN_calculate, na.rm = TRUE)
+##meandeviation(DEN_calculate, na.rm=TRUE)
+##summary(DEN_calculate)
 
 ####################################################
 
@@ -1451,9 +1453,9 @@ arrows.circular(LEN_calculate.mean) #add mean to plot
 rm(DEG, DEH, DEL, DEM, DHG, DHH, DHL, DHM, DHN, DLG, DLH, DLL, DLM, DMG, DMH, DML, DMM, DMN, DNG, DNL, LEG, LEH, LEL, LEM, LHG, LHH, LHL, LHM, LLH, LMH, LML, LMM)
 ##rm(D, d1, d2, dd, dotprod, doty, dotx, dotz, dx1, dx2, dy1, dy2, dz1, dz2, list2, list3, list4, list5, lth, smoothx1, smoothx2, smoothy1, smoothy2)
 ##rm(smoothz1, smoothz2, v1, v2, vx1, vx2, vy1, vy2, vz1, vz2, x1, x2, y1, y2, z1, z2)
-
-LNN <- droplevels(LNN)
-str(LNN)
+#####################################################################
+LHN <- droplevels(LHN)
+str(LHN)
 
 ```
 
@@ -2707,10 +2709,32 @@ Tests against each other
 ################################################### Example of testing means of groups against each other
 # Ant orientation from Duelli and Wehner (1973) 
 # Example used in Batschelet (1981) 
-data1 <- list( exp = circular(rep(c(-20,-10, 0), c(1,7,2)), units="degrees", template="geographics"), control = circular(rep(c(-10, 0, 10, 20), c(3,3,3,1)), units="degrees", template="geographics")
-          ) 
+
+
+data1 <- list(exp = circular(LLL_calculate$angle, units="degrees", template="geographics"), control = circular(LNN_calculate$angle, units="degrees", template="geographics"))
+           
 watson.williams.test(data1)
 
+
+## gives error 
+  ##Warning in watson.williams.test.default(x, group) :
+  ##Concentration parameters (0.328, 0.231) not equal between groups. The test might not be applicable
+##Warning in watson.williams.test.default(x, group) :
+  ##Global concentration parameter: 0.314 < 2. The test is probably not applicable
+
+    ## suggests using Wheeler-Watson test instead
+
+watson.wheeler.test(data1)
+
+## gives warning of :
+## Warning in watson.wheeler.test.default(x, group) :
+  ##There are 75884 ties in the data.
+  ##Ties will be broken appart randomly and may influence the result.
+  ##Re-run the test several times to check the influence of ties.
+
+          ## after running 4 times: W = (792.65, .78, .8, .7)
+          ## all df's = 2
+          ## all p-values = 2.2
 
 
 
