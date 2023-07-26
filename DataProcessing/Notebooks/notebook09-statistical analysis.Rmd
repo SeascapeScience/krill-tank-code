@@ -1759,29 +1759,26 @@ Headings for each level of Chlorophyll
 
 ```{r}
 
-### Kernel density plots ################### Headings
+### Kernel density plots ################### Heading
 par(mar= c(4,4,2,1))
-par(mfrow=c(3,3))
+par(mfrow=c(3,2))
 
 ################################ Flow Rate ########################
-levels(CC.TotalData$Flow.rate)
 
-par(mar= c(4,4,2,1))
-par(mfrow=c(3,3))
+## CHL 0
+kd1 <- density(CHL0$heading.pi[CHL0$Flow.rate=="0"])
+plot(kd1, xlim = c(-190,190), ylim = c(0, 0.03), col='blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = 0")
 
-kd1 <- density(ChlA0$heading.pi[ChlA0$Flow.rate=="0"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.012), col='blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = 0")
-
-kd2 <- density(ChlA0$heading.pi[ChlA0$Flow.rate=="0.6"])
+kd2 <- density(CHL0$heading.pi[CHL0$Flow.rate=="0.6"])
 lines(kd2, col='light blue', lwd=2)
 
-kd3 <- density(ChlA0$heading.pi[ChlA0$Flow.rate=="3"])
+kd3 <- density(CHL0$heading.pi[CHL0$Flow.rate=="3"])
 lines(kd3, col='yellow', lwd=2)
 
-kd4 <- density(ChlA0$heading.pi[ChlA0$Flow.rate=="5.9"])
+kd4 <- density(CHL0$heading.pi[CHL0$Flow.rate=="5.9"])
 lines(kd4, col='orange', lwd=2)
 
-kd5 <- density(ChlA0$heading.pi[ChlA0$Flow.rate=="8.9"])
+kd5 <- density(CHL0$heading.pi[CHL0$Flow.rate=="8.9"])
 lines(kd5, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -1790,45 +1787,67 @@ legend("topright",                                  # Add legend to density
        lty = 1)
 
 
+## CHL Low
 
+kd1 <- density(CHLL$heading.pi[CHLL$Flow.rate=="0"])
+plot(kd1, xlim = c(-190,190), ylim = c(0, 0.03), col='blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = Low")
 
-##kd1 <- density(ChlA4.3$heading.pi[ChlA4.3$Flow.rate=="0"])
-##plot(kd1, xlim = c(5,175), ylim = c(0, 0.02), col='blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = 4.3")
-
-kd2 <- density(ChlA4.3$heading.pi[ChlA4.3$Flow.rate=="0.6"])
-plot(kd2, xlim = c(-180,180), ylim = c(0, 0.012), col='light blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = 4.3")
-##lines(kd2, col='light blue', lwd=2)
-
-##kd3 <- density(ChlA4.3$heading.pi[ChlA4.3$Flow.rate=="3"])
-##lines(kd3, col='yellow', lwd=2)
-
-##kd4 <- density(ChlA4.3$heading.pi[ChlA4.3$Flow.rate=="5.9"])
-##lines(kd4, col='orange', lwd=2)
-
-##kd5 <- density(ChlA4.3$heading.pi[ChlA4.3$Flow.rate=="8.9"])
-##lines(kd5, col='red', lwd=2)
-
-legend("topright",                                  # Add legend to density
-       legend = c("Flow rate  0", "Flow rate 0.6", "Flow rate 3", "Flow rate 5.9", "Flow rate 8.9"),
-       col = c("blue", "light blue", "yellow", "orange", "red"),
-       lty = 1)
-
-
-
-kd1 <- density(ChlA4.6$heading.pi[ChlA4.6$Flow.rate=="0"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.012), col='blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = 4.6")
-
-kd2 <- density(ChlA4.6$heading.pi[ChlA4.6$Flow.rate=="0.6"])
-##plot(kd2, xlim = c(5,175), ylim = c(0, 0.02), col='light blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = 4.6")
+kd2 <- density(CHLL$heading.pi[CHLL$Flow.rate=="0.6"])
 lines(kd2, col='light blue', lwd=2)
 
-##kd3 <- density(ChlA4.6$heading.pi[ChlA4.6$Flow.rate=="3"])
-##lines(kd3, col='yellow', lwd=2)
+kd3 <- density(CHLL$heading.pi[CHLL$Flow.rate=="3"])
+lines(kd3, col='yellow', lwd=2)
 
-##kd4 <- density(ChlA4.6$heading.pi[ChlA4.6$Flow.rate=="5.9"])
+kd4 <- density(CHLL$heading.pi[CHLL$Flow.rate=="5.9"])
+lines(kd4, col='orange', lwd=2)
+
+kd5 <- density(CHLL$heading.pi[CHLL$Flow.rate=="8.9"])
+lines(kd5, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Flow rate  0", "Flow rate 0.6", "Flow rate 3", "Flow rate 5.9", "Flow rate 8.9"),
+       col = c("blue", "light blue", "yellow", "orange", "red"),
+       lty = 1)
+
+
+## CHL Medium
+
+kd1 <- density(CHLM$heading.pi[CHLM$Flow.rate=="0"])
+plot(kd1, xlim = c(-190,190), ylim = c(0, 0.03), col='blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = Medium")
+
+kd2 <- density(CHLM$heading.pi[CHLM$Flow.rate=="0.6"])
+lines(kd2, col='light blue', lwd=2)
+
+kd3 <- density(CHLM$heading.pi[CHLM$Flow.rate=="3"])
+lines(kd3, col='yellow', lwd=2)
+
+kd4 <- density(CHLM$heading.pi[CHLM$Flow.rate=="5.9"])
+lines(kd4, col='orange', lwd=2)
+
+kd5 <- density(CHLM$heading.pi[CHLM$Flow.rate=="8.9"])
+lines(kd5, col='red', lwd=2)
+
+legend("topright",                                  # Add legend to density
+       legend = c("Flow rate  0", "Flow rate 0.6", "Flow rate 3", "Flow rate 5.9", "Flow rate 8.9"),
+       col = c("blue", "light blue", "yellow", "orange", "red"),
+       lty = 1)
+
+
+## CHL High
+
+kd1 <- density(CHLH$heading.pi[CHLH$Flow.rate=="0"])
+plot(kd1, xlim = c(-190,190), ylim = c(0, 0.03), col='blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = High")
+
+kd2 <- density(CHLH$heading.pi[CHLH$Flow.rate=="0.6"])
+lines(kd2, col='light blue', lwd=2)
+
+kd3 <- density(CHLH$heading.pi[CHLH$Flow.rate=="3"])
+lines(kd3, col='yellow', lwd=2)
+
+##kd4 <- density(CHLH$heading.pi[CHLH$Flow.rate=="5.9"])
 ##lines(kd4, col='orange', lwd=2)
 
-##kd5 <- density(ChlA4.6$heading.pi[ChlA4.6$Flow.rate=="8.9"])
+##kd5 <- density(CHLH$heading.pi[CHLH$Flow.rate=="8.9"])
 ##lines(kd5, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -1838,19 +1857,22 @@ legend("topright",                                  # Add legend to density
 
 
 
-kd1 <- density(ChlA5.5$heading.pi[ChlA5.5$Flow.rate=="0"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.012), col='blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = 5.5")
+## CHL Filament
 
-##kd2 <- density(ChlA5.5$heading.pi[ChlA5.5$Flow.rate=="0.6"])
+##kd1 <- density(CHLF$heading.pi[CHLF$Flow.rate=="0"])
+##plot(kd1, xlim = c(-190,190), ylim = c(0, 0.03), col='blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = Filament")
+
+kd2 <- density(CHLF$heading.pi[CHLF$Flow.rate=="0.6"])
+plot(kd2, xlim = c(-190,190), ylim = c(0, 0.03), col='light blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = Filament")
 ##lines(kd2, col='light blue', lwd=2)
 
-##kd3 <- density(ChlA5.5$heading.pi[ChlA5.5$Flow.rate=="3"])
+##kd3 <- density(CHLF$heading.pi[CHLF$Flow.rate=="3"])
 ##lines(kd3, col='yellow', lwd=2)
 
-##kd4 <- density(ChlA5.5$heading.pi[ChlA5.5$Flow.rate=="5.9"])
+##kd4 <- density(CHLF$heading.pi[CHLF$Flow.rate=="5.9"])
 ##lines(kd4, col='orange', lwd=2)
 
-##kd5 <- density(ChlA5.5$heading.pi[ChlA5.5$Flow.rate=="8.9"])
+##kd5 <- density(CHLF$heading.pi[CHLF$Flow.rate=="8.9"])
 ##lines(kd5, col='red', lwd=2)
 
 legend("topright",                                  # Add legend to density
@@ -1858,202 +1880,81 @@ legend("topright",                                  # Add legend to density
        col = c("blue", "light blue", "yellow", "orange", "red"),
        lty = 1)
 
-
-
-##kd1 <- density(ChlA6$heading.pi[ChlA6$Flow.rate=="0"])
-##plot(kd1, xlim = c(5,175), ylim = c(0, 0.02), col='blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = 6")
-
-kd2 <- density(ChlA6$heading.pi[ChlA6$Flow.rate=="0.6"])
-plot(kd2, xlim = c(-180,180), ylim = c(0, 0.012), col='light blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = 6")
-##lines(kd2, col='light blue', lwd=2)
-
-##kd3 <- density(ChlA6$heading.pi[ChlA6$Flow.rate=="3"])
-##lines(kd3, col='yellow', lwd=2)
-
-##kd4 <- density(ChlA6$heading.pi[ChlA6$Flow.rate=="5.9"])
-##lines(kd4, col='orange', lwd=2)
-
-##kd5 <- density(ChlA6$heading.pi[ChlA6$Flow.rate=="8.9"])
-##lines(kd5, col='red', lwd=2)
-
-legend("topright",                                  # Add legend to density
-       legend = c("Flow rate  0", "Flow rate 0.6", "Flow rate 3", "Flow rate 5.9", "Flow rate 8.9"),
-       col = c("blue", "light blue", "yellow", "orange", "red"),
-       lty = 1)
-
-
-
-kd1 <- density(ChlA7$heading.pi[ChlA7$Flow.rate=="0"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.012), col='blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = 7")
-
-##kd2 <- density(ChlA7$heading.pi[ChlA7$Flow.rate=="0.6"])
-##lines(kd2, col='light blue', lwd=2)
-
-##kd3 <- density(ChlA7$heading.pi[ChlA7$Flow.rate=="3"])
-##lines(kd3, col='yellow', lwd=2)
-
-##kd4 <- density(ChlA7$heading.pi[ChlA7$Flow.rate=="5.9"])
-##lines(kd4, col='orange', lwd=2)
-
-##kd5 <- density(ChlA7$heading.pi[ChlA7$Flow.rate=="8.9"])
-##lines(kd5, col='red', lwd=2)
-
-legend("topright",                                  # Add legend to density
-       legend = c("Flow rate  0", "Flow rate 0.6", "Flow rate 3", "Flow rate 5.9", "Flow rate 8.9"),
-       col = c("blue", "light blue", "yellow", "orange", "red"),
-       lty = 1)
-
-
-
-##kd1 <- density(ChlA13$heading.pi[ChlA13$Flow.rate=="0"])
-##plot(kd1, xlim = c(5,175), ylim = c(0, 0.02), col='blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = 13")
-
-kd2 <- density(ChlA13$heading.pi[ChlA13$Flow.rate=="0.6"])
-plot(kd2, xlim = c(-180,180), ylim = c(0, 0.012), col='light blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = 13")
-##lines(kd2, col='light blue', lwd=2)
-
-##kd3 <- density(ChlA13$heading.pi[ChlA13$Flow.rate=="3"])
-##lines(kd3, col='yellow', lwd=2)
-
-##kd4 <- density(ChlA13$heading.pi[ChlA13$Flow.rate=="5.9"])
-##lines(kd4, col='orange', lwd=2)
-
-##kd5 <- density(ChlA13$heading.pi[ChlA13$Flow.rate=="8.9"])
-##lines(kd5, col='red', lwd=2)
-
-legend("topright",                                  # Add legend to density
-       legend = c("Flow rate  0", "Flow rate 0.6", "Flow rate 3", "Flow rate 5.9", "Flow rate 8.9"),
-       col = c("blue", "light blue", "yellow", "orange", "red"),
-       lty = 1)
-
-
-
-kd1 <- density(ChlA19$heading.pi[ChlA19$Flow.rate=="0"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.012), col='blue', lwd=2, main = "Heading Vs Flow Rate, Chlorophyll = 19")
-
-##kd2 <- density(ChlA19$heading.pi[ChlA19$Flow.rate=="0.6"])
-##lines(kd2, col='light blue', lwd=2)
-
-##kd3 <- density(ChlA19$heading.pi[ChlA19$Flow.rate=="3"])
-##lines(kd3, col='yellow', lwd=2)
-
-##kd4 <- density(ChlA19$heading.pi[ChlA19$Flow.rate=="5.9"])
-##lines(kd4, col='orange', lwd=2)
-
-##kd5 <- density(ChlA19$heading.pi[ChlA19$Flow.rate=="8.9"])
-##lines(kd5, col='red', lwd=2)
-
-legend("topright",                                  # Add legend to density
-       legend = c("Flow rate  0", "Flow rate 0.6", "Flow rate 3", "Flow rate 5.9", "Flow rate 8.9"),
-       col = c("blue", "light blue", "yellow", "orange", "red"),
-       lty = 1)
-
-
-###########################################################################
+##########################################################################
 
 #############################  Light  ######################################
 
-###########################################################################
-
+##########################################################################
 par(mar= c(4,4,2,1))
-par(mfrow=c(3,3))
+par(mfrow=c(3,2))
 
-kd1 <- density(ChlA0$heading.pi[ChlA0$Light=="Present"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.02), col='blue', lwd=2, main = "Headings Vs Light, Chlorophyll = 0")
+#### CHL 0
 
-kd2 <- density(ChlA0$heading.pi[ChlA0$Light=="Absent"])
-lines(kd2, col='red', lwd=2)
+kd1 <- density(CHL0$heading.pi[CHL0$Light=="Present"])
+plot(kd1, xlim = c(-190,190), ylim = c(0, 0.03), col='yellow', lwd=2, main = "Heading Vs Light, Chlorophyll = 0")
 
-legend("topright",                                  # Add legend to density
-       legend = c("Light Present", "Light Absent"),
-       col = c("blue", "red"),
-       lty = 1)
-
-
-kd1 <- density(ChlA4.3$heading.pi[ChlA4.3$Light=="Present"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.02), col='blue', lwd=2, main = "Headings Vs Light, Chlorophyll = 4.3")
-
-##kd2 <- density(ChlA4.3$heading.pi[ChlA4.3$Light=="Absent"])
-##lines(kd2, col='red', lwd=2)
+kd2 <- density(CHL0$heading.pi[CHL0$Light=="Absent"])
+lines(kd2, col='black', lwd=2)
 
 legend("topright",                                  # Add legend to density
        legend = c("Light Present", "Light Absent"),
-       col = c("blue", "red"),
+       col = c("yellow", "black"),
        lty = 1)
 
 
-kd1 <- density(ChlA4.6$heading.pi[ChlA4.6$Light=="Present"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.02), col='blue', lwd=2, main = "Headings Vs Light, Chlorophyll = 4.6")
+## CHL Low
 
-##kd2 <- density(ChlA4.6$heading.pi[ChlA4.6$Light=="Absent"])
-##lines(kd2, col='red', lwd=2)
+kd1 <- density(CHLL$heading.pi[CHLL$Light=="Present"])
+plot(kd1, xlim = c(-190,190), ylim = c(0, 0.03), col='yellow', lwd=2, main = "Heading Vs Light, Chlorophyll = Low")
+
+kd2 <- density(CHLL$heading.pi[CHLL$Light=="Absent"])
+lines(kd2, col='black', lwd=2)
 
 legend("topright",                                  # Add legend to density
        legend = c("Light Present", "Light Absent"),
-       col = c("blue", "red"),
+       col = c("yellow", "black"),
        lty = 1)
 
+### CHL Medium
 
-kd1 <- density(ChlA5.5$heading.pi[ChlA5.5$Light=="Present"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.02), col='blue', lwd=2, main = "Headings Vs Light, Chlorophyll = 5.5")
+kd1 <- density(CHLM$heading.pi[CHLM$Light=="Present"])
+plot(kd1, xlim = c(-190,190), ylim = c(0, 0.03), col='yellow', lwd=2, main = "Heading Vs Light, Chlorophyll = Medium")
 
-##kd2 <- density(ChlA5.5$heading.pi[ChlA5.5$Light=="Absent"])
-##lines(kd2, col='red', lwd=2)
+kd2 <- density(CHLM$heading.pi[CHLM$Light=="Absent"])
+lines(kd2, col='black', lwd=2)
 
 legend("topright",                                  # Add legend to density
        legend = c("Light Present", "Light Absent"),
-       col = c("blue", "red"),
+       col = c("yellow", "black"),
        lty = 1)
 
 
+### CHL High
 
-kd1 <- density(ChlA6$heading.pi[ChlA6$Light=="Present"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.02), col='blue', lwd=2, main = "Headings Vs Light, Chlorophyll = 6")
+kd1 <- density(CHLH$heading.pi[CHLH$Light=="Present"])
+plot(kd1, xlim = c(-190,190), ylim = c(0, 0.03), col='yellow', lwd=2, main = "Heading Vs Light, Chlorophyll = High")
 
-##kd2 <- density(ChlA6$heading.pi[ChlA6$Light=="Absent"])
-##lines(kd2, col='red', lwd=2)
+kd2 <- density(CHLH$heading.pi[CHLH$Light=="Absent"])
+lines(kd2, col='black', lwd=2)
 
 legend("topright",                                  # Add legend to density
        legend = c("Light Present", "Light Absent"),
-       col = c("blue", "red"),
+       col = c("yellow", "black"),
        lty = 1)
 
+### CHL Filament
 
-kd1 <- density(ChlA7$heading.pi[ChlA7$Light=="Present"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.02), col='blue', lwd=2, main = "Headings Vs Light, Chlorophyll = 7")
+kd1 <- density(CHLF$heading.pi[CHLF$Light=="Present"])
+plot(kd1, xlim = c(-190,190), ylim = c(0, 0.03), col='yellow', lwd=2, main = "Heading Vs Light, Chlorophyll = Filament")
 
-kd2 <- density(ChlA7$heading.pi[ChlA7$Light=="Absent"])
-lines(kd2, col='red', lwd=2)
+##kd2 <- density(CHLF$heading.pi[CHLF$Light=="Absent"])
+##lines(kd2, col='black', lwd=2)
 
 legend("topright",                                  # Add legend to density
        legend = c("Light Present", "Light Absent"),
-       col = c("blue", "red"),
+       col = c("yellow", "black"),
        lty = 1)
 
-
-
-kd1 <- density(ChlA13$heading.pi[ChlA13$Light=="Present"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.02), col='blue', lwd=2, main = "Headings Vs Light, Chlorophyll = 13")
-
-##kd2 <- density(ChlA13$heading.pi[ChlA13$Light=="Absent"])
-##lines(kd2, col='red', lwd=2)
-
-legend("topright",                                  # Add legend to density
-       legend = c("Light Present", "Light Absent"),
-       col = c("blue", "red"),
-       lty = 1)
-
-
-kd1 <- density(ChlA19$heading.pi[ChlA19$Light=="Present"])
-plot(kd1, xlim = c(-180,180), ylim = c(0, 0.02), col='blue', lwd=2, main = "Headings Vs Light, Chlorophyll = 19")
-
-kd2 <- density(ChlA19$heading.pi[ChlA19$Light=="Absent"])
-lines(kd2, col='red', lwd=2)
-
-legend("topright",                                  # Add legend to density
-       legend = c("Light Present", "Light Absent"),
-       col = c("blue", "red"),
-       lty = 1)
 
 ```
 
