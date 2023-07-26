@@ -1,0 +1,6 @@
+---
+title: "notebook14-simulation"
+output:
+  html_document:
+    df_print: paged
+---
