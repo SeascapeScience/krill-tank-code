@@ -1958,3 +1958,18 @@ legend("topright",                                  # Add legend to density
 
 ```
 
+Using subset data from notebook 11
+Plotting histograms for each condition level, starting with turn angles. Heading, Pitch and Velocity next...
+```{r}
+par(mar= c(4,4,2,1))
+par(mfrow=c(1,1))
+
+hist_info <- hist(LLN$smooth.pitch, plot = FALSE)         # Store output of hist function
+hist_info$density <- hist_info$counts /    # Compute density values
+  sum(hist_info$counts) * 100
+plot(hist_info, freq = FALSE, xlab = "Pitch (degrees)", ylab = "Percentage (%)", main = "Light, Low Flow (0.6 cm s-1), No Chlorophyll", xlim=c(-100,100), ylim=c(0,75), xaxp = c(-180, 180, 18))              # Plot histogram with percentages
+
+
+High Chlorophyll
+```
+
