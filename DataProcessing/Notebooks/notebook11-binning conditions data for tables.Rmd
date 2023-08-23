@@ -6,7 +6,7 @@ output: html_notebook
 Load data
 ```{r}
 rm(list=ls(all=TRUE))
-load("~/Post-doc/Data/Total Merged Data File (Sep 2 2022).RData")
+load("~/Post-doc/Data/Total Merged Data File (July 24 2023).RData")
 
 CC.TotalData$turn.anglexy <- atan2(CC.TotalData$X, CC.TotalData$Y)
 CC.TotalData$turn.angleyz <- atan2(CC.TotalData$Y, CC.TotalData$Z)
@@ -26,7 +26,12 @@ d2 <- sqrt(dx2^2 + dy2^2 +dz2^2)
 dd <- D/d1/d2
 hist(acos(dd)/pi*180)
 
-CC.TotalData$turn.angle <- c(NA, acos(D/d1/d2))/pi*180
+CC.TotalData$turn.angle.smooth <- c(NA, acos(D/d1/d2))/pi*180
+
+range(CC.TotalData$vel.turn.angle.smooth)
+
+head(CC.TotalData)
+
 ```
 
 Change factor levels to N, L M H E, etc
@@ -37,22 +42,108 @@ str(data)
 levels(data$Flow.rate) <- c("No Flow","Low Flow","Medium Flow", "High Flow","Extreme Flow")
 plot(data$Flow.rate, data$turn.angle, xlab = "Flow rate (cm s-1)", ylab = "Turn Angles (degrees)", ylim = c(0, 180))
 
-levels(data$Chlorophyll) <- c("No Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll",  "Medium Chlorophyll",  "Medium Chlorophyll", "High Chlorophyll")
-plot(data$Chlorophyll, data$vel.flow)
+##levels(data$Chlorophyll) <- c("No Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll",  "Medium Chlorophyll",  "Medium Chlorophyll", "High Chlorophyll")
+plot(data$Chlorophyll, data$vel.flow, xlab = "Chlorophyll (mg L-1)", ylab = "Velocity in relation to flow (cm s-1)")
 
 library(ggplot2)
-ggplot(data,aes(x=Flow.rate, y=pitch.perfect, fill=Chlorophyll))+
+
+######  Chlorophyll
+ggplot(data,aes(x=Flow.rate, y=smooth.pitch, fill=Chlorophyll))+
   geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
   theme(axis.text=element_text(color="black"))+
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
   theme(panel.grid.minor=element_blank())+
   labs(size= "",x = "Flow Rate (cm s-1)", y = "Pitch (degrees)", title = "Light") +
-  scale_fill_manual(values=c("greenyellow", "yellowgreen","lightgreen", "green", "green3", "green4", "darkgreen"),name = "Chlorophyll (mg L-1)",
-                    labels=c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll"))+
+  scale_fill_manual(values=c("white", "yellowgreen","green", "darkgreen", "black"),name = "Chlorophyll (mg L-1)",
+                    labels=c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll", "Filament"))+
+  facet_grid(~Light, scales = "free_x", space = "free")
+
+
+ggplot(data,aes(x=Flow.rate, y=smooth.heading, fill=Chlorophyll))+
+  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  labs(size= "",x = "Flow Rate (cm s-1)", y = "Heading (degrees)", title = "Light") +
+  scale_fill_manual(values=c("white", "yellowgreen","green", "darkgreen", "black"),name = "Chlorophyll (mg L-1)",
+                    labels=c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll", "Filament"))+
+  facet_grid(~Light, scales = "free_x", space = "free")
+
+
+ggplot(data,aes(x=Flow.rate, y=vel.flow, fill=Chlorophyll))+
+  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  labs(size= "",x = "Flow Rate (cm s-1)", y = "Velocity in relation to flow (cm s-1)", title = "Light") +
+  scale_fill_manual(values=c("white", "yellowgreen","green", "darkgreen", "black"),name = "Chlorophyll (mg L-1)",
+                    labels=c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll", "Filament"))+
+  facet_grid(~Light, scales = "free_x", space = "free")
+
+
+ggplot(data,aes(x=Flow.rate, y=vel.turn.angle.smooth, fill=Chlorophyll))+
+  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  labs(size= "",x = "Flow Rate (cm s-1)", y = "Turn Angles (degrees)", title = "Light") +
+  scale_fill_manual(values=c("white", "yellowgreen","green", "darkgreen", "black"),name = "Chlorophyll (mg L-1)",
+                    labels=c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll", "Filament"))+
   facet_grid(~Light, scales = "free_x", space = "free")
 
 
 
+##################
+
+
+########  Guano
+
+ggplot(data,aes(x=Flow.rate, y=smooth.pitch, fill=Guano))+
+  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  labs(size= "",x = "Flow Rate (cm s-1)", y = "Pitch (degrees)", title = "Light") +
+  scale_fill_manual(values=c("white", "red"),name = "Guano (3 mg L-1)",
+                    labels=c("Guano Absent", "Guano Present"))+
+  facet_grid(~Light, scales = "free_x", space = "free")
+
+
+ggplot(data,aes(x=Flow.rate, y=smooth.heading, fill=Guano))+
+  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  labs(size= "",x = "Flow Rate (cm s-1)", y = "Heading (degrees)", title = "Light") +
+  scale_fill_manual(values=c("white", "red"),name = "Guano (3 mg L-1)",
+                    labels=c("Guano Absent", "Guano Present"))+
+  facet_grid(~Light, scales = "free_x", space = "free")
+
+
+ggplot(data,aes(x=Flow.rate, y=vel.flow, fill=Guano))+
+  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  labs(size= "",x = "Flow Rate (cm s-1)", y = "Velocity in relation to flow (cm s-1)", title = "Light") +
+  scale_fill_manual(values=c("white", "red"),name = "Guano (3 mg L-1)",
+                    labels=c("Guano Absent", "Guano Present"))+
+  facet_grid(~Light, scales = "free_x", space = "free")
+
+
+ggplot(data,aes(x=Flow.rate, y=vel.turn.angle.smooth, fill=Guano))+
+  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  labs(size= "",x = "Flow Rate (cm s-1)", y = "Turn Angles (degrees)", title = "Light") +
+  scale_fill_manual(values=c("white", "red"),name = "Guano (3 mg L-1)",
+                    labels=c("Guano Absent", "Guano Present"))+
+  facet_grid(~Light, scales = "free_x", space = "free")
+
+
+
+save.image("~/Post-doc/Data/Total Merged Data File (August 11 2023).RData")
 ```
 
 aggregate data by factor levels
@@ -131,7 +222,7 @@ aov.circular(circ, CC.TotalData$Light) ## working but unsure
 Sub-setting factors into separate data sets to calculate mean vectors and dispersion for angle data
 ```{r}
 ## Subset each column (each treatment), and assign as circular data
-library(circular)
+##library(circular)
 #####################################################################
 
    ##  Light On, NO Flow
@@ -1450,12 +1541,14 @@ arrows.circular(DEN_calculate.mean-180) #add mean to plot in degrees
 ####################################################
 
 
-rm(DEG, DEH, DEL, DEM, DHG, DHH, DHL, DHM, DHN, DLG, DLH, DLL, DLM, DMG, DMH, DML, DMM, DMN, DNG, DNL, LEG, LEH, LEL, LEM, LHG, LHH, LHL, LHM, LLH, LMH, LML, LMM)
+rm(DEG, DEH, DEM, DHH, DHN, DLG, DLH, DLL, DLM, DMG, DMN, DNG, DNL, LEG, LEH, LHH)
 ##rm(D, d1, d2, dd, dotprod, doty, dotx, dotz, dx1, dx2, dy1, dy2, dz1, dz2, list2, list3, list4, list5, lth, smoothx1, smoothx2, smoothy1, smoothy2)
 ##rm(smoothz1, smoothz2, v1, v2, vx1, vx2, vy1, vy2, vz1, vz2, x1, x2, y1, y2, z1, z2)
 #####################################################################
 LHN <- droplevels(LHN)
 str(LHN)
+
+save.image("~/Post-doc/Data/Total Merged Data File (August 11 2023).RData")
 
 ```
 
