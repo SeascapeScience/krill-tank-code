@@ -18,7 +18,15 @@ library(randomForest)
 rm(list=ls(all=TRUE))
 #load("~/Post-doc/Data/Total Merged Data File (Sep 2 2022).RData")
 #load('~/Work/Data/Antarctic/CC.TotalData.2022.07.20.RData')
-load('~/Work/Data/Antarctic/TotalMergedDataFile.2023.04.12.RData')
+#load('~/Work/Data/Antarctic/TotalMergedDataFile.2023.04.12.RData')
+#load('~/Work/Data/Antarctic/Total Merged Data File (June 23 2023).RData')
+load('~/Work/Data/Antarctic/Total Merged Data File (July 24 2023).RData')
+
+CC.TotalData$Chlorophyll <- as.numeric(CC.TotalData$Chlorophyll)
+CC.TotalData$Light <- as.numeric(CC.TotalData$Light)
+CC.TotalData$Guano <- as.numeric(CC.TotalData$Guano)
+CC.TotalData$Flow.rate <- as.numeric(CC.TotalData$Flow.rate)
+CC.TotalData$Flow.Direction <- as.numeric(CC.TotalData$Flow.Direction)
 ```
 
 Set parameter ranges
@@ -41,8 +49,8 @@ for (i in 1:dim(conditions)[1])
      CC.TotalData$Chlorophyll==conditions[i,2] & 
      as.numeric(CC.TotalData$Guano)==conditions[i,3] &
      as.numeric(CC.TotalData$Light)==conditions[i,4])]
-  if (length(velocity) <= 1) {
-    conditions[i,5] <- NA } else {
+  if (length(velocity) <= 1 | length(velocity[!is.na(velocity)])==0) {
+    conditions[i,5:9] <- NA } else {
       c<-cor.test(log10(velocity[1:length(velocity)-1]),
                   log10(velocity[2:length(velocity)]))
       conditions[i,5] <- c$estimate
@@ -118,5 +126,5 @@ plot(conditions_blank$guano,conditions_blank$sigma)
 
 Save fit models
 ```{r}
-save(conditions.rf.slope,conditions.rf.intercept,conditions.rf.sigma, file='notebook13-rf.RData')
+save(conditions.rf.slope,conditions.rf.intercept,conditions.rf.sigma, file='notebook13-rf-24.07.2023data.RData')
 ```
