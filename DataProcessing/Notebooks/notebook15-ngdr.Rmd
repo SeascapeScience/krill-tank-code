@@ -4,6 +4,8 @@ output: html_notebook
 ---
 NGDR is the ratio of the net displacement (linear distance between starting point and end point of a path) to the gross displacement (total distance travelled) for each path recorded. 
 
+
+Calculate Total distance of track
 ```{r}
 library(dplyr)
 head(Feeding)
@@ -26,7 +28,7 @@ write.csv(NGDR, file = "~/Post-doc/Data/NGDR Sep 29 2023.csv", row.names = FALSE
 ```
 
 
-
+Calculate distance from start x,y to end, x,y location
 ```{r}
 full_dist <- data.frame()
 for (dvt in unique(Feeding$D_V_T)) {
@@ -53,7 +55,7 @@ write.csv(NGDR2, file = "~/Post-doc/Data/NGDR Sep 29 2023.csv", row.names = FALS
 
 ```
 
-
+Calculate NGDR ratio
 ```{r}
 NGDR2$NGDR <- NGDR2$diff.dist/NGDR2$dtot
 head(NGDR2)
@@ -64,3 +66,37 @@ NGDR2 %>% group_by(Light, Flow.rate, Chem) %>% summarise_at(vars(NGDR, diff.dist
 ```
 
 
+Plotting Angular data into histograms on polar projection
+```{r}
+## redo with vertical headings, change range for turn angles?
+
+library(ggplot2)
+head(AGG_Feed)
+str(AGG_Feed)
+range(AGG_Feed$turn.anglexysmooth)
+AGG_Feed$turn.anglexysmooth <- AGG_Feed$turn.anglexysmooth/(2*pi)*360
+f_mu <- mean(Feeding$turn.angle.smooth, by =c(Chem, Light, Flow.rate))
+
+ggplot(AGG_Feed, aes(turn.anglexysmooth, fill = Chem)) +
+  geom_histogram(binwidth = 5, boundary = 0, colour = "black", size = .25) +
+  coord_polar() +
+   ylim(0, 12)  +
+  scale_x_continuous(limits = c(0,360),
+                     breaks = seq(0, 360, by = 45),
+                     minor_breaks = seq(0, 360, by = 15))+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=0,hjust=1,vjust=0.4))+
+  theme(axis.line = element_line(size = 0.5, linetype = "solid",
+                                   colour = "black"))+
+  theme(legend.key = element_rect(fill = "white"))+
+  ##geom_vline(aes(heading.pi), xintercept = f_mu)+   ## adds mean angle line to plot
+  labs(size = "", x = "Turn Angle (degrees)", y = "Frequency of Turn Angle", title = "")+
+  scale_fill_manual(values=c("white", "gray", "gray35"),name = "Chemical Cue",
+                    labels=c("Ambient", "Guano", "Guano+CHL"))+
+ facet_grid(facets = Light ~ Flow.rate, labeller = label_both)
+
+
+
+
+
+```
