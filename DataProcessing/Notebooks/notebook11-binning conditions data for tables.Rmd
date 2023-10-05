@@ -3046,17 +3046,6 @@ a
 
 ```
 
-Binning Headings into 15 degree groups then doing a gtest
-```{r}
-
-
-
-
-
-
-```
-
-
 
 Saving Data.frames as csv files
 ```{r}
