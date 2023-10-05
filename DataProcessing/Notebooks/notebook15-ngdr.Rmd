@@ -1,0 +1,66 @@
+---
+title: "NGDR"
+output: html_notebook
+---
+NGDR is the ratio of the net displacement (linear distance between starting point and end point of a path) to the gross displacement (total distance travelled) for each path recorded. 
+
+```{r}
+library(dplyr)
+head(Feeding)
+
+total.dist <- function(x,y) {
+  sum(sqrt((x-lag(x))^2+(y-lag(y))^2),na.rm=TRUE)
+}
+
+res <- Feeding %>% group_by(D_V_T) %>% summarise(dtot=total.dist(xsmooth,ysmooth))
+
+print(res)
+
+NGDR <- merge(AGG_Feed, res)
+
+head(NGDR)
+
+write.csv(NGDR, file = "~/Post-doc/Data/NGDR Sep 29 2023.csv", row.names = FALSE)
+
+
+```
+
+
+
+```{r}
+full_dist <- data.frame()
+for (dvt in unique(Feeding$D_V_T)) {
+  data1 <- Feeding %>% subset(D_V_T==dvt)
+    sd1 <- data1[1,"smooth.d"]
+    sd2 <- data1[5000,"smooth.d"]
+    diff.dist <- sd1-sd2
+    tmp <- data.frame(D_V_T=dvt,i,sd1,sd2,diff.dist)
+    full_dist <- rbind(full_dist,tmp)
+    print(dvt)
+}
+
+
+str(full_dist)
+NGDR2 <- na.omit(NGDR2)
+full_dist %>% group_by(D_V_T) %>% summarise_at(vars(diff.dist), mean)
+
+NGDR2 <- merge(NGDR, full_dist)
+
+head(NGDR2)
+tail(NGDR2)
+
+write.csv(NGDR2, file = "~/Post-doc/Data/NGDR Sep 29 2023.csv", row.names = FALSE)
+
+```
+
+
+```{r}
+NGDR2$NGDR <- NGDR2$diff.dist/NGDR2$dtot
+head(NGDR2)
+
+range(NGDR2$diff.dist)
+
+NGDR2 %>% group_by(Light, Flow.rate, Chem) %>% summarise_at(vars(NGDR, diff.dist, dtot), mean)
+```
+
+

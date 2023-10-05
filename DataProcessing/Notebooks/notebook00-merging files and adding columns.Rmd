@@ -63,7 +63,7 @@ delete.na <- function(DF, n=0) {
   DF[rowSums(is.na(DF)) <= n,]
 }
 
-TotalData <- delete.na(alldata, 3)
+TotalData <- delete.na(alldata, 2)
 head(TotalData)
 tail(TotalData)
 
@@ -78,7 +78,7 @@ str(TotalData)
 
 ```
 
-Add heading, pitch and d and v values
+Add horizontal and vertical heading angles, d and v values
 ```{r}
 x1 <- TotalData$X[1:(nrow(TotalData)-1)]
 x2 <- TotalData$X[2:nrow(TotalData)]
@@ -104,11 +104,11 @@ TotalData$vy <- TotalData$dy/(1/30)  ## velocity on the y axis
 TotalData$vz <- TotalData$dz/(1/30)  ## velocity on the z axis
 TotalData$v <- TotalData$d/(1/30) ## total velocity
 
-TotalData$heading <- atan2(TotalData$dx, TotalData$dy)
-TotalData$pitch <- atan(TotalData$dz/(sqrt(TotalData$dx^2 + TotalData$dy^2)))
+TotalData$h.heading <- atan2(TotalData$dx, TotalData$dy)
+TotalData$v.heading <- atan(TotalData$dz/(sqrt(TotalData$dx^2 + TotalData$dy^2)))
 
-hist(TotalData$pitch/(2*pi)*360)
-hist(TotalData$heading/(2*pi)*360)
+hist(TotalData$v.heading/(2*pi)*360)
+hist(TotalData$h.heading/(2*pi)*360)
 
 hist(TotalData$dz[abs(TotalData$dz)<.01],breaks = 100)
 hist(TotalData$dy[abs(TotalData$dy)<.01],breaks = 100)
@@ -117,10 +117,21 @@ hist(TotalData$dx[abs(TotalData$dx)<.01],breaks = 100)
 ```
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (July 24 2023).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (Sep 20 2023).RData")
+```
+
+
+```{r}
+
+
+
+
+
 
 
 ```
+
+
 
 
 

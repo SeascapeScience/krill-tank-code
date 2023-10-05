@@ -6,7 +6,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (July 24 2022).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Sep 20 2023).Rdata")
 
 
 ## Flow happens in the Y direction
@@ -122,8 +122,8 @@ plot(tab_AGG$Flow.Rate, tab_AGG$turn.angle, xlab = "Flow Rate (cm/s)", ylab = "T
 #plot(tab_AGG$Light, tab_AGG$turn.angle, xlab = "Light", ylab = "Turn Angle (degrees)")
 
     ######## heading means and SD  ######
-plot(tab_AGG$Chlorophyll, tab_AGG$heading/(2*pi)*360, xlab = "Chlorophyll (mg/L)", ylab = "Heading (degrees)")
-plot(tab_AGG$Flow.Rate, tab_AGG$heading/(2*pi)*360, xlab = "Flow Rate (cm/s)", ylab = "Heading (degrees)")
+plot(tab_AGG$Chlorophyll, tab_AGG$h.heading/(2*pi)*360, xlab = "Chlorophyll (mg/L)", ylab = "Heading (degrees)")
+plot(tab_AGG$Flow.Rate, tab_AGG$h.heading/(2*pi)*360, xlab = "Flow Rate (cm/s)", ylab = "Heading (degrees)")
 #plot(tab_AGG$Guano, tab_AGG$heading, xlab = "Guano", ylab = "Heading (degrees)")           ################# Guano and Light still not factors 
 #plot(tab_AGG$Light, tab_AGG$heading, xlab = "Light", ylab = "Heading (degrees)") 
 
@@ -151,16 +151,16 @@ plot(CC.TotalData$Guano, CC.TotalData$turn.angle, xlab = "Guano", ylab = "Turn A
 plot(CC.TotalData$Light, CC.TotalData$turn.angle, xlab = "Light", ylab = "Turn Angle (degrees)")
 
     ######## heading means and SD  ######
-plot(CC.TotalData$Chlorophyll, CC.TotalData$heading/(2*pi)*360, xlab = "Chlorophyll (mg/L)", ylab = "Heading (degrees)")
-plot(CC.TotalData$Flow.rate, CC.TotalData$heading/(2*pi)*360, xlab = "Flow Rate (cm/s)", ylab = "Heading (degrees)")
-plot(CC.TotalData$Guano, CC.TotalData$heading/(2*pi)*360, xlab = "Guano", ylab = "Heading (degrees)")         
-plot(CC.TotalData$Light, CC.TotalData$heading/(2*pi)*360, xlab = "Light", ylab = "Heading (degrees)") 
+plot(CC.TotalData$Chlorophyll, CC.TotalData$h.heading/(2*pi)*360, xlab = "Chlorophyll (mg/L)", ylab = "Heading (degrees)")
+plot(CC.TotalData$Flow.rate, CC.TotalData$h.heading/(2*pi)*360, xlab = "Flow Rate (cm/s)", ylab = "Heading (degrees)")
+plot(CC.TotalData$Guano, CC.TotalData$h.heading/(2*pi)*360, xlab = "Guano", ylab = "Heading (degrees)")         
+plot(CC.TotalData$Light, CC.TotalData$h.heading/(2*pi)*360, xlab = "Light", ylab = "Heading (degrees)") 
 
 ```
 
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (July 24 2023).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (Sep 20 2023).RData")
 
 
 ```

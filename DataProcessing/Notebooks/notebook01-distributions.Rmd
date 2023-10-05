@@ -7,7 +7,7 @@ Plot and fit distributions of variables
 
 ```{r}
 
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (July 24 2023).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Sep 20 2023).Rdata")
 
 hist(log10(TotalData$v),
      xlab = "Velocity (Log^10 mm/s)")
@@ -107,6 +107,7 @@ Now looking at turning angles
 ```{r}
 TotalData$turn.anglexy <- atan2(TotalData$X, TotalData$Y)
 TotalData$turn.angleyz <- atan2(TotalData$Y, TotalData$Z)
+range(TotalData$turn.angle)
 
 
 lth <- dim(TotalData)[1]
@@ -159,9 +160,13 @@ plot(TotalData$Flow.rate, TotalData$turn.angle, main = "", xlab = "Flow Rate (cm
 
 plot(TotalData$Chlorophyll, TotalData$turn.angle, main = "", xlab = "Chlorophyll (mg/L)", ylab = "Turn angle (degrees)")
 
+levels(CC.TotalData$Flow.rate)
+
+levels(CC.TotalData$Flow.rate) <- c("No Flow", "Low Flow", "Medium Flow", "High Flow", "Extreme Flow")
+
 levels(CC.TotalData$Chlorophyll)
 
-levels(CC.TotalData$Chlorophyll) <- c("No Chlorophyll", "No Chlorophyll",  "High Chlorophyll",  "High Chlorophyll",  "High Chlorophyll", "Low Chlorophyll", "Low Chlorophyll",  "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll",  "Medium Chlorophyll", "Medium Chlorophyll",  "Medium Chlorophyll", "Medium Chlorophyll", "Filament")
+levels(CC.TotalData$Chlorophyll) <- c("No Chlorophyll", "Low Chlorophyll",  "High Chlorophyll",  "High Chlorophyll",  "High Chlorophyll", "Low Chlorophyll", "Low Chlorophyll",  "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll",  "Medium Chlorophyll", "Medium Chlorophyll",  "Medium Chlorophyll", "Medium Chlorophyll", "Filament")
 str(CC.TotalData)
 
 
@@ -196,10 +201,10 @@ Starting to look at bi-modality in the variables by merging the TotalData frame 
 
 ## guano and light not working
 
-AGG_TD <- aggregate(CC.TotalData, by = list(CC.TotalData$D_V_T, CC.TotalData$Guano, CC.TotalData$Light), FUN = mean)
+AGG_TD <- aggregate(CC.TotalData, by = list(CC.TotalData$D_V_T, CC.TotalData$Guano, CC.TotalData$Light, CC.TotalData$Chlorophyll, CC.TotalData$Flow.rate), FUN = mean)
 head(AGG_TD)
-AGG_TD <- AGG_TD[ -c(4:5, 9:12, 15:16) ]
-colnames(AGG_TD) <- c("Ind", "Guano", "Light", "X", "Y", "Z", "Flow.Rate", "Chlorophyll", "dx", "dy", "dz", "d", "vx", "vy", "vz", "v", "heading", "pitch", "turn.anglexy", "turn.angleyz", "turn.angle")##, "vel.flow", "vel.turn.angle", "trim.X", "xsmooth", "ysmooth", "zsmooth", "log.vel.flow", "heading.pi", "pitch.perfect")
+AGG_TD <- AGG_TD[ -c(6:7, 11:20)]
+colnames(AGG_TD) <- c("Ind", "Guano", "Light","Chlorophyll", "Flow.rate", "X", "Y", "Z", "dx", "dy", "dz", "d", "vx", "vy", "vz", "v", "h.heading", "v.heading", "turn.anglexy", "turn.angleyz", "turn.angle")##, "vel.flow", "vel.turn.angle", "trim.X", "xsmooth", "ysmooth", "zsmooth", "log.vel.flow", "heading.pi", "pitch.perfect")
 head(AGG_TD)
 tail(AGG_TD)
 
@@ -210,7 +215,7 @@ str(tab_AGG)
 tab_AGG$Flow.Rate <- as.factor(tab_AGG$Flow.Rate)
 tab_AGG$Chlorophyll <- as.factor(tab_AGG$Chlorophyll)
 
-freq <- table(CC.TotalData$Light, CC.TotalData$Guano)
+freq <- table(CC.TotalData$Light, CC.TotalData$Flow.rate, CC.TotalData$Guano)
 print(freq)
 prob <- prop.table(freq) ##Relative Frequency Table
 print (prob)
@@ -244,7 +249,7 @@ hist(CC.TotalData$turn.angle, breaks = 100)
 
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (July 24 2023).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (Sep 20 2023).RData")
 
 ```
 

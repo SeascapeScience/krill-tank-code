@@ -6,7 +6,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (July 24 2023).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Sep 20 2023).Rdata")
 
 head(TotalData) ## all rows of data from TotalData
 head(CC.TotalData) ## ONLY complete cases of TotalData
@@ -26,10 +26,10 @@ ggpairs(f8[60000:120000,], columns = c(21, 22, 23, 26, 27, 28, 29))      ### flo
 
 ### looking at specific pairs
 
-ggplot(CC.TotalData[10000:20000,], aes(abs(pitch), abs(turn.angle-90))) +   ### weird pattern ??
+ggplot(CC.TotalData[10000:20000,], aes(abs(v.heading), abs(turn.angle-90))) +   ### weird pattern ??
   geom_point(alpha = 0.7)
 
-ggplot(CC.TotalData[10000:20000,], aes(heading, turn.angle)) +     ### no pattern (good :) )
+ggplot(CC.TotalData[10000:20000,], aes(h.heading, turn.angle)) +     ### no pattern (good :) )
   geom_point(alpha = 0.7)
 
 
@@ -56,9 +56,9 @@ acf(CC.TotalData$vel.turn.angle[seq(1,10000,30)])   ##sinusoidal (statistical re
 
 acf(CC.TotalData$vel.flow[seq(1,10000,30)])
 
-acf(CC.TotalData$pitch[seq(1,10000,30)])
+acf(CC.TotalData$v.heading[seq(1,10000,30)])
 
-acf(CC.TotalData$heading[seq(1,10000,30)])
+acf(CC.TotalData$h.heading[seq(1,10000,30)])
 
 acf(CC.TotalData$v[seq(1,10000,30)])
 

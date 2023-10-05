@@ -6,7 +6,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (April 12 2022).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Sep 20 2023).Rdata")
 
 head(TotalData) ## all rows of data from TotalData
 head(CC.TotalData) ## ONLY complete cases of TotalData
@@ -358,6 +358,6 @@ CC.TotalData$Guano<-as.numeric(CC.TotalData$Guano)  ##Nans produced
 Finally save the image
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (April 18 2022).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (Sep 20 2023).RData")
 
 ```
