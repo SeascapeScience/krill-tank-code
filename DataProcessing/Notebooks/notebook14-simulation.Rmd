@@ -4,3 +4,23 @@ output:
   html_document:
     df_print: paged
 ---
+
+```{r echo=F}
+#knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+source('../functions/model-source.R')
+library('plotly')
+```
+
+A quick example of a series of simulations in a tank
+```{r echo=F, warning = F, message=F}
+paths <- as.numeric(c(NA,NA,NA))
+for (i in 1:20)
+{
+  dataout <- krilltankinit()
+  paths <- rbind(paths,dataout)
+}
+krilltankplot(paths)
+```
+
+A more detailed example
+

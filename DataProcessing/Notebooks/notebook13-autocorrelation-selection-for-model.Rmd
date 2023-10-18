@@ -20,22 +20,30 @@ rm(list=ls(all=TRUE))
 #load('~/Work/Data/Antarctic/CC.TotalData.2022.07.20.RData')
 #load('~/Work/Data/Antarctic/TotalMergedDataFile.2023.04.12.RData')
 #load('~/Work/Data/Antarctic/Total Merged Data File (June 23 2023).RData')
-load('~/Work/Data/Antarctic/Total Merged Data File (July 24 2023).RData')
+#load('~/Work/Data/Antarctic/Total Merged Data File (July 24 2023).RData')
+#load('~/Work/Data/Antarctic/TotalMergedDataFile.2023.09.20.RData')
+load('~/Work/Data/Antarctic/CC.TotalData.2023.09.20.RData')
 
-CC.TotalData$Chlorophyll <- as.numeric(CC.TotalData$Chlorophyll)
-CC.TotalData$Light <- as.numeric(CC.TotalData$Light)
-CC.TotalData$Guano <- as.numeric(CC.TotalData$Guano)
-CC.TotalData$Flow.rate <- as.numeric(CC.TotalData$Flow.rate)
-CC.TotalData$Flow.Direction <- as.numeric(CC.TotalData$Flow.Direction)
+CC.TotalData$Chlorophyll <- as.numeric(as.character(CC.TotalData$Chlorophyll))
+CC.TotalData$Light <- as.numeric((CC.TotalData$Light)) - 1
+CC.TotalData$Guano <- as.numeric((CC.TotalData$Guano)) - 1
+CC.TotalData$Flow.rate <- as.numeric(as.character(CC.TotalData$Flow.rate))
+CC.TotalData$Flow.Direction <- as.numeric(as.character(CC.TotalData$Flow.Direction))
 ```
 
 Set parameter ranges
 ```{r}
 # Vectors of all possible conditions combinations
-frs <- as.numeric(as.character(unique(CC.TotalData$Flow.rate)))
-chls <- as.numeric(as.character(unique(CC.TotalData$Chlorophyll)))
-guans <- c(1,2)
-lights <- c(1,2)
+frs <- unique(CC.TotalData$Flow.rate)
+chls <- unique(CC.TotalData$Chlorophyll)
+guans <- unique(CC.TotalData$Guano)
+lights <- unique(CC.TotalData$Light)
+#frs <- as.numeric(as.character(unique(CC.TotalData$Flow.rate)))
+#chls <- as.numeric(as.character(unique(CC.TotalData$Chlorophyll)))
+#guans <- as.numeric(as.character(unique(CC.TotalData$Guano)))
+#lights <- as.numeric(as.character(unique(CC.TotalData$Light)))
+#guans <- c(1,2)
+#lights <- c(1,2)
 conditions <- expand.grid(frs,chls,guans,lights)
 ```
 
@@ -126,5 +134,5 @@ plot(conditions_blank$guano,conditions_blank$sigma)
 
 Save fit models
 ```{r}
-save(conditions.rf.slope,conditions.rf.intercept,conditions.rf.sigma, file='notebook13-rf-24.07.2023data.RData')
+save(conditions.rf.slope,conditions.rf.intercept,conditions.rf.sigma, file='notebook13-rf-2023.10.18data.RData')
 ```
