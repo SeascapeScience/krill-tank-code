@@ -1,0 +1,255 @@
+---
+title: "NGDR"
+output: html_notebook
+---
+NGDR is the ratio of the net displacement (linear distance between starting point and end point of a path) to the gross displacement (total distance travelled) for each path recorded. 
+
+
+Calculate Total distance of track
+```{r}
+library(dplyr)
+head(Feeding)
+
+total.dist <- function(x,y) {
+  sum(sqrt((x-lag(x))^2+(y-lag(y))^2),na.rm=TRUE)
+}
+
+res <- Feeding %>% group_by(D_V_T) %>% summarise(dtot=total.dist(xsmooth,ysmooth))
+
+print(res)
+
+NGDR <- merge(AGG_Feed, res)
+
+head(NGDR)
+
+write.csv(NGDR, file = "~/Post-doc/Data/NGDR Sep 29 2023.csv", row.names = FALSE)
+
+
+```
+
+
+Calculate distance from start x,y to end, x,y location
+```{r}
+full_dist <- data.frame()
+for (dvt in unique(Feeding$D_V_T)) {
+  data1 <- Feeding %>% subset(D_V_T==dvt)
+    sd1 <- data1[1,"smooth.d"]
+    sd2 <- data1[5000,"smooth.d"]
+    diff.dist <- sd1-sd2
+    tmp <- data.frame(D_V_T=dvt,i,sd1,sd2,diff.dist)
+    full_dist <- rbind(full_dist,tmp)
+    print(dvt)
+}
+
+
+str(full_dist)
+NGDR2 <- na.omit(NGDR2)
+full_dist %>% group_by(D_V_T) %>% summarise_at(vars(diff.dist), mean)
+
+NGDR2 <- merge(NGDR, full_dist)
+
+head(NGDR2)
+tail(NGDR2)
+
+write.csv(NGDR2, file = "~/Post-doc/Data/NGDR Sep 29 2023.csv", row.names = FALSE)
+
+```
+
+Calculate NGDR ratio
+```{r}
+NGDR2$NGDR <- NGDR2$diff.dist/NGDR2$dtot
+head(NGDR2)
+
+range(NGDR2$diff.dist)
+
+NGDR2 %>% group_by(Light, Flow.rate, Chem) %>% summarise_at(vars(NGDR, diff.dist, dtot), mean)
+```
+
+
+Plotting Angular data into histograms on polar projection
+```{r}
+## redo with vertical headings, change range for turn angles?
+
+library(ggplot2)
+head(AGG_Feed)
+str(AGG_Feed)
+range(AGG_Feed$turn.anglexysmooth)
+AGG_Feed$turn.anglexysmooth <- AGG_Feed$turn.anglexysmooth/(2*pi)*360
+f_mu <- mean(Feeding$turn.angle.smooth, by =c(Chem, Light, Flow.rate))
+
+ggplot(AGG_Feed, aes(turn.anglexysmooth, fill = Chem)) +
+  geom_histogram(binwidth = 5, boundary = 0, colour = "black", size = .25) +
+  coord_polar() +
+   ylim(0, 12)  +
+  scale_x_continuous(limits = c(0,360),
+                     breaks = seq(0, 360, by = 45),
+                     minor_breaks = seq(0, 360, by = 15))+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=0,hjust=1,vjust=0.4))+
+  theme(axis.line = element_line(size = 0.5, linetype = "solid",
+                                   colour = "black"))+
+  theme(legend.key = element_rect(fill = "white"))+
+  ##geom_vline(aes(heading.pi), xintercept = f_mu)+   ## adds mean angle line to plot
+  labs(size = "", x = "Turn Angle (degrees)", y = "Frequency of Turn Angle", title = "")+
+  scale_fill_manual(values=c("white", "gray", "gray35"),name = "Chemical Cue",
+                    labels=c("Ambient", "Guano", "Guano+CHL"))+
+ facet_grid(facets = Light ~ Flow.rate, labeller = label_both)
+
+
+```
+
+
+
+Circular stats for pathwise means of angular data
+
+```{r}
+library(tidyverse)
+library(circular)
+library(bbmle)
+
+dvm <- circular:::DvonmisesRad
+## check vectorization
+stopifnot(all.equal(c(dvm(1,1,0.5,log=TRUE), dvm(2,3,0.5,log=TRUE)),
+                    dvm(c(1,2), c(1,3), 0.5, log=TRUE)))
+
+m_null <- mle2(turn.anglexysmooth ~ dvm(exp(log_mu), exp(log_kappa)),
+           parameters = list(log_mu ~ 1),
+           data = AGG_Feed,
+           start = list(log_mu = 0, log_kappa = 0))
+
+m3_LFC <- update(m_null, parameters = list(log_mu ~ Light+Flow.rate+Chem))
+m3_LF  <- update(m_null, parameters = list(log_mu ~ Light+Flow.rate))
+m3_L   <- update(m_null, parameters = list(log_mu ~ Light))
+
+anova(m3_LFC, m3_LF, m3_L, m_null)
+
+```
+
+
+Circular stats for angles
+```{r}
+### circular stats for angles
+range(LML$heading.pi)
+library(circular)
+
+range(AGG_Feed$turn.anglexysmooth)
+AGG_Feed$turn.anglexysmooth <- AGG_Feed$turn.anglexysmooth/(2*pi)*360
+
+circ.turn <- circular(AGG_Feed$turn.anglexysmooth, type = c("angles"),
+          units = c("degrees"),
+          template = c("geographics"))
+
+## S3 method for class 'circular'
+## as(circ, control.circular=list(), ...) ## NOT WORKING CURRENTLY
+
+## S3 method for class 'circular'
+is(circ)
+
+## S3 method for class 'circular'
+print(circ, info=TRUE)
+range(circ)
+
+## S3 method for class 'circular'
+plot(circ, pch = 16, cex = 1, stack = TRUE,
+axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,   ### larger stack number = more zoomed out
+bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
+col = NULL, tol = 0.04, uin = NULL,
+xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
+template = NULL, zero = NULL, rotation = NULL,
+main = NULL, sub=NULL, xlab = "", ylab = "",
+control.circle=circle.control())
+
+
+### calculating mean vector from circular data
+mean(circ.turn)
+
+## calculating variance of the vector from circular data
+var(circ.turn)
+
+## calculating mean deviation from circular data
+meandeviation(circ.turn)
+
+# Compute summary statistics of a random sample of observations. 
+summary(circ.turn) 
+
+## ANOVA using circular stats
+aov.circular(circ.turn, AGG_Feed$Chem) ## working but unsure
+
+```
+
+Rayleigh and Watson Two Test
+```{r}
+
+##  A Rayleigh Test is a test for significant unimodal orientation (e.g. Is everyone in the treatment going the same direction?).
+
+rayleigh.test(circLM)  ## if significant shows non-uniformity of direction  (No flow vs extreme flow)
+rayleigh.test(circLH)  ## if significant shows non-uniformity of direction
+
+rayleigh.test(circDM)  
+rayleigh.test(circDH) 
+
+# Test whether LNN and LEN (etc) orient differently  
+
+##  A Watson Test determines if two groups’ orientations are significantly different from each other. 
+watson.two.test(circLM, circLH, alpha = 0.05)
+
+```
+
+
+Tests against each other
+
+```{r}   
+################################################### Example of testing means of groups against each other
+# Ant orientation from Duelli and Wehner (1973) 
+# Example used in Batschelet (1981) 
+
+
+data1 <- list(dahi = circular(DH$v.heading, units="degrees", template="geographics"), dame = circular(DM$v.heading, units="degrees", template="geographics"), lihi = circular(LH$v.heading, units="degrees", template="geographics"), lime = circular(LM$v.heading, units="degrees", template="geographics"))
+           
+watson.williams.test(data1)
+
+## gives error 
+  ##Warning in watson.williams.test.default(x, group) :
+  ##Concentration parameters (0.328, 0.231) not equal between groups. The test might not be applicable
+##Warning in watson.williams.test.default(x, group) :
+  ##Global concentration parameter: 0.314 < 2. The test is probably not applicable
+
+    ## suggests using Wheeler-Watson test instead
+
+watson.wheeler.test(data1)
+
+## gives warning of :
+## Warning in watson.wheeler.test.default(x, group) :
+  ##There are 75884 ties in the data.
+  ##Ties will be broken appart randomly and may influence the result.
+  ##Re-run the test several times to check the influence of ties.
+
+          ## after running 4 times: W = (792.65, .78, .8, .7)
+          ## all df's = 2
+          ## all p-values = 2.2
+
+```
+
+
+Binning Headings into 15 degree groups then doing a gtest
+```{r}
+
+
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

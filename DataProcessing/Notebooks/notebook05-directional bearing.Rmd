@@ -6,7 +6,7 @@ output: html_notebook
 ```{r}
 
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (July 24 2022).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Sep 20 2023).Rdata")
 
 ## Need to use turn angles and a point of reference (e.g. inlet valve) to determine directional bearing
 
@@ -23,16 +23,18 @@ str(TotalData)
 
 
 library(ggplot2)
-ggplot(TotalData,aes(x=Flow.rate, y=heading/(2*pi)*360, fill=Chlorophyll))+
+ggplot(TotalData,aes(x=Flow.rate, y=h.heading/(2*pi)*360, fill=Chlorophyll))+
   geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
   theme(axis.text=element_text(color="black"))+
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
   theme(panel.grid.minor=element_blank())+
-  labs(size= "",x = "Flow Rate (cm/s)", y = "Heading (degrees)", title = "Light") +
+  labs(size= "",x = "Flow Rate (cm/s)", y = "Horizontal Heading (degrees)", title = "Light") +
   scale_fill_manual(values=c("greenyellow", "yellowgreen","lightgreen", "green", "green3", "green4", "darkgreen"),name = "Chlorophyll (mg/L)",
                     labels=c("0", "4.3", "4.6", "6.1", "7.6", "13.5", "19"))+
   facet_grid(~Light, scales = "free_x", space = "free")
 ```
+
+
 ```{r}
 library(circular)
 TotalData$ta.xy.pi <- TotalData$turn.anglexy/(2*pi)*360
@@ -61,14 +63,47 @@ print(circ, info=TRUE)
 
 
 ## S3 method for class 'circular'
-plot(circ, pch = 16, cex = 1, stack = TRUE,
+plot(circLM, pch = 16, cex = 1, stack = TRUE,
 axes = TRUE, start.sep=0, sep = 0.025, shrink = 1.5,
-bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
+bins = 24, ticks = TRUE, tcl = 0.025, tcl.text = 0.125,
 col = NULL, tol = 0.04, uin = NULL,
 xlim = c(-1, 1), ylim = c(-1, 1), digits = 2, units = NULL,
 template = NULL, zero = NULL, rotation = NULL,
-main = "Track 1 Turn Angles (yz)", sub=NULL, xlab = "", ylab = "",
+main = "Light, Medium Flow, Horizontal Headings (degrees)", sub=NULL, xlab = "", ylab = "",
 control.circle=circle.control())
+
+
+##########################################
+
+  ##ggplot2 approach
+
+## redo with vertical headings, change range for turn angles?
+
+library(ggplot2)
+head(AGG_Feed)
+str(AGG_Feed)
+range(AGG_Feed$turn.anglexysmooth)
+AGG_Feed$turn.anglexysmooth <- AGG_Feed$turn.anglexysmooth/(2*pi)*360
+f_mu <- mean(Feeding$turn.angle.smooth, by =c(Chem, Light, Flow.rate))
+
+ggplot(AGG_Feed, aes(turn.anglexysmooth, fill = Chem)) +
+  geom_histogram(binwidth = 5, boundary = 0, colour = "black", size = .25) +
+  coord_polar() +
+   ylim(0, 12)  +
+  scale_x_continuous(limits = c(0,360),
+                     breaks = seq(0, 360, by = 45),
+                     minor_breaks = seq(0, 360, by = 15))+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=0,hjust=1,vjust=0.4))+
+  theme(axis.line = element_line(size = 0.5, linetype = "solid",
+                                   colour = "black"))+
+  theme(legend.key = element_rect(fill = "white"))+
+  ##geom_vline(aes(heading.pi), xintercept = f_mu)+   ## adds mean angle line to plot
+  labs(size = "", x = "Turn Angle (degrees)", y = "Frequency of Turn Angle", title = "")+
+  scale_fill_manual(values=c("white", "gray", "gray35"),name = "Chemical Cue",
+                    labels=c("Ambient", "Guano", "Guano+CHL"))+
+ facet_grid(facets = Light ~ Flow.rate, labeller = label_both)
+
 
 
 ### need to subset data into variables to see if more manageable to make figures of
@@ -210,7 +245,7 @@ Save the environment and remove unneeded dataframes, lists, etc
 rm(ldf, s.v, sd.vel, D, d.p, d1, d2, dd, dotprod, dotx, doty, dotz, dx1, dx2, dy1, dy2, dz1, dz2, l, i, list2, list3, list4, list5, lth)
 rm(mean.v, prob, s, sd.v, v1, v2, vels, vx1, vx2, vy1, vy2, vz1, vz2, x1, x2, y1, y2, z1, z2)
 
-save.image("~/Post-doc/Data/Total Merged Data File (July 24 2022).RData")
+save.image("~/Post-doc/Data/Total Merged Data File (Sep 20 2023).RData")
 
 ```
 
