@@ -16,7 +16,7 @@ A quick example of a series of simulations in a tank
 paths <- as.numeric(c(NA,NA,NA))
 for (i in 1:20)
 {
-  dataout <- krilltankinit()
+  dataout <- krilltankinit(nt=10000,xsize=25000,ysize=33000,zsize=18000)
   paths <- rbind(paths,dataout)
 }
 krilltankplot(paths)

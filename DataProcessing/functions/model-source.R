@@ -1,3 +1,7 @@
+library('plotly')
+library(randomForest)
+
+# First version of a simulation, generic krill swimming around
 krilltankinit <- function(xsize = 256,
                           ysize = 332,
                           zsize = 179,
@@ -33,23 +37,23 @@ krilltankinit <- function(xsize = 256,
   return(dataout)
 }
 
-
-krilltankinit2 <- function(xsize = 256,
+# Second version of a simulation, adding experimental conditions
+krilltankinit2 <- function(xsize = 256,  # Size of tank (mm)
                           ysize = 332,
                           zsize = 179,
-                          xi = 100,
+                          xi = 100,  # Initial position (mm)
                           yi = 100,
                           zi = 100,
-                          psi = 0,
+                          psi = 0,  # Initial turn angle
                           theta = 0,
-                          v = 0.1,
-                          nt = 10000,
-                          dt = 1,
+                          v = 0.1,  # Initial velocity (mm/s)
+                          nt = 10000,  # Number of time steps
+                          dt = 1,  # Lenght of time step (s)
                           flow.rate = 0,
                           chloro = 0,
                           guano = 0,
                           light = 0,
-                          filein = 'notebook13-rf-24.07.RData')
+                          filein = 'notebook13-rf-2023.10.18data.RData')
 {
   dataout <- matrix(data=NA,nrow=nt,ncol=3)
   dataout[1,1:3] <- c(xi,yi,zi)
@@ -59,16 +63,16 @@ krilltankinit2 <- function(xsize = 256,
                       chloro = chloro,
                       guano = guano,
                       light = light)
-  slope <- params[1]
-  intercept <- params[2]
-  sigma <- params[3]
+  slope <- as.numeric(params[1])
+  intercept <- as.numeric(params[2])
+  sigma <- as.numeric(params[3])
   #mu <- 0
   #sigma <- 0.5
   
   
   for (i in 1:(nt-1))
   {
-    v <- v * slope + intercept + rnorm(1, mean = 0, sd = sigma)
+    v <- v + v * slope + intercept + rnorm(1, mean = 0, sd = sigma)
     #v <- v + rnorm(1, mean = mu, sd = sigma)/100
     #v=v+(mu+sigma*tan(pi*(rand(1,1)-1/2)))/100; # Cauchy (matlab)
     psi <- psi + (runif(1)-.5)*5;
@@ -82,6 +86,9 @@ krilltankinit2 <- function(xsize = 256,
   }
   return(dataout)
 }
+
+
+# Plots a krill path in 3D
 krilltankplot <- function(datain = c(NA,NA,NA))
 {
   fig <- plot_ly(x=datain[,1], y=datain[,2], z=datain[,3],
@@ -90,6 +97,8 @@ krilltankplot <- function(datain = c(NA,NA,NA))
   return(fig)
 }
 
+# Given a set of experimental conditions and a random forest model
+# Returns the statistical parameters of swimming
 getparams <- function(filein = 'notebook13-rf-24.07.2023data.RData',
                       flow.rate = 0,
                       chloro = 0,
