@@ -22,5 +22,16 @@ for (i in 1:20)
 krilltankplot(paths)
 ```
 
-A more detailed example
+A different example
+```{r echo=F, warning = F, message=F}
+nk <- 100
+swarm <- matrix(data=NA,nrow=nk,ncol=3)
+for (i in 1:nk)
+{
+  dataout <- krilltankinit2(nt=1000,
+                            xsize=25000,ysize=33000,zsize=18000,
+                            xi=12000,yi=20000,zi=9000,
+                            flow.rate=100)
+  swarm[i,] <- dataout[1000,]
+}
 
