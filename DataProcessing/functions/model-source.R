@@ -53,7 +53,7 @@ krilltankinit2 <- function(xsize = 256,  # Size of tank (mm)
                           chloro = 0,
                           guano = 0,
                           light = 0,
-                          filein = 'notebook13-rf-2023.10.18data.RData')
+                          filein = 'notebook13-rf-2023.10.23data.RData')
 {
   dataout <- matrix(data=NA,nrow=nt,ncol=3)
   dataout[1,1:3] <- c(xi,yi,zi)
@@ -72,7 +72,9 @@ krilltankinit2 <- function(xsize = 256,  # Size of tank (mm)
   
   for (i in 1:(nt-1))
   {
-    v <- v + v * slope + intercept + rnorm(1, mean = 0, sd = sigma)
+    v <- log10(v)
+    v <- v * slope + intercept + rnorm(1, mean = 0, sd = sigma)
+    v <- 10 ^ v
     #v <- v + rnorm(1, mean = mu, sd = sigma)/100
     #v=v+(mu+sigma*tan(pi*(rand(1,1)-1/2)))/100; # Cauchy (matlab)
     psi <- psi + (runif(1)-.5)*5;
@@ -104,7 +106,7 @@ krillswarm <- function(nkrill = 100,  # Number of krill
                        chloro = 0,
                        guano = 0,
                        light = 0,
-                       filein = 'notebook13-rf-2023.10.18data.RData')
+                       filein = 'notebook13-rf-2023.10.23data.RData')
 {
   swarm <- matrix(data=NA,nrow=nkrill,ncol=3)
   for (i in 1:nkrill)
@@ -136,7 +138,7 @@ krilltankplot <- function(datain = c(NA,NA,NA))
 
 # Given a set of experimental conditions and a random forest model
 # Returns the statistical parameters of swimming
-getparams <- function(filein = 'notebook13-rf-24.07.2023data.RData',
+getparams <- function(filein = 'notebook13-rf-2023.10.23data.RData',
                       flow.rate = 0,
                       chloro = 0,
                       guano = 0,
