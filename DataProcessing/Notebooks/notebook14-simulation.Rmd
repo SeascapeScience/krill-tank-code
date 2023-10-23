@@ -24,7 +24,7 @@ krilltankplot(paths)
 
 A different example
 ```{r echo=F, warning = F, message=F}
-nk <- 100
+nk <- 500
 swarm <- matrix(data=NA,nrow=nk,ncol=3)
 for (i in 1:nk)
 {

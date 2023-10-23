@@ -87,6 +87,43 @@ krilltankinit2 <- function(xsize = 256,  # Size of tank (mm)
   return(dataout)
 }
 
+# Simulate a "swarm"
+krillswarm <- function(nkrill = 100,  # Number of krill
+                       xsize = 25600,  # Size of tank (mm)
+                       ysize = 33200,
+                       zsize = 17900,
+                       xi = 10000,  # Initial position (mm)
+                       yi = 10000,
+                       zi = 10000,
+                       psi = 0,  # Initial turn angle
+                       theta = 0,
+                       v = 0.1,  # Initial velocity (mm/s)
+                       nt = 1000,  # Number of time steps
+                       dt = 1,  # Lenght of time step (s)
+                       flow.rate = 0,
+                       chloro = 0,
+                       guano = 0,
+                       light = 0,
+                       filein = 'notebook13-rf-2023.10.18data.RData')
+{
+  swarm <- matrix(data=NA,nrow=nkrill,ncol=3)
+  for (i in 1:nkrill)
+  {
+    dataout <- krilltankinit2(nt=nt,
+                              xsize=xsize,ysize=ysize,zsize=zsize,
+                              xi=xi,yi=yi,zi=zi,
+                              psi = psi,theta = theta,v = v,  
+                              dt = dt,  
+                              flow.rate = flow.rate,
+                              chloro = chloro,
+                              guano = guano,
+                              light = light,
+                              filein = filein)
+    swarm[i,] <- dataout[nt,]
+  }
+  fig <- plot_ly(x=swarm[,1], y=swarm[,2], z=swarm[,3])
+  fig
+}
 
 # Plots a krill path in 3D
 krilltankplot <- function(datain = c(NA,NA,NA))
