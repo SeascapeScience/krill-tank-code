@@ -34,4 +34,6 @@ for (i in 1:nk)
                             flow.rate=100)
   swarm[i,] <- dataout[1000,]
 }
-
+fig <- plot_ly(x=swarm[,1], y=swarm[,2], z=swarm[,3])
+fig
+```
