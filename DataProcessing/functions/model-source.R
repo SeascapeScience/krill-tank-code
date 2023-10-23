@@ -97,12 +97,13 @@ getparams <- function(filein = 'notebook13-rf-24.07.2023data.RData',
                       light = 0)
 {
   load(filein)
-  fit.slope <- predict(conditions.rf.slope,
-                       c(flow.rate,chloro,guano,light))
-  fit.intercept <- predict(conditions.rf.intercept,
-                       c(flow.rate,chloro,guano,light))
-  fit.sigma <- predict(conditions.rf.sigma,
-                       c(flow.rate,chloro,guano,light))
-  return(c(fit.slope,fit.intercept,fit.sigma))
+  df.in <- data.frame(flow.rate = flow.rate, chlorophyll = chloro, guano = guano, light = light)
+  fit.slope <- predict(conditions.rf.slope,df.in)
+  fit.intercept <- predict(conditions.rf.intercept,df.in)
+  fit.sigma <- predict(conditions.rf.sigma,df.in)
+  df.out <- data.frame(fit.slope = fit.slope,
+                       fit.intercept = fit.intercept,
+                       fit.sigma = fit.sigma)
+  return(df.out)
 }
 
