@@ -31,7 +31,7 @@ CC.TotalData$Flow.rate <- as.numeric(as.character(CC.TotalData$Flow.rate))
 CC.TotalData$Flow.Direction <- as.numeric(as.character(CC.TotalData$Flow.Direction))
 ```
 
-Set parameter ranges
+Set parameter ranges based on value combinations used in experiments.
 ```{r}
 # Vectors of all possible conditions combinations
 frs <- unique(CC.TotalData$Flow.rate)

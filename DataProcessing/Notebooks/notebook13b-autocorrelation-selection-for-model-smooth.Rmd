@@ -1,0 +1,144 @@
+---
+title: "notebook13-autocorrelation-selection-for-model"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+Load data
+```{r echo=F}
+library(ggplot2)
+library(GGally)
+library(hexbin)
+library(diptest)
+library(tidymodels)
+library(randomForest)
+library('matrixStats')
+
+rm(list=ls(all=TRUE))
+#load("~/Post-doc/Data/Total Merged Data File (Sep 2 2022).RData")
+#load('~/Work/Data/Antarctic/CC.TotalData.2022.07.20.RData')
+#load('~/Work/Data/Antarctic/TotalMergedDataFile.2023.04.12.RData')
+#load('~/Work/Data/Antarctic/Total Merged Data File (June 23 2023).RData')
+#load('~/Work/Data/Antarctic/Total Merged Data File (July 24 2023).RData')
+#load('~/Work/Data/Antarctic/TotalMergedDataFile.2023.09.20.RData')
+load('~/Work/Data/Antarctic/CC.TotalData.2023.09.20.RData')
+
+CC.TotalData$Chlorophyll <- as.numeric(as.character(CC.TotalData$Chlorophyll))
+CC.TotalData$Light <- as.numeric((CC.TotalData$Light)) - 1
+CC.TotalData$Guano <- as.numeric((CC.TotalData$Guano)) - 1
+CC.TotalData$Flow.rate <- as.numeric(as.character(CC.TotalData$Flow.rate))
+CC.TotalData$Flow.Direction <- as.numeric(as.character(CC.TotalData$Flow.Direction))
+```
+
+Set parameter ranges based on value combinations used in experiments.
+```{r}
+# Vectors of all possible conditions combinations
+frs <- unique(CC.TotalData$Flow.rate)
+chls <- unique(CC.TotalData$Chlorophyll)
+guans <- unique(CC.TotalData$Guano)
+lights <- unique(CC.TotalData$Light)
+#frs <- as.numeric(as.character(unique(CC.TotalData$Flow.rate)))
+#chls <- as.numeric(as.character(unique(CC.TotalData$Chlorophyll)))
+#guans <- as.numeric(as.character(unique(CC.TotalData$Guano)))
+#lights <- as.numeric(as.character(unique(CC.TotalData$Light)))
+#guans <- c(1,2)
+#lights <- c(1,2)
+conditions <- expand.grid(frs,chls,guans,lights)
+```
+
+Loop through combinations
+
+```{r}
+for (i in 1:dim(conditions)[1])
+{
+  velocity <- CC.TotalData$smooth.v[
+  (CC.TotalData$Flow.rate==conditions[i,1] & 
+     CC.TotalData$Chlorophyll==conditions[i,2] & 
+     as.numeric(CC.TotalData$Guano)==conditions[i,3] &
+     as.numeric(CC.TotalData$Light)==conditions[i,4])]
+  if (length(velocity) <= 1 | length(velocity[!is.na(velocity)])==0) {
+    conditions[i,5:9] <- NA } else {
+        # Because we're using the smoothed data, we'll average the velocities into 30-step bins
+      idx <- 1:length(velocity)
+      bx <- seq(from=0.5, to=length(velocity), by=30)
+      velocity <- binMeans(y = velocity, x = idx, bx = bx)
+      
+      c<-cor.test(log10(velocity[1:length(velocity)-1]),
+                  log10(velocity[2:length(velocity)]))
+      conditions[i,5] <- c$estimate
+        v0 <- log10(velocity[1:length(velocity)-1])
+        v1 <- log10(velocity[2:length(velocity)])
+        df <- data.frame(v0,v1)
+        fit <- lm(v1 ~ v0 + 1, data = df)
+        conditions[i,6] <- fit$coefficients[2]
+        conditions[i,7] <- fit$coefficients[1]
+        conditions[i,8] <- sd(fit$residuals)
+        d <- dip.test(velocity)
+        conditions[i,9] <- d$p.value
+        hist(log10(velocity),100,
+             main=d$p.value)
+  }  
+}
+conditions <- setNames(conditions,c("flow.rate","chlorophyll","guano","light","corr.val","slope","intercept","sigma","dip.test"))
+```
+
+Using random forest to fit the missing values for autocorrelation
+
+```{r}
+Idata <- which(!is.na(conditions[,5])) # Index of data
+Iblank <- which(is.na(conditions[,5])) # Index of blank data
+
+conditions_data <- conditions[Idata,]
+conditions_blank <- conditions[Iblank,]
+
+conditions.rf.slope <- randomForest(slope ~ .,
+                              data=select(conditions_data,c(1,2,3,4,6)),
+                              importance=TRUE,
+                              proximity=TRUE)
+plot(conditions.rf.slope)
+varImpPlot(conditions.rf.slope)
+conditions_blank$slope <- predict(conditions.rf.slope,conditions_blank[,1:4])
+fit.slope <- predict(conditions.rf.slope,conditions_data[,1:4])
+plot(fit.slope,conditions_data$slope)
+plot(conditions_blank$chlorophyll,conditions_blank$slope)
+plot(conditions_blank$flow.rate,conditions_blank$slope)
+plot(conditions_blank$light,conditions_blank$slope)
+plot(conditions_blank$guano,conditions_blank$slope)
+
+
+conditions.rf.intercept <- randomForest(intercept ~ .,
+                              data=select(conditions_data,c(1,2,3,4,7)),
+                              importance=TRUE,
+                              proximity=TRUE)
+plot(conditions.rf.intercept)
+varImpPlot(conditions.rf.intercept)
+conditions_blank$intercept <- predict(conditions.rf.intercept,conditions_blank[,1:4])
+fit.intercept <- predict(conditions.rf.intercept,conditions_data[,1:4])
+plot(fit.intercept,conditions_data$intercept)
+plot(conditions_blank$chlorophyll,conditions_blank$intercept)
+plot(conditions_blank$flow.rate,conditions_blank$intercept)
+plot(conditions_blank$light,conditions_blank$intercept)
+plot(conditions_blank$guano,conditions_blank$intercept)
+
+
+conditions.rf.sigma <- randomForest(sigma ~ .,
+                              data=select(conditions_data,c(1,2,3,4,8)),
+                              importance=TRUE,
+                              proximity=TRUE)
+plot(conditions.rf.sigma)
+varImpPlot(conditions.rf.sigma)
+conditions_blank$sigma <- predict(conditions.rf.sigma,conditions_blank[,1:4])
+fit.sigma <- predict(conditions.rf.sigma,conditions_data[,1:4])
+plot(fit.sigma,conditions_data$sigma)
+plot(conditions_blank$chlorophyll,conditions_blank$sigma)
+plot(conditions_blank$flow.rate,conditions_blank$sigma)
+plot(conditions_blank$light,conditions_blank$sigma)
+plot(conditions_blank$guano,conditions_blank$sigma)
+```
+
+Save fit models
+```{r}
+save(conditions.rf.slope,conditions.rf.intercept,conditions.rf.sigma, file='notebook13-rf-2023.10.24data.RData')
+```
