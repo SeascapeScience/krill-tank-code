@@ -60,10 +60,24 @@ for (i in 1:dim(conditions)[1])
      as.numeric(CC.TotalData$Light)==conditions[i,4])]
   if (length(velocity) <= 1 | length(velocity[!is.na(velocity)])==0) {
     conditions[i,5:9] <- NA } else {
-        # Because we're using the smoothed data, we'll average the velocities into 30-step bins
+      # Because we're using the smoothed data, we'll average        the velocities into 30-step bins
       idx <- 1:length(velocity)
       bx <- seq(from=0.5, to=length(velocity), by=30)
       velocity <- binMeans(y = velocity, x = idx, bx = bx)
+      # Now get turn angles and bin those too
+      heading.h <- CC.TotalData$smooth.h.heading[
+        (CC.TotalData$Flow.rate==conditions[i,1] & 
+          CC.TotalData$Chlorophyll==conditions[i,2] & 
+          as.numeric(CC.TotalData$Guano)==conditions[i,3] &
+          as.numeric(CC.TotalData$Light)==conditions[i,4])]
+      heading.h <- binMeans(y=heading.h, x = idx, bx = bx)
+      heading.v <- CC.TotalData$smooth.v.heading[
+        (CC.TotalData$Flow.rate==conditions[i,1] & 
+          CC.TotalData$Chlorophyll==conditions[i,2] & 
+          as.numeric(CC.TotalData$Guano)==conditions[i,3] &
+          as.numeric(CC.TotalData$Light)==conditions[i,4])]
+      heading.v <- binMeans(y= heading.v, x = idx, bx = bx)
+      
       
       c<-cor.test(log10(velocity[1:length(velocity)-1]),
                   log10(velocity[2:length(velocity)]))
@@ -77,8 +91,17 @@ for (i in 1:dim(conditions)[1])
         conditions[i,8] <- sd(fit$residuals)
         d <- dip.test(velocity)
         conditions[i,9] <- d$p.value
-        hist(log10(velocity),100,
-             main=d$p.value)
+        #hist(log10(velocity),100,
+        #     main=d$p.value)
+        plot(log10(velocity),heading.h)
+        dview <- data.frame(logvel = log10(velocity),
+                         heading.h.abs=abs(heading.h),
+                         heading.v.abs=abs(heading.v))
+        ggpairs(dview,
+                title=paste(conditions$flow.rate[i],
+                            conditions$chloro[i],
+                            conditions$guano[i],
+                            conditions$light[i], sep='_'))
   }  
 }
 conditions <- setNames(conditions,c("flow.rate","chlorophyll","guano","light","corr.val","slope","intercept","sigma","dip.test"))
