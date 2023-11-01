@@ -4,10 +4,15 @@ output:
   html_document:
     df_print: paged
 ---
+This notebook is using the data from the krill tracks in DLTdv8a and testing them for auto-correlation and cross-correlation with each other.
+These correlations are then run through a Random Forrest Model to see which experimental conditions affect the fit of the correlation models the most.
 
+The first thing we need to do is load in the data and change the experimental factors into numeric operators so that we can generate a matrix of experimental conditions.
 
-Load data
 ```{r echo=F}
+### This is a short list of all of the library packages that are needed to run the code in this notebook.
+### If you don't already have these packages installed use install.packages('...') prior to the library call to install the package from Cran-r.
+
 library(ggplot2)
 library(GGally)
 library(hexbin)
@@ -16,20 +21,21 @@ library(tidymodels)
 library(randomForest)
 library('matrixStats')
 
-rm(list=ls(all=TRUE))
+
+rm(list=ls(all=TRUE))   ## removes the previous workspace and environment so that we only have the data we need loaded in the session
 #load("~/Post-doc/Data/Total Merged Data File (Sep 2 2022).RData")
 #load('~/Work/Data/Antarctic/CC.TotalData.2022.07.20.RData')
 #load('~/Work/Data/Antarctic/TotalMergedDataFile.2023.04.12.RData')
 #load('~/Work/Data/Antarctic/Total Merged Data File (June 23 2023).RData')
 #load('~/Work/Data/Antarctic/Total Merged Data File (July 24 2023).RData')
 #load('~/Work/Data/Antarctic/TotalMergedDataFile.2023.09.20.RData')
-load('~/Work/Data/Antarctic/CC.TotalData.2023.09.20.RData')
+load('~/Work/Data/Antarctic/CC.TotalData.2023.09.20.RData')  ## loads the most recent version of the data, after it has been cleaned, processed and transformed into a singular dataframe, that has then been saved as a .Rdata file.
 
-CC.TotalData$Chlorophyll <- as.numeric(as.character(CC.TotalData$Chlorophyll))
-CC.TotalData$Light <- as.numeric((CC.TotalData$Light)) - 1
-CC.TotalData$Guano <- as.numeric((CC.TotalData$Guano)) - 1
-CC.TotalData$Flow.rate <- as.numeric(as.character(CC.TotalData$Flow.rate))
-CC.TotalData$Flow.Direction <- as.numeric(as.character(CC.TotalData$Flow.Direction))
+CC.TotalData$Chlorophyll <- as.numeric(as.character(CC.TotalData$Chlorophyll))  ## turns each factor level into a numeric operator
+CC.TotalData$Light <- as.numeric((CC.TotalData$Light)) - 1  ##as above
+CC.TotalData$Guano <- as.numeric((CC.TotalData$Guano)) - 1  ##as above
+CC.TotalData$Flow.rate <- as.numeric(as.character(CC.TotalData$Flow.rate))  ##as above
+CC.TotalData$Flow.Direction <- as.numeric(as.character(CC.TotalData$Flow.Direction))  ##as above
 ```
 
 Set parameter ranges based on value combinations used in experiments.
