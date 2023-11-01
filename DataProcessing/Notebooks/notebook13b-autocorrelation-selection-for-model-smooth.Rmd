@@ -38,7 +38,9 @@ CC.TotalData$Flow.rate <- as.numeric(as.character(CC.TotalData$Flow.rate))  ##as
 CC.TotalData$Flow.Direction <- as.numeric(as.character(CC.TotalData$Flow.Direction))  ##as above
 ```
 
-Set parameter ranges based on value combinations used in experiments.
+Using the numeric operators for each experimental factor we now create vectors of each and create a matrix grid of each set of unique experimental conditions.
+This will also set parameter ranges based on value combinations used in experiments.
+
 ```{r}
 # Vectors of all possible conditions combinations
 frs <- unique(CC.TotalData$Flow.rate)
@@ -51,26 +53,27 @@ lights <- unique(CC.TotalData$Light)
 #lights <- as.numeric(as.character(unique(CC.TotalData$Light)))
 #guans <- c(1,2)
 #lights <- c(1,2)
-conditions <- expand.grid(frs,chls,guans,lights)
+conditions <- expand.grid(frs,chls,guans,lights)  ## creates a grid of all possible condition combinations
 ```
 
-Loop through combinations
+The next chunk looks at velocity and how it effects krill swimming behaviour. 
+Firstly we loop through every combination of conditions and bin velocity that has been smoothed by the smoothing spline (See notebook08) into 30-step bins (30 fps = 1 second).
 
 ```{r}
-for (i in 1:dim(conditions)[1])
+for (i in 1:dim(conditions)[1])  ## start of the loop for each set of conditions
 {
-  velocity <- CC.TotalData$smooth.v[
-  (CC.TotalData$Flow.rate==conditions[i,1] & 
-     CC.TotalData$Chlorophyll==conditions[i,2] & 
-     as.numeric(CC.TotalData$Guano)==conditions[i,3] &
-     as.numeric(CC.TotalData$Light)==conditions[i,4])]
-  if (length(velocity) <= 1 | length(velocity[!is.na(velocity)])==0) {
-    conditions[i,5:9] <- NA } else {  # We have a tank experiment...
+  velocity <- CC.TotalData$smooth.v[  ## takes the smoothed velocity from the data and creates a vector of it
+  (CC.TotalData$Flow.rate==conditions[i,1] & ## takes only the smoothed velocity for that set of conditions
+     CC.TotalData$Chlorophyll==conditions[i,2] &  ##as above
+     as.numeric(CC.TotalData$Guano)==conditions[i,3] &  ##as above
+     as.numeric(CC.TotalData$Light)==conditions[i,4])]  ##as above
+  if (length(velocity) <= 1 | length(velocity[!is.na(velocity)])==0) {  ##  checks to see if we have velocity data for that set of experimental conditions, if not then it leaves that set of conditions blank (with NA's)
+    conditions[i,5:9] <- NA } else {  # Otherwise if we have a tank experiment...
       # Because we're using the smoothed data, we'll average
-      # the velocities into 30-step (1 second) bins
-      idx <- 1:length(velocity)
-      bx <- seq(from=0.5, to=length(velocity), by=30)
-      velocity <- binMeans(y = velocity, x = idx, bx = bx)
+      # the velocities into 30-step (1 second) bins  (30 fps = 1 second)
+      idx <- 1:length(velocity)  ## creates a vector of the same length as the velocity vector
+      bx <- seq(from=0.5, to=length(velocity), by=30)  ## creates a sequence of breaks in increments of 30 the length of the velocity vector
+      velocity <- binMeans(y = velocity, x = idx, bx = bx)  ##  takes the velocity vector and puts it into the bins we created (bins the data)
       # Now get turn angles and bin those too
       heading.h <- CC.TotalData$smooth.h.heading[
         (CC.TotalData$Flow.rate==conditions[i,1] & 
