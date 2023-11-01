@@ -1,5 +1,5 @@
 ---
-title: "notebook13-autocorrelation-selection-for-model"
+title: "notebook13b-autocorrelation-selection-for-model"
 output:
   html_document:
     df_print: paged
@@ -59,8 +59,9 @@ for (i in 1:dim(conditions)[1])
      as.numeric(CC.TotalData$Guano)==conditions[i,3] &
      as.numeric(CC.TotalData$Light)==conditions[i,4])]
   if (length(velocity) <= 1 | length(velocity[!is.na(velocity)])==0) {
-    conditions[i,5:9] <- NA } else {
-      # Because we're using the smoothed data, we'll average        the velocities into 30-step bins
+    conditions[i,5:9] <- NA } else {  # We have a tank experiment...
+      # Because we're using the smoothed data, we'll average
+      # the velocities into 30-step (1 second) bins
       idx <- 1:length(velocity)
       bx <- seq(from=0.5, to=length(velocity), by=30)
       velocity <- binMeans(y = velocity, x = idx, bx = bx)
@@ -77,37 +78,74 @@ for (i in 1:dim(conditions)[1])
           as.numeric(CC.TotalData$Guano)==conditions[i,3] &
           as.numeric(CC.TotalData$Light)==conditions[i,4])]
       heading.v <- binMeans(y= heading.v, x = idx, bx = bx)
-      
-      
+      # Now we start adding columns on to conditions
+      #  These are the parameters that will be used in the simulations
+      # Autocorrelation coefficient for velocity
       c<-cor.test(log10(velocity[1:length(velocity)-1]),
                   log10(velocity[2:length(velocity)]))
       conditions[i,5] <- c$estimate
-        v0 <- log10(velocity[1:length(velocity)-1])
-        v1 <- log10(velocity[2:length(velocity)])
-        df <- data.frame(v0,v1)
-        fit <- lm(v1 ~ v0 + 1, data = df)
-        conditions[i,6] <- fit$coefficients[2]
-        conditions[i,7] <- fit$coefficients[1]
-        conditions[i,8] <- sd(fit$residuals)
-        d <- dip.test(velocity)
-        conditions[i,9] <- d$p.value
-        #hist(log10(velocity),100,
-        #     main=d$p.value)
-        plot(log10(velocity),heading.h)
-        dview <- data.frame(logvel = log10(velocity),
-                         heading.h.abs=abs(heading.h),
-                         heading.v.abs=abs(heading.v))
-        ggpairs(dview,
-                title=paste(conditions$flow.rate[i],
-                            conditions$chloro[i],
-                            conditions$guano[i],
-                            conditions$light[i], sep='_'))
+      # Coefficients for autocorrelation (log)linear fit
+      v0 <- log10(velocity[1:length(velocity)-1])
+      v1 <- log10(velocity[2:length(velocity)])
+      df <- data.frame(v0,v1)
+      fit <- lm(v1 ~ v0 + 1, data = df)
+      conditions[i,6] <- fit$coefficients[2] # Slope
+      conditions[i,7] <- fit$coefficients[1] # Intercept
+      conditions[i,8] <- sd(fit$residuals) # Variance
+      # Dip test to look for bimodal velocity (doesn't work great)  
+      d <- dip.test(velocity)
+      conditions[i,9] <- d$p.value # P val for dip test
+      #hist(log10(velocity),100,
+      #     main=d$p.value)
+      c <- cor.test(log10(velocity),abs(heading.h))
+      plot(log10(velocity),abs(heading.h),
+           main = c$estimate)
+      c <- cor.test(log10(velocity),abs(heading.v))
+      plot(log10(velocity),abs(heading.v),
+           main = c$estimate)
+      c <- cor.test(abs(heading.v),abs(heading.h))
+      plot(abs(heading.v),abs(heading.h),
+           main = c$estimate)
+      #dview <- data.frame(logvel = log10(velocity),
+      #                   heading.h.abs=abs(heading.h),
+      #                   heading.v.abs=abs(heading.v))
+      #ggpairs(dview,
+      #          title=paste(conditions$flow.rate[i],
+      #                      conditions$chloro[i],
+      #                      conditions$guano[i],
+      #                      conditions$light[i], sep='_'))
+      
+      # Now walk through same process with heading angles
+      # Note: assuming these params are independent for now
+      # (correlations are pretty low)
+      
+      # Horizontal heading
+      h0 <- (heading.h[1:length(heading.h)-1])
+      h1 <- (heading.h[2:length(heading.h)])
+      df <- data.frame(h0,h1)
+      fit <- lm(h1 ~ h0 + 1, data = df)
+      conditions[i,10] <- fit$coefficients[2] # Slope
+      conditions[i,11] <- fit$coefficients[1] # Intercept
+      conditions[i,12] <- sd(fit$residuals) # Variance
+      # Vertical heading
+      h0 <- (heading.v[1:length(heading.v)-1])
+      h1 <- (heading.v[2:length(heading.v)])
+      df <- data.frame(h0,h1)
+      fit <- lm(h1 ~ h0 + 1, data = df)
+      conditions[i,13] <- fit$coefficients[2] # Slope
+      conditions[i,14] <- fit$coefficients[1] # Intercept
+      conditions[i,15] <- sd(fit$residuals) # Variance
+      
   }  
 }
-conditions <- setNames(conditions,c("flow.rate","chlorophyll","guano","light","corr.val","slope","intercept","sigma","dip.test"))
+conditions <- setNames(conditions,c(
+  "flow.rate","chlorophyll","guano","light",
+  "vel.corr.val","vel.slope","vel.intercept","vel.sigma","dip.test",
+  "h.slope","h.intercept","h.sigma",
+  "v.slope","v.intercept","v.sigma"))
 ```
 
-Using random forest to fit the missing values for autocorrelation
+Using random forest to fit the missing values for autocorrelation. First block is for fitting velocity.
 
 ```{r}
 Idata <- which(!is.na(conditions[,5])) # Index of data
@@ -116,52 +154,173 @@ Iblank <- which(is.na(conditions[,5])) # Index of blank data
 conditions_data <- conditions[Idata,]
 conditions_blank <- conditions[Iblank,]
 
-conditions.rf.slope <- randomForest(slope ~ .,
+# First do velocity
+conditions.rf.vel.slope <- randomForest(vel.slope ~ .,
                               data=select(conditions_data,c(1,2,3,4,6)),
                               importance=TRUE,
                               proximity=TRUE)
-plot(conditions.rf.slope)
-varImpPlot(conditions.rf.slope)
-conditions_blank$slope <- predict(conditions.rf.slope,conditions_blank[,1:4])
-fit.slope <- predict(conditions.rf.slope,conditions_data[,1:4])
-plot(fit.slope,conditions_data$slope)
-plot(conditions_blank$chlorophyll,conditions_blank$slope)
-plot(conditions_blank$flow.rate,conditions_blank$slope)
-plot(conditions_blank$light,conditions_blank$slope)
-plot(conditions_blank$guano,conditions_blank$slope)
+plot(conditions.rf.vel.slope)
+varImpPlot(conditions.rf.vel.slope)
+conditions_blank$vel.slope <- predict(
+  conditions.rf.vel.slope,conditions_blank[,1:4])
+fit.vel.slope <- predict(conditions.rf.vel.slope,conditions_data[,1:4])
+plot(fit.vel.slope,conditions_data$vel.slope)
+plot(conditions_blank$chlorophyll,conditions_blank$vel.slope)
+plot(conditions_blank$flow.rate,conditions_blank$vel.slope)
+plot(conditions_blank$light,conditions_blank$vel.slope)
+plot(conditions_blank$guano,conditions_blank$vel.slope)
 
 
-conditions.rf.intercept <- randomForest(intercept ~ .,
+conditions.rf.vel.intercept <- randomForest(vel.intercept ~ .,
                               data=select(conditions_data,c(1,2,3,4,7)),
                               importance=TRUE,
                               proximity=TRUE)
-plot(conditions.rf.intercept)
-varImpPlot(conditions.rf.intercept)
-conditions_blank$intercept <- predict(conditions.rf.intercept,conditions_blank[,1:4])
-fit.intercept <- predict(conditions.rf.intercept,conditions_data[,1:4])
-plot(fit.intercept,conditions_data$intercept)
-plot(conditions_blank$chlorophyll,conditions_blank$intercept)
-plot(conditions_blank$flow.rate,conditions_blank$intercept)
-plot(conditions_blank$light,conditions_blank$intercept)
-plot(conditions_blank$guano,conditions_blank$intercept)
+plot(conditions.rf.vel.intercept)
+varImpPlot(conditions.rf.vel.intercept)
+conditions_blank$vel.intercept <- predict(
+  conditions.rf.vel.intercept,conditions_blank[,1:4])
+fit.vel.intercept <- predict(
+  conditions.rf.vel.intercept,conditions_data[,1:4])
+plot(fit.vel.intercept,conditions_data$vel.intercept)
+plot(conditions_blank$chlorophyll,conditions_blank$vel.intercept)
+plot(conditions_blank$flow.rate,conditions_blank$vel.intercept)
+plot(conditions_blank$light,conditions_blank$vel.intercept)
+plot(conditions_blank$guano,conditions_blank$vel.intercept)
 
 
-conditions.rf.sigma <- randomForest(sigma ~ .,
+conditions.rf.vel.sigma <- randomForest(vel.sigma ~ .,
                               data=select(conditions_data,c(1,2,3,4,8)),
                               importance=TRUE,
                               proximity=TRUE)
-plot(conditions.rf.sigma)
-varImpPlot(conditions.rf.sigma)
-conditions_blank$sigma <- predict(conditions.rf.sigma,conditions_blank[,1:4])
-fit.sigma <- predict(conditions.rf.sigma,conditions_data[,1:4])
-plot(fit.sigma,conditions_data$sigma)
-plot(conditions_blank$chlorophyll,conditions_blank$sigma)
-plot(conditions_blank$flow.rate,conditions_blank$sigma)
-plot(conditions_blank$light,conditions_blank$sigma)
-plot(conditions_blank$guano,conditions_blank$sigma)
+plot(conditions.rf.vel.sigma)
+varImpPlot(conditions.rf.vel.sigma)
+conditions_blank$vel.sigma <- predict(
+  conditions.rf.vel.sigma,conditions_blank[,1:4])
+fit.vel.sigma <- predict(conditions.rf.vel.sigma,conditions_data[,1:4])
+plot(fit.vel.sigma,conditions_data$vel.sigma)
+plot(conditions_blank$chlorophyll,conditions_blank$vel.sigma)
+plot(conditions_blank$flow.rate,conditions_blank$vel.sigma)
+plot(conditions_blank$light,conditions_blank$vel.sigma)
+plot(conditions_blank$guano,conditions_blank$vel.sigma)
+```
+
+This next block is for horizontal (i.e. rel to flow) heading.
+```{r}
+# Next do horizontal heading
+
+conditions.rf.h.slope <- randomForest(h.slope ~ .,
+                              data=select(conditions_data,c(1,2,3,4,10)),
+                              importance=TRUE,
+                              proximity=TRUE)
+plot(conditions.rf.h.slope)
+varImpPlot(conditions.rf.h.slope)
+conditions_blank$h.slope <- predict(
+  conditions.rf.h.slope,conditions_blank[,1:4])
+fit.h.slope <- predict(conditions.rf.h.slope,conditions_data[,1:4])
+plot(fit.h.slope,conditions_data$h.slope)
+plot(conditions_blank$chlorophyll,conditions_blank$h.slope)
+plot(conditions_blank$flow.rate,conditions_blank$h.slope)
+plot(conditions_blank$light,conditions_blank$h.slope)
+plot(conditions_blank$guano,conditions_blank$h.slope)
+
+
+conditions.rf.h.intercept <- randomForest(h.intercept ~ .,
+                              data=select(conditions_data,c(1,2,3,4,11)),
+                              importance=TRUE,
+                              proximity=TRUE)
+plot(conditions.rf.h.intercept)
+varImpPlot(conditions.rf.h.intercept)
+conditions_blank$h.intercept <- predict(
+  conditions.rf.h.intercept,conditions_blank[,1:4])
+fit.h.intercept <- predict(
+  conditions.rf.h.intercept,conditions_data[,1:4])
+plot(fit.h.intercept,conditions_data$h.intercept)
+plot(conditions_blank$chlorophyll,conditions_blank$h.intercept)
+plot(conditions_blank$flow.rate,conditions_blank$h.intercept)
+plot(conditions_blank$light,conditions_blank$h.intercept)
+plot(conditions_blank$guano,conditions_blank$h.intercept)
+
+
+conditions.rf.h.sigma <- randomForest(h.sigma ~ .,
+                              data=select(conditions_data,c(1,2,3,4,12)),
+                              importance=TRUE,
+                              proximity=TRUE)
+plot(conditions.rf.h.sigma)
+varImpPlot(conditions.rf.h.sigma)
+conditions_blank$h.sigma <- predict(
+  conditions.rf.h.sigma,conditions_blank[,1:4])
+fit.h.sigma <- predict(conditions.rf.h.sigma,conditions_data[,1:4])
+plot(fit.h.sigma,conditions_data$h.sigma)
+plot(conditions_blank$chlorophyll,conditions_blank$h.sigma)
+plot(conditions_blank$flow.rate,conditions_blank$h.sigma)
+plot(conditions_blank$light,conditions_blank$h.sigma)
+plot(conditions_blank$guano,conditions_blank$h.sigma)
+```
+
+Now vertical heading
+
+```{r}
+# Next do vertical heading
+conditions.rf.v.slope <- randomForest(v.slope ~ .,
+                              data=select(conditions_data,c(1,2,3,4,13)),
+                              importance=TRUE,
+                              proximity=TRUE)
+plot(conditions.rf.v.slope)
+varImpPlot(conditions.rf.v.slope)
+conditions_blank$v.slope <- predict(
+  conditions.rf.v.slope,conditions_blank[,1:4])
+fit.v.slope <- predict(conditions.rf.v.slope,conditions_data[,1:4])
+plot(fit.v.slope,conditions_data$v.slope)
+plot(conditions_blank$chlorophyll,conditions_blank$v.slope)
+plot(conditions_blank$flow.rate,conditions_blank$v.slope)
+plot(conditions_blank$light,conditions_blank$v.slope)
+plot(conditions_blank$guano,conditions_blank$v.slope)
+
+
+conditions.rf.v.intercept <- randomForest(v.intercept ~ .,
+                              data=select(conditions_data,c(1,2,3,4,14)),
+                              importance=TRUE,
+                              proximity=TRUE)
+plot(conditions.rf.v.intercept)
+varImpPlot(conditions.rf.v.intercept)
+conditions_blank$v.intercept <- predict(
+  conditions.rf.v.intercept,conditions_blank[,1:4])
+fit.v.intercept <- predict(
+  conditions.rf.v.intercept,conditions_data[,1:4])
+plot(fit.v.intercept,conditions_data$v.intercept)
+plot(conditions_blank$chlorophyll,conditions_blank$v.intercept)
+plot(conditions_blank$flow.rate,conditions_blank$v.intercept)
+plot(conditions_blank$light,conditions_blank$v.intercept)
+plot(conditions_blank$guano,conditions_blank$v.intercept)
+
+
+conditions.rf.v.sigma <- randomForest(v.sigma ~ .,
+                              data=select(conditions_data,c(1,2,3,4,15)),
+                              importance=TRUE,
+                              proximity=TRUE)
+plot(conditions.rf.v.sigma)
+varImpPlot(conditions.rf.v.sigma)
+conditions_blank$v.sigma <- predict(
+  conditions.rf.v.sigma,conditions_blank[,1:4])
+fit.v.sigma <- predict(conditions.rf.v.sigma,conditions_data[,1:4])
+plot(fit.v.sigma,conditions_data$v.sigma)
+plot(conditions_blank$chlorophyll,conditions_blank$v.sigma)
+plot(conditions_blank$flow.rate,conditions_blank$v.sigma)
+plot(conditions_blank$light,conditions_blank$v.sigma)
+plot(conditions_blank$guano,conditions_blank$v.sigma)
+
 ```
 
 Save fit models
 ```{r}
-save(conditions.rf.slope,conditions.rf.intercept,conditions.rf.sigma, file='notebook13-rf-2023.10.24data.RData')
+save(conditions.rf.vel.slope,
+     conditions.rf.vel.intercept,
+     conditions.rf.vel.sigma, 
+     conditions.rf.h.slope,
+     conditions.rf.h.intercept,
+     conditions.rf.h.sigma, 
+     conditions.rf.v.slope,
+     conditions.rf.v.intercept,
+     conditions.rf.v.sigma, 
+     file='notebook13-rf-2023.11.01data.RData')
 ```
