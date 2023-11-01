@@ -175,7 +175,9 @@ conditions <- setNames(conditions,c(
   "v.slope","v.intercept","v.sigma"))
 ```
 
-Using random forest to fit the missing values for autocorrelation. First block is for fitting velocity.
+Now that we have our auto- and cross-correlation fits, slopes, intercepts and variance we can plot these for each set of experimental conditions and test to see what set of conditions causes the most variance, or the mean to shift the most. To do this we are using a Random Forest Model.
+
+Using random forest to fit the missing values for autocorrelation. This first block is for fitting velocity.
 
 ```{r}
 Idata <- which(!is.na(conditions[,5])) # Index of data
@@ -185,23 +187,26 @@ conditions_data <- conditions[Idata,]
 conditions_blank <- conditions[Iblank,]
 
 # First do velocity
-conditions.rf.vel.slope <- randomForest(vel.slope ~ .,
-                              data=select(conditions_data,c(1,2,3,4,6)),
+conditions.rf.vel.slope <- randomForest(vel.slope ~ .,  ## creates a vector of the Random Forest Model based on the slope for velocities correlation
+                              data=select(conditions_data,c(1,2,3,4,6)),  ## takes the first 4 columns (experimental conditions)
+                                                                          ## and the slope for those conditions (column 6)
                               importance=TRUE,
                               proximity=TRUE)
-plot(conditions.rf.vel.slope)
-varImpPlot(conditions.rf.vel.slope)
-conditions_blank$vel.slope <- predict(
+plot(conditions.rf.vel.slope)    ## plots the random forest model for velocity slope
+varImpPlot(conditions.rf.vel.slope)  ##
+conditions_blank$vel.slope <- predict(  ## fills the blank data frame with no conditions with predictions based the Random Forest models fit
   conditions.rf.vel.slope,conditions_blank[,1:4])
-fit.vel.slope <- predict(conditions.rf.vel.slope,conditions_data[,1:4])
-plot(fit.vel.slope,conditions_data$vel.slope)
-plot(conditions_blank$chlorophyll,conditions_blank$vel.slope)
-plot(conditions_blank$flow.rate,conditions_blank$vel.slope)
-plot(conditions_blank$light,conditions_blank$vel.slope)
-plot(conditions_blank$guano,conditions_blank$vel.slope)
+fit.vel.slope <- predict(conditions.rf.vel.slope,conditions_data[,1:4])  ## predictions based on the actual conditions data
+plot(fit.vel.slope,conditions_data$vel.slope)  ## plots the 2 sets of predictions against each other
+plot(conditions_blank$chlorophyll,conditions_blank$vel.slope)  ## plots the predicted velocity slope for each level of chlorophyll
+plot(conditions_blank$flow.rate,conditions_blank$vel.slope)  ##as above for flow rate
+plot(conditions_blank$light,conditions_blank$vel.slope)  ##as above for light
+plot(conditions_blank$guano,conditions_blank$vel.slope)  ##as above for guano
 
 
-conditions.rf.vel.intercept <- randomForest(vel.intercept ~ .,
+## Now we do the same again for the intercept of the correlation fit for velocity
+
+conditions.rf.vel.intercept <- randomForest(vel.intercept ~ .,  
                               data=select(conditions_data,c(1,2,3,4,7)),
                               importance=TRUE,
                               proximity=TRUE)
@@ -217,6 +222,8 @@ plot(conditions_blank$flow.rate,conditions_blank$vel.intercept)
 plot(conditions_blank$light,conditions_blank$vel.intercept)
 plot(conditions_blank$guano,conditions_blank$vel.intercept)
 
+
+## Now we do the same again for the variance (sigma) of the correlation fit for velocity
 
 conditions.rf.vel.sigma <- randomForest(vel.sigma ~ .,
                               data=select(conditions_data,c(1,2,3,4,8)),
@@ -234,7 +241,10 @@ plot(conditions_blank$light,conditions_blank$vel.sigma)
 plot(conditions_blank$guano,conditions_blank$vel.sigma)
 ```
 
-This next block is for horizontal (i.e. rel to flow) heading.
+
+The next section does the same things as the block above did for velocity but for horizontal heading (i.e. relative to flow).
+
+
 ```{r}
 # Next do horizontal heading
 
@@ -287,7 +297,9 @@ plot(conditions_blank$light,conditions_blank$h.sigma)
 plot(conditions_blank$guano,conditions_blank$h.sigma)
 ```
 
-Now vertical heading
+
+The next section does the same things as the blocks above did for velocity and horizontal heading but for vertical heading (i.e. relative to surface, aka pitch).
+
 
 ```{r}
 # Next do vertical heading
@@ -341,7 +353,10 @@ plot(conditions_blank$guano,conditions_blank$v.sigma)
 
 ```
 
-Save fit models
+
+Now we save the each of the model outcomes and predictions, fits, slopes, intercepts and variance into a data file so we can call on it for the model simulations.
+
+
 ```{r}
 save(conditions.rf.vel.slope,
      conditions.rf.vel.intercept,
@@ -352,5 +367,5 @@ save(conditions.rf.vel.slope,
      conditions.rf.v.slope,
      conditions.rf.v.intercept,
      conditions.rf.v.sigma, 
-     file='notebook13-rf-2023.11.01data.RData')
+     file='notebook13-rf-2023.11.01data.RData')  ## this is the file name we are saving it as that the model simulations will call on (See notebook14)
 ```
