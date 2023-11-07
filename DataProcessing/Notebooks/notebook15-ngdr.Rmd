@@ -5,6 +5,12 @@ output: html_notebook
 NGDR is the ratio of the net displacement (linear distance between starting point and end point of a path) to the gross displacement (total distance travelled) for each path recorded. 
 
 
+```{r}
+rm(list=ls(all=TRUE))   ## removes the previous workspace and environment so that we only have the data we need loaded in the session
+load("~/Post-doc/Data/Total Merged Data File (Oct 5 2023).RData")
+```
+
+
 Calculate Total distance of track
 ```{r}
 library(dplyr)
@@ -96,6 +102,27 @@ ggplot(AGG_Feed, aes(turn.anglexysmooth, fill = Chem)) +
  facet_grid(facets = Light ~ Flow.rate, labeller = label_both)
 
 
+#######################################################################################
+#### angular plots with mean heading as arrow and length as coefficient of dispersion
+library(ggplot2)
+
+dat <- aggregate(AGG_Feed, by = list(AGG_Feed$Flow.rate, AGG_Feed$Light, AGG_Feed$Chem), FUN=mean)
+colnames(dat) <- c("Flow", "Light", "Chem", "DVT", "Guano", "Light2", "Chem2", "Flow2", "X", "Y", "Z", "dx", "dy", "dz", "d", "vx", "vy", "vz", "v", "h.heading", "v.heading", "turn.anglexy", "turn.angleyz", "turn.angle", "vel.turn.angle", "vel","vel.flow", "trim.X", "xsmooth", "ysmooth", "zsmooth", "smooth.dx", "smooth.dy", "smooth.dz", "smooth.d",  "smooth.vx", "smooth.vy", "smooth.vz", "smooth.v",  "smooth.h.heading", "heading.pi", "smooth.v.heading", "pitch.perfect", "turn.anglexysmooth", "turn.angleyzsmooth")
+
+levels(dat$Chem)
+levels(dat$Chem) <- c("Ambient", "Guano", "Guano+CHL")
+
+# plot
+ggplot(data = dat, aes(xsmooth, ysmooth, colour = Light)) +
+  geom_spoke(data = dat, aes(x = abs(xsmooth), y = abs(ysmooth), angle = turn.anglexysmooth, radius = n/2), arrow=arrow(length = unit(0.2,"cm")), size = 1) +
+  coord_equal()+
+  theme_classic()+
+  scale_color_manual(values = c("gray", "black"))+
+  labs(size = "", x = "Mean distance in X axis", y = "Mean distance in Y axis", title = "Turn Angles as mean vector") +
+  facet_grid(facets = Chem ~ Flow, labeller = label_both)
+
+###########################################################################################
+colour=c("grey", "black")[factor(dat$Light)]
 ```
 
 
