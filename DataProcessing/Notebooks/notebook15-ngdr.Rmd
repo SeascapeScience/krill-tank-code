@@ -112,17 +112,36 @@ colnames(dat) <- c("Flow", "Light", "Chem", "DVT", "Guano", "Light2", "Chem2", "
 levels(dat$Chem)
 levels(dat$Chem) <- c("Ambient", "Guano", "Guano+CHL")
 
-# plot
-ggplot(data = dat, aes(xsmooth, ysmooth, colour = Light)) +
-  geom_spoke(data = dat, aes(x = abs(xsmooth), y = abs(ysmooth), angle = turn.anglexysmooth, radius = n/2), arrow=arrow(length = unit(0.2,"cm")), size = 1) +
+n <- nrow(dat)
+range(dat$turn.anglexysmooth)
+
+
+write.csv(dat, file = "~/Post-doc/Data/Aggregated means(dat).csv", row.names = FALSE)
+
+# plot (not working as intended but close)
+ggplot(data = dat, aes(x = xsmooth, y = ysmooth, colour = Light)) +
+  geom_spoke(data = dat, aes(x = xsmooth, y = ysmooth, angle = turn.anglexysmooth, radius = n/2),       arrow=arrow(length = unit(0.2,"cm")), size = 1) +
   coord_equal()+
+  ##scale_x_continuous(limits = c(0,90),
+                    ## breaks = seq(0, 90, by = 15),
+                    ## minor_breaks = seq(0, 90, by = 5))+
+  ##scale_y_continuous(limits = c(0,90),
+                    ## breaks = seq(0, 90, by = 15),
+                    ## minor_breaks = seq(0, 90, by = 5))+
   theme_classic()+
   scale_color_manual(values = c("gray", "black"))+
-  labs(size = "", x = "Mean distance in X axis", y = "Mean distance in Y axis", title = "Turn Angles as mean vector") +
+  labs(size = "", x = "X", y = "Y", title = "") +
   facet_grid(facets = Chem ~ Flow, labeller = label_both)
 
 ###########################################################################################
-colour=c("grey", "black")[factor(dat$Light)]
+library(MASS)
+eqscplot(dat$xsmooth, dat$ysmooth, xlim=c(0,0.5), ylim=c(0,0.5), xlab = "X", ylab = "Y", main = "", axes=FALSE, frame.plot = FALSE)
+axis(1, pos=0)
+axis(2, pos=0)
+arrows(0,0,x1=dat$xsmooth, y1 = dat$ysmooth, col = dat$Light)
+symbols(0,0,2, add = TRUE, inches = FALSE, asp = 1)
+
+  
 ```
 
 

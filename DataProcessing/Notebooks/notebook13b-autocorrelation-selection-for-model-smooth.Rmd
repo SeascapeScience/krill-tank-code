@@ -23,13 +23,13 @@ library('matrixStats')
 
 
 rm(list=ls(all=TRUE))   ## removes the previous workspace and environment so that we only have the data we need loaded in the session
-load("~/Post-doc/Data/Total Merged Data File (Oct 5 2023).RData")
+#load("~/Post-doc/Data/Total Merged Data File (Oct 5 2023).RData")
 #load('~/Work/Data/Antarctic/CC.TotalData.2022.07.20.RData')
 #load('~/Work/Data/Antarctic/TotalMergedDataFile.2023.04.12.RData')
 #load('~/Work/Data/Antarctic/Total Merged Data File (June 23 2023).RData')
 #load('~/Work/Data/Antarctic/Total Merged Data File (July 24 2023).RData')
 #load('~/Work/Data/Antarctic/TotalMergedDataFile.2023.09.20.RData')
-#load('~/Work/Data/Antarctic/CC.TotalData.2023.09.20.RData')  ## loads the most recent version of the data, after it has been cleaned, processed and transformed into a singular dataframe, that has then been saved as a .Rdata file.
+load('~/Work/Data/Antarctic/CC.TotalData.2023.09.20.RData')  ## loads the most recent version of the data, after it has been cleaned, processed and transformed into a singular dataframe, that has then been saved as a .Rdata file.
 
 CC.TotalData$Chlorophyll <- as.numeric(as.character(CC.TotalData$Chlorophyll))  ## turns each factor level into a numeric operator
 CC.TotalData$Light <- as.numeric((CC.TotalData$Light)) - 1  ##as above
