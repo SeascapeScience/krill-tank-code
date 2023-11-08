@@ -367,5 +367,5 @@ save(conditions.rf.vel.slope,
      conditions.rf.v.slope,
      conditions.rf.v.intercept,
      conditions.rf.v.sigma, 
-     file='notebook13-rf-2023.11.01data.RData')  ## this is the file name we are saving it as that the model simulations will call on (See notebook14)
+     file='notebook13-rf-2023.11.08data.RData')  ## this is the file name we are saving it as that the model simulations will call on (See notebook14)
 ```

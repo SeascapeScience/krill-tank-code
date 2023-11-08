@@ -31,7 +31,7 @@ for (i in 1:nk)
   dataout <- krilltankinit2(nt=1000,
                             xsize=25000,ysize=33000,zsize=18000,
                             xi=12000,yi=20000,zi=9000,
-                            flow.rate=100)
+                            flow.rate=100, chloro = 50, guano = 1, light=1)
   swarm[i,] <- dataout[1000,]
 }
 fig <- plot_ly(x=swarm[,1], y=swarm[,2], z=swarm[,3])

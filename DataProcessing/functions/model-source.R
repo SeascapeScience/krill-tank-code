@@ -53,7 +53,7 @@ krilltankinit2 <- function(xsize = 256,  # Size of tank (mm)
                           chloro = 0,
                           guano = 0,
                           light = 0,
-                          filein = 'notebook13-rf-2023.10.23data.RData')
+                          filein = 'notebook13-rf-2023.11.08data.RData')
 {
   dataout <- matrix(data=NA,nrow=nt,ncol=3)
   dataout[1,1:3] <- c(xi,yi,zi)
@@ -63,9 +63,15 @@ krilltankinit2 <- function(xsize = 256,  # Size of tank (mm)
                       chloro = chloro,
                       guano = guano,
                       light = light)
-  slope <- as.numeric(params[1])
-  intercept <- as.numeric(params[2])
-  sigma <- as.numeric(params[3])
+  vel.slope <- as.numeric(params[1])
+  vel.intercept <- as.numeric(params[2])
+  vel.sigma <- as.numeric(params[3])
+  v.slope <- as.numeric(params[4])
+  v.intercept <- as.numeric(params[5])
+  v.sigma <- as.numeric(params[6])
+  h.slope <- as.numeric(params[7])
+  h.intercept <- as.numeric(params[8])
+  h.sigma <- as.numeric(params[9])
   #mu <- 0
   #sigma <- 0.5
   
@@ -73,15 +79,20 @@ krilltankinit2 <- function(xsize = 256,  # Size of tank (mm)
   for (i in 1:(nt-1))
   {
     v <- log10(v)
-    v <- v * slope + intercept + rnorm(1, mean = 0, sd = sigma)
+    v <- v * vel.slope + vel.intercept + rnorm(1, mean = 0, sd = vel.sigma)
     v <- 10 ^ v
     #v <- v + rnorm(1, mean = mu, sd = sigma)/100
     #v=v+(mu+sigma*tan(pi*(rand(1,1)-1/2)))/100; # Cauchy (matlab)
-    psi <- psi + (runif(1)-.5)*5;
-    theta <- theta + (runif(1)-.5)*5;
-    dataout[i+1,1] <- dataout[i,1] + v * dt * cos(pi*psi/180)
-    dataout[i+1,2] <- dataout[i,2] + v * dt * sin(pi*psi/180)
-    dataout[i+1,3] <- dataout[i,3] + v * dt * sin(pi*theta/180)
+    #psi <- psi + (runif(1)-.5)*5;
+    #theta <- theta + (runif(1)-.5)*5;
+    psi <- psi * h.slope + h.intercept + rnorm(1, mean = 0, sd = h.sigma)
+    theta <- theta * v.slope + v.intercept + rnorm(1, mean=0, sd = v.sigma)
+    #dataout[i+1,1] <- dataout[i,1] + v * dt * cos(pi*psi/180)
+    #dataout[i+1,2] <- dataout[i,2] + v * dt * sin(pi*psi/180)
+    #dataout[i+1,3] <- dataout[i,3] + v * dt * sin(pi*theta/180)
+    dataout[i+1,1] <- dataout[i,1] + v * dt * cos(psi) * sin(theta)
+    dataout[i+1,2] <- dataout[i,2] + v * dt * sin(psi) * sin(theta)
+    dataout[i+1,3] <- dataout[i,3] + v * dt * sin(theta)
     dataout[i+1,1] <- max(min(dataout[i+1,1],xsize),0)
     dataout[i+1,2] <- max(min(dataout[i+1,2],ysize),0)
     dataout[i+1,3] <- max(min(dataout[i+1,3],zsize),0)
@@ -138,7 +149,7 @@ krilltankplot <- function(datain = c(NA,NA,NA))
 
 # Given a set of experimental conditions and a random forest model
 # Returns the statistical parameters of swimming
-getparams <- function(filein = 'notebook13-rf-2023.10.23data.RData',
+getparams <- function(filein = 'notebook13-rf-2023.11.08data.RData',
                       flow.rate = 0,
                       chloro = 0,
                       guano = 0,
@@ -146,12 +157,28 @@ getparams <- function(filein = 'notebook13-rf-2023.10.23data.RData',
 {
   load(filein)
   df.in <- data.frame(flow.rate = flow.rate, chlorophyll = chloro, guano = guano, light = light)
-  fit.slope <- predict(conditions.rf.slope,df.in)
-  fit.intercept <- predict(conditions.rf.intercept,df.in)
-  fit.sigma <- predict(conditions.rf.sigma,df.in)
-  df.out <- data.frame(fit.slope = fit.slope,
-                       fit.intercept = fit.intercept,
-                       fit.sigma = fit.sigma)
+  # Autocorrelation parameters for velocity
+  fit.vel.slope <- predict(conditions.rf.vel.slope,df.in)
+  fit.vel.intercept <- predict(conditions.rf.vel.intercept,df.in)
+  fit.vel.sigma <- predict(conditions.rf.vel.sigma,df.in)
+  # Autocorrelation parameters for vertical heading
+  fit.v.slope <- predict(conditions.rf.v.slope,df.in)
+  fit.v.intercept <- predict(conditions.rf.v.intercept,df.in)
+  fit.v.sigma <- predict(conditions.rf.v.sigma,df.in)
+  # Autocorrelation parameters for horizontal heading
+  fit.h.slope <- predict(conditions.rf.h.slope,df.in)
+  fit.h.intercept <- predict(conditions.rf.h.intercept,df.in)
+  fit.h.sigma <- predict(conditions.rf.h.sigma,df.in)
+  # Compile all parameters
+  df.out <- data.frame(fit.vel.slope = fit.vel.slope,
+                       fit.vel.intercept = fit.vel.intercept,
+                       fit.vel.sigma = fit.vel.sigma,
+                       fit.v.slope = fit.v.slope,
+                       fit.v.intercept = fit.v.intercept,
+                       fit.v.sigma = fit.v.sigma,
+                       fit.h.slope = fit.h.slope,
+                       fit.h.intercept = fit.h.intercept,
+                       fit.h.sigma = fit.h.sigma)
   return(df.out)
 }
 
