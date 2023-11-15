@@ -102,6 +102,34 @@ ggplot(AGG_Feed, aes(turn.anglexysmooth, fill = Chem)) +
  facet_grid(facets = Light ~ Flow.rate, labeller = label_both)
 
 
+```
+
+
+
+
+```{r}
+# plot 
+n <- 128
+
+ggplot(data = dat, aes(x = turn.anglexysmooth, colour = Light)) +
+  geom_spoke(data = dat, aes(x = xsmooth, y = ysmooth, angle = turn.anglexysmooth, radius = n/2),       arrow=arrow(length = unit(0.2,"cm")), size = 1) +
+  geom_spoke(data = dat, aes(x = xsmooth, y = ysmooth, angle = turn.anglexysmooth+30, radius = n/2),       arrow=arrow(length = unit(0.2,"cm")), size = 1) +
+  geom_spoke(data = dat, aes(x = xsmooth, y = ysmooth, angle = turn.anglexysmooth+35, radius = n/2),       arrow=arrow(length = unit(0.2,"cm")), size = 1) +
+  coord_equal()+
+  ylim(0, 90)+
+  scale_x_continuous(limits = c(0,90),
+                     breaks = seq(0, 90, by = 45),
+                     minor_breaks = seq(0, 360, by = 15))+
+  ##scale_y_continuous(limits = c(0,90),
+                    ## breaks = seq(0, 90, by = 15),
+                    ## minor_breaks = seq(0, 90, by = 5))+
+  theme_classic()+
+  scale_color_manual(values = c("black", "gray"))+
+  labs(size = "", x = "Coefficient of Dispersion", y = "Turn Angle (degrees)", title = "") +
+  facet_grid(facets = Chem ~ Flow, labeller = label_both)
+
+
+
 #######################################################################################
 #### angular plots with mean heading as arrow and length as coefficient of dispersion
 library(ggplot2)
@@ -113,14 +141,14 @@ levels(dat$Chem)
 levels(dat$Chem) <- c("Ambient", "Guano", "Guano+CHL")
 
 n <- nrow(dat)
-range(dat$turn.anglexysmooth)
+range(AGG_Feed$turn.anglexysmooth)
 
 
 write.csv(dat, file = "~/Post-doc/Data/Aggregated means(dat).csv", row.names = FALSE)
 
 # plot (not working as intended but close)
-ggplot(data = dat, aes(x = xsmooth, y = ysmooth, colour = Light)) +
-  geom_spoke(data = dat, aes(x = xsmooth, y = ysmooth, angle = turn.anglexysmooth, radius = n/2),       arrow=arrow(length = unit(0.2,"cm")), size = 1) +
+ggplot(data = AGG_Feed, aes(x = xsmooth, y = ysmooth, colour = Light)) +
+  geom_spoke(data = AGG_Feed, aes(x = xsmooth, y = ysmooth, angle = turn.anglexysmooth+30, radius = 12),       arrow=arrow(length = unit(0.2,"cm")), size = 1) +
   coord_equal()+
   ##scale_x_continuous(limits = c(0,90),
                     ## breaks = seq(0, 90, by = 15),
@@ -131,7 +159,7 @@ ggplot(data = dat, aes(x = xsmooth, y = ysmooth, colour = Light)) +
   theme_classic()+
   scale_color_manual(values = c("gray", "black"))+
   labs(size = "", x = "X", y = "Y", title = "") +
-  facet_grid(facets = Chem ~ Flow, labeller = label_both)
+  facet_grid(facets = Chem ~ Flow.rate, labeller = label_both)
 
 ###########################################################################################
 library(MASS)
