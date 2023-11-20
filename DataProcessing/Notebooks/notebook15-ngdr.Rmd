@@ -102,12 +102,7 @@ ggplot(AGG_Feed, aes(turn.anglexysmooth, fill = Chem)) +
  facet_grid(facets = Light ~ Flow.rate, labeller = label_both)
 
 
-```
-
-
-
-
-```{r}
+################# turn angles arrow plot
 # plot 
 n <- 128
 
@@ -128,8 +123,67 @@ ggplot(data = dat, aes(x = turn.anglexysmooth, colour = Light)) +
   labs(size = "", x = "Coefficient of Dispersion", y = "Turn Angle (degrees)", title = "") +
   facet_grid(facets = Chem ~ Flow, labeller = label_both)
 
+#############################################
+
+################### Horiz heading plot
 
 
+dat$heading.pi+360
+dat$heading.pi
+
+
+##works but want it in co-ord polar and with arrows
+ggplot(dat, aes(heading.pi, col=Light))+
+  geom_point(data = dat, aes(y = heading.pi))+
+  facet_grid(facets = Chem ~ Flow, labeller = label_both)
+
+
+
+## adding each element in
+ggplot(dat, aes(heading.pi, col=Light))+
+  geom_point(data = dat, aes(y = heading.pi))+
+  scale_color_manual(values = c("black", "gray"))+
+  labs(size = "", x = "Coefficient of Dispersion", y = "Horizontal Heading (degrees)", title =     "") +
+  facet_grid(facets = Chem ~ Flow, labeller = label_both)
+
+##
+ggplot(dat, aes(heading.pi, col=Light))+
+  geom_point(data = dat, aes(y = heading.pi))+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=0,hjust=1,vjust=0.4))+
+  theme(axis.line = element_line(size = 0.5, linetype = "solid",
+                                   colour = "black"))+
+  theme(legend.key = element_rect(fill = "white"))+
+  scale_color_manual(values = c("black", "gray"))+
+  labs(size = "", x = "Coefficient of Dispersion", y = "Horizontal Heading (degrees)", title =     "") +
+  facet_grid(facets = Chem ~ Flow, labeller = label_both)
+
+# plot 
+n <- 128
+
+##need to center y axis to x axis
+ggplot(data = dat, aes(x = heading.pi, y = ysmooth, colour = Light)) +
+  geom_spoke(data = dat, aes(x = 0, y = 0, angle = heading.pi, radius = n/2),         arrow=arrow(length = unit(0.2,"cm")), size = 1) +
+  geom_spoke(data = dat, aes(x = 0, y = 0, angle = heading.pi+360, radius = n/2),         arrow=arrow(length = unit(0.2,"cm")), size = 1) +
+  coord_polar() +
+  scale_x_continuous(limits = c(0,360),
+                     breaks = seq(0, 360, by = 45),
+                     minor_breaks = seq(0, 360, by = 15))+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=0,hjust=1,vjust=0.4))+
+  theme(axis.line = element_line(size = 0.5, linetype = "solid",
+                                   colour = "black"))+
+  theme(legend.key = element_rect(fill = "white"))+
+  scale_color_manual(values = c("black", "gray"))+
+  labs(size = "", x = "Coefficient of Dispersion", y = "Horizontal Heading (degrees)", title =     "") +
+  facet_grid(facets = Chem ~ Flow, labeller = label_both)
+
+```
+
+
+
+
+```{r}
 #######################################################################################
 #### angular plots with mean heading as arrow and length as coefficient of dispersion
 library(ggplot2)
