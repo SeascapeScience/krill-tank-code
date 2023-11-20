@@ -148,14 +148,12 @@ ggplot(dat, aes(heading.pi, col=Light))+
 
 ##
 ggplot(dat, aes(heading.pi, col=Light))+
-  geom_point(data = dat, aes(y = heading.pi))+
-  theme(axis.text=element_text(color="black"))+
-  theme(axis.text.x=element_text(angle=0,hjust=1,vjust=0.4))+
-  theme(axis.line = element_line(size = 0.5, linetype = "solid",
-                                   colour = "black"))+
-  theme(legend.key = element_rect(fill = "white"))+
+  geom_point(data = dat, aes(y = 0))+
+  xlim(-90,90)+
+  ylim(-.5, .5)+
+  theme_classic()+
   scale_color_manual(values = c("black", "gray"))+
-  labs(size = "", x = "Coefficient of Dispersion", y = "Horizontal Heading (degrees)", title =     "") +
+  labs(size = "", x = "Horizontal Heading (degrees)", y = "Coefficient of Dispersion", title =     "") +
   facet_grid(facets = Chem ~ Flow, labeller = label_both)
 
 # plot 
@@ -177,6 +175,28 @@ ggplot(data = dat, aes(x = heading.pi, y = ysmooth, colour = Light)) +
   scale_color_manual(values = c("black", "gray"))+
   labs(size = "", x = "Coefficient of Dispersion", y = "Horizontal Heading (degrees)", title =     "") +
   facet_grid(facets = Chem ~ Flow, labeller = label_both)
+
+###############################################################################
+
+## trying in coord_equal instead
+
+ggplot(data = dat, aes(x = heading.pi, colour = Light)) +
+  geom_spoke(data = dat, aes(x = ysmooth, y = xsmooth, angle = heading.pi*(-1), radius = n/2),       arrow=arrow(length = unit(0.2,"cm")), size = 1) +
+  geom_spoke(data = dat, aes(x = ysmooth, y = xsmooth, angle = heading.pi+90, radius = n/2),       arrow=arrow(length = unit(0.2,"cm")), size = 1) +
+  geom_spoke(data = dat, aes(x = ysmooth, y = xsmooth, angle = heading.pi+180, radius = n/2),       arrow=arrow(length = unit(0.2,"cm")), size = 1) +
+  coord_equal()+
+  ylim(0, 90)+
+  scale_x_continuous(limits = c(0,90),
+                     breaks = seq(0, 90, by = 45),
+                     minor_breaks = seq(0, 90, by = 15))+
+  ##scale_y_continuous(limits = c(0,90),
+                    ## breaks = seq(0, 90, by = 15),
+                    ## minor_breaks = seq(0, 90, by = 5))+
+  theme_classic()+
+  scale_color_manual(values = c("black", "gray"))+
+  labs(size = "", x = "Heading Angle (degrees)", y = "Coefficient of Dispersion", title = "") +
+  facet_grid(facets = Chem ~ Flow, labeller = label_both)
+
 
 ```
 
