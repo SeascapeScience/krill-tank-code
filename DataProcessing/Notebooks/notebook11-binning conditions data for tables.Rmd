@@ -21,7 +21,7 @@ str(data)
 levels(data$Flow.rate) <- c("No Flow","Low Flow","Medium Flow", "High Flow","Extreme Flow")
 plot(data$Flow.rate, data$turn.angle, xlab = "Flow rate (cm s-1)", ylab = "Turn Angles (degrees)", ylim = c(0, 180))
 levels(data$Chlorophyll)
-levels(data$Chlorophyll) <- c("No Chlorophyll", "Low Chlorophyll","Medium Chlorophyll", "High Chlorophyll", "High Chlorophyll","High Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll",  "Medium Chlorophyll",  "Medium Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll",  "Filament")
+levels(data$Chlorophyll) <- c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll", "High Chlorophyll","High Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll",  "Medium Chlorophyll",  "Medium Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll",  "Filament")
 plot(data$Flow.rate, data$vel.flow, xlab = "Chlorophyll (mg L-1)", ylab = "Velocity in relation to flow (cm s-1)")
 
 library(ggplot2)
@@ -200,8 +200,76 @@ ggplot(data,aes(x=Flow.rate, y=vel.turn.angle.smooth, fill=Guano))+
 save.image("~/Post-doc/Data/Total Merged Data File (Sep 14 2023).RData")
 ```
 
+
+Aggregated Feeding data for stats
+```{r}
+
+DHL$Chem <- "Control"
+DHG$Chem <- "Guano"
+DHC$Chem <- "Guano+CHL"
+
+DH <- rbind(DHL,DHG,DHC)
+levels(DH$Chem)
+str(DH)
+DH$Chem <- as.factor(DH$Chem)
+
+Medflow <- rbind(DM, LM)
+Highflow <- rbind(DH, LH)
+str(Medflow)
+
+levels(Medflow$Chem)
+levels(Highflow$Chem) <- c("Ambient", "Guano", "Guano+CHL")
+
+Medflow$Chem <- ordered(Medflow$Chem, levels = c("Ambient", "Guano", "Guano+CHL"))
+
+Feeding <- rbind(Medflow, Highflow)
+levels(Feeding$Chem)
+
+AGG_Feed <- aggregate(Feeding, by = list(Feeding$D_V_T, Feeding$Guano, Feeding$Light, Feeding$Chem, Feeding$Flow.rate), FUN = mean)
+head(AGG_Feed)
+AGG_Feed <- AGG_Feed[ -c(6:7, 11:20, 55:57)]
+colnames(AGG_Feed) <- c("D_V_T", "Guano", "Light","Chem", "Flow.rate", "X", "Y", "Z", "dx", "dy", "dz", "d", "vx", "vy", "vz", "v", "h.heading", "v.heading", "turn.anglexy", "turn.angleyz", "turn.angle", "vel.turn.angle", "vel", "vel.flow", "trim.X", "xsmooth", "ysmooth", "zsmooth", "smooth.dx", "smooth.dy", "smooth.dz", "smooth.d", "smooth.vx", "smooth.vy", "smooth.vz", "smooth.v", "smooth.h.heading", "heading.pi", "smooth.v.heading", "pitch.perfect", "turn.anglexysmooth", "turn.angleyzsmooth")
+head(AGG_Feed)
+tail(AGG_Feed)
+
+AGG_Feed
+range(AGG_Feed$heading.pi)
+##AGG_Feed$turn.anglexysmooth <- AGG_Feed$turn.anglexysmooth/(2*pi)*360
+
+levels(AGG_Feed$Chem)
+levels(AGG_Feed$Chem) <- c("Ambient", "Guano", "Guano+CHL")
+AGG_Feed$Chem <- ordered(AGG_Feed$Chem, levels = c("Ambient", "Guano", "Guano+CHL"))
+
+library(ggplot2)
+
+a <- ggplot(AGG_Feed,aes(x = Chem, y = turn.anglexysmooth, fill= Chem))+
+  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
+  theme(legend.key.size = unit(2, "cm"))+
+  theme(text = element_text(size = 16))+
+  ##stat_summary(fun=mean, geom="line", lty=2, lwd=1, col = "black", aes(group=1)) +
+  stat_summary(fun.y = mean, geom = "errorbar", aes(ymax = ..y.., ymin = ..y..),
+                 width = 0.75, linetype = "dashed")+
+  ##stat_summary(fun=mean, colour="red", geom="point", size = 4) +
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  theme(panel.background = element_rect(fill = "white",
+                                colour = "black",
+                                linetype = "solid"))+
+  theme(axis.line = element_line(size = 0.5, linetype = "solid",
+                                   colour = "black"))+
+  theme(legend.key = element_rect(fill = "white"))+
+  labs(size = "", x = "Chemical Cue", y = "Vertical heading (degrees)", title = "") +
+  scale_fill_manual(values=c("white", "gray", "gray35"),name = "Chemical Cue",
+                    labels=c("Ambient", "Guano", "Guano+CHL"))+
+  facet_grid(facets = Light ~ Flow.rate, labeller = label_both, scales = "free_x", space = "free")
+a
+
+```
+
 aggregate data by factor levels
 Find max, min, mean and sd for v and vel.flow
+
 ```{r}
 str (CC.TotalData)
 ### aggregate data

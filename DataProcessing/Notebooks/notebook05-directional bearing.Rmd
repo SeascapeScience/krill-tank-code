@@ -82,24 +82,25 @@ control.circle=circle.control())
 library(ggplot2)
 head(AGG_Feed)
 str(AGG_Feed)
-range(AGG_Feed$turn.anglexysmooth)
+range(AGG_Feed$heading.pi)
 AGG_Feed$turn.anglexysmooth <- AGG_Feed$turn.anglexysmooth/(2*pi)*360
 f_mu <- mean(Feeding$turn.angle.smooth, by =c(Chem, Light, Flow.rate))
 
-ggplot(AGG_Feed, aes(turn.anglexysmooth, fill = Chem)) +
-  geom_histogram(binwidth = 5, boundary = 0, colour = "black", size = .25) +
+ggplot(AGG_Feed, aes(heading.pi, fill = Chem)) +
+  geom_histogram(binwidth = 10, boundary = 0, colour = "black", size = .25) +
   coord_polar() +
-   ylim(0, 12)  +
-  scale_x_continuous(limits = c(0,360),
-                     breaks = seq(0, 360, by = 45),
-                     minor_breaks = seq(0, 360, by = 15))+
+   ylim(0, 20)  +
+  scale_x_continuous(limits = c(-180,180),
+                     breaks = seq(-180, 180, by = 45),
+                     minor_breaks = seq(-180, 180, by = 15))+
+  theme(text=element_text(size=20))+
   theme(axis.text=element_text(color="black"))+
   theme(axis.text.x=element_text(angle=0,hjust=1,vjust=0.4))+
   theme(axis.line = element_line(size = 0.5, linetype = "solid",
                                    colour = "black"))+
   theme(legend.key = element_rect(fill = "white"))+
   ##geom_vline(aes(heading.pi), xintercept = f_mu)+   ## adds mean angle line to plot
-  labs(size = "", x = "Turn Angle (degrees)", y = "Frequency of Turn Angle", title = "")+
+  labs(x = "Horizontal Heading (degrees)", y = "Frequency of Heading", title = "") +
   scale_fill_manual(values=c("white", "gray", "gray35"),name = "Chemical Cue",
                     labels=c("Ambient", "Guano", "Guano+CHL"))+
  facet_grid(facets = Light ~ Flow.rate, labeller = label_both)
