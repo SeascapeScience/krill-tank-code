@@ -148,6 +148,7 @@ for (i in 1:dim(conditions)[1])  ## start of the loop for each set of conditions
       # Horizontal heading
       h0 <- (heading.h[1:length(heading.h)-1])
       h1 <- (heading.h[2:length(heading.h)])
+      plot(h0, h1, main = "Heading autocorrel")
       df <- data.frame(h0,h1)
       fit <- lm(h1 ~ h0 + 1, data = df)
       conditions[i,10] <- fit$coefficients[2] # Slope
