@@ -1,18 +1,24 @@
 ---
-title: "notebook13b-autocorrelation-selection-for-model"
+title: "Parameterization Model"
 output:
   html_document:
     df_print: paged
 ---
-This notebook is using the data from the krill tracks in DLTdv8a and testing them for auto-correlation and cross-correlation with each other.
-These correlations are then run through a Random Forrest Model to see which experimental conditions affect the fit of the correlation models the most.
+This analysis extracts swimming parameters from each of the 127 different experimental conditions tested. Then a random forest model is built and saved so that someone downstream can pull the full set of parameters (or whatever they need) given an arbitrary set of environmental conditions.
 
-The first thing we need to do is load in the data and change the experimental factors into numeric operators so that we can generate a matrix of experimental conditions.
+The experimental conditons are: flow rate, chlorophyll concentration, guano presence, and light presence.
 
-```{r}
-### This is a short list of all of the library packages that are needed to run the code in this notebook.
-### If you don't already have these packages installed use install.packages('...') prior to the library call to install the package from Cran-r.
+The swimming parameters are: 
+ - Mean velocity magnitude
+ - Velocity magnitude variance
+ - Velocity magnitude autocorrelation slope, intercept, residual
+ - Velocity magnitude bimodal test significance
+ - Mean angle (horizontal/vertical)… plus same relative to flow direction
+ - Angle coefficient of dispersion (horizontal/vertical) … plus same relative to flow direction
+ - Heading (horizontal) autocorrelation slope, intercept, residual
+ - ...
 
+```{r echo=FALSE}
 library(ggplot2)
 library(GGally)
 library(hexbin)
@@ -23,40 +29,25 @@ library('matrixStats')
 
 source('../functions/parameters-source.R')
 
-rm(list=ls(all=TRUE))   ## removes the previous workspace and environment so that we only have the data we need loaded in the session
-load("~/Post-doc/Data/Total Merged Data File (Oct 5 2023).RData")
-#load('~/Work/Data/Antarctic/CC.TotalData.2022.07.20.RData')
-#load('~/Work/Data/Antarctic/TotalMergedDataFile.2023.04.12.RData')
-#load('~/Work/Data/Antarctic/Total Merged Data File (June 23 2023).RData')
-#load('~/Work/Data/Antarctic/Total Merged Data File (July 24 2023).RData')
-#load('~/Work/Data/Antarctic/TotalMergedDataFile.2023.09.20.RData')
-#load('~/Work/Data/Antarctic/CC.TotalData.2023.09.20.RData')  ## loads the most recent version of the data, after it has been cleaned, processed and transformed into a singular dataframe, that has then been saved as a .Rdata file.
-
-CC.TotalData$Chlorophyll <- as.numeric(as.character(CC.TotalData$Chlorophyll))  ## turns each factor level into a numeric operator
-CC.TotalData$Light <- as.numeric((CC.TotalData$Light)) - 1  ##as above
-CC.TotalData$Guano <- as.numeric((CC.TotalData$Guano)) - 1  ##as above
-CC.TotalData$Flow.rate <- as.numeric(as.character(CC.TotalData$Flow.rate))  ##as above
-CC.TotalData$Flow.Direction <- as.numeric(as.character(CC.TotalData$Flow.Direction))  ##as above
+rm(list=ls(all=TRUE))   
+#load("~/Post-doc/Data/Total Merged Data File (Oct 5 2023).RData")
+load('~/Work/Data/Antarctic/CC.TotalData.2023.09.20.RData')  # loads the most recent version of the data, after it has been cleaned, processed and transformed into a singular dataframe, that has then been saved as a .Rdata file.
+CC.TotalData$Chlorophyll <- as.numeric(as.character(CC.TotalData$Chlorophyll))  
+CC.TotalData$Light <- as.numeric((CC.TotalData$Light)) - 1  
+CC.TotalData$Guano <- as.numeric((CC.TotalData$Guano)) - 1  
+CC.TotalData$Flow.rate <- as.numeric(as.character(CC.TotalData$Flow.rate))  
+CC.TotalData$Flow.Direction <- as.numeric(as.character(CC.TotalData$Flow.Direction))
 ```
 
-Using the numeric operators for each experimental factor we now create vectors of each and create a matrix grid of each set of unique experimental conditions.
-This will also set parameter ranges based on value combinations used in experiments.
+The experimental conditions tested were:
+ - Flow rates: 0, 0.6, 3.0, 5.9, 8.9
+ - Chlorophyll concentrations: 0.00, 1.01, 2.70, 2.80, 3.00, 3.70, 4.30, 4.50, 4.60, 5.50, 5.70, 5.90, 6.00, 6.10, 7.60, 9.00, 13.50, 16.00, 16.90, 19.00
+ - Guano presence: absent, present
+ - Light presence: absent, present
+Of the possible combinations, 127 combinations were tested in an experimental setting.
 
-```{r}
-# Vectors of all possible conditions combinations
-#frs <- unique(CC.TotalData$Flow.rate)
-#chls <- unique(CC.TotalData$Chlorophyll)
-#guans <- unique(CC.TotalData$Guano)
-#lights <- unique(CC.TotalData$Light)
-#frs <- as.numeric(as.character(unique(CC.TotalData$Flow.rate)))
-#chls <- as.numeric(as.character(unique(CC.TotalData$Chlorophyll)))
-#guans <- as.numeric(as.character(unique(CC.TotalData$Guano)))
-#lights <- as.numeric(as.character(unique(CC.TotalData$Light)))
-#guans <- c(1,2)
-#lights <- c(1,2)
-#conditions <- expand.grid(frs,chls,guans,lights)  ## creates a grid of all possible condition combinations
-
-conditions <- getconditions(CC.TotalData)
+```{r echo=FALSE}
+conditions <- getconditions(CC.TotalData) # A matrix of all combinations of experimental conditions, with columns = flow rate, chlorophyll conc., guano, light
 ```
 
 The next chunk looks at velocity and how it effects krill swimming behaviour. 
