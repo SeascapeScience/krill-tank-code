@@ -7,9 +7,12 @@ NGDR is the ratio of the net displacement (linear distance between starting poin
 
 ```{r}
 rm(list=ls(all=TRUE))   ## removes the previous workspace and environment so that we only have the data we need loaded in the session
-load("~/Post-doc/Data/Total Merged Data File (Oct 5 2023).RData")
-```
+load("~/Post-doc/Data/Total Merged Data File (March 6 2024).RData")
 
+FeedingDark <- read.csv(file = "~/Bigelow/Manuscripts/Feeding MS/FeedingDark.csv", sep = ',', header = T)
+AGG_Dark<- read.csv(file = "~/Bigelow/Manuscripts/Feeding MS/AGG_Dark.csv", sep = ',', header = T)
+
+```
 
 Calculate Total distance of track
 ```{r}
@@ -32,7 +35,6 @@ write.csv(NGDR, file = "~/Post-doc/Data/NGDR Sep 29 2023.csv", row.names = FALSE
 
 
 ```
-
 
 Calculate distance from start x,y to end, x,y location
 ```{r}
@@ -70,7 +72,6 @@ range(NGDR2$diff.dist)
 
 NGDR2 %>% group_by(Light, Flow.rate, Chem) %>% summarise_at(vars(NGDR, diff.dist, dtot), mean)
 ```
-
 
 Plotting Angular data into histograms on polar projection
 ```{r}
@@ -200,9 +201,6 @@ ggplot(data = dat, aes(x = heading.pi, colour = Light)) +
 
 ```
 
-
-
-
 ```{r}
 #######################################################################################
 #### angular plots with mean heading as arrow and length as coefficient of dispersion
@@ -246,10 +244,7 @@ symbols(0,0,2, add = TRUE, inches = FALSE, asp = 1)
   
 ```
 
-
-
 Circular stats for pathwise means of angular data
-
 ```{r}
 library(tidyverse)
 library(circular)
@@ -272,7 +267,6 @@ m3_L   <- update(m_null, parameters = list(log_mu ~ Light))
 anova(m3_LFC, m3_LF, m3_L, m_null)
 
 ```
-
 
 Circular stats for angles
 ```{r}
@@ -343,9 +337,7 @@ watson.two.test(circLM, circLH, alpha = 0.05)
 
 ```
 
-
 Tests against each other
-
 ```{r}   
 ################################################### Example of testing means of groups against each other
 # Ant orientation from Duelli and Wehner (1973) 
@@ -378,17 +370,13 @@ watson.wheeler.test(data1)
 
 ```
 
-
 Binning Headings into 15 degree groups then doing a gtest
 ```{r}
 library(AMR)
-
-
 g.test(AGG_Dark$Chem, AGG_Dark$Flow.rate)
 
-
-
-
+write.csv(FeedingDark, file = "~/Bigelow/Manuscripts/Feeding MS/FeedingDark.csv", row.names = FALSE)
+write.csv(AGG_Dark, file = "~/Bigelow/Manuscripts/Feeding MS/AGG_Dark.csv", row.names = FALSE)
 ```
 
 
