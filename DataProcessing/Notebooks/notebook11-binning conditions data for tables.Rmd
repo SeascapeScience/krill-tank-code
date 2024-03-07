@@ -334,10 +334,10 @@ Total angles
 range(LML$heading.pi)
 library(circular)
 
-range(AGG_Feed$turn.anglexysmooth)
+range(AGG_Dark$turn.anglexysmooth)
 AGG_Feed$turn.anglexysmooth <- AGG_Feed$turn.anglexysmooth/(2*pi)*360
 
-circ.turn <- circular(AGG_Feed$turn.anglexysmooth, type = c("angles"),
+circ.turn <- circular(AGG_Dark$turn.anglexysmooth, type = c("angles"),
           units = c("degrees"),
           template = c("geographics"))
 
@@ -375,7 +375,7 @@ meandeviation(circ.turn)
 summary(circ.turn) 
 
 ## ANOVA using circular stats
-aov.circular(circ.turn, AGG_Feed$Chem) ## working but unsure
+aov.circular(circ.turn, AGG_Dark$Flow.rate) ## working but unsure
 
 ```
 
@@ -1354,10 +1354,15 @@ Test if mean vectors are significantly different...
 
 ```{r}
 library(circular)
+AGG_DM <- subset(AGG_Dark, Flow.rate == "Medium Flow")
+AGG_DH <- subset(AGG_Dark, Flow.rate == "High Flow")
+
+levels(AGG_Dark$Flow.rate)
+
 DH$v.heading <- DH$v.heading/(2*pi)*360
 range(DH$v.heading)
 
-circDH <- circular(DH$v.heading, type = c("angles"),
+circDH <- circular(AGG_DH$turn.anglexysmooth, type = c("angles"),
           units = c("degrees"),
           template = c("geographics"))
 
@@ -1400,7 +1405,7 @@ aov.circular(circDH, DH$Chem) ## working but unsure
 
 ##  A Rayleigh Test is a test for significant unimodal orientation (e.g. Is everyone in the treatment going the same direction?).
 
-rayleigh.test(circLM)  ## if significant shows non-uniformity of direction  (No flow vs extreme flow)
+rayleigh.test(circ.turn)  ## if significant shows non-uniformity of direction  (No flow vs extreme flow)
 rayleigh.test(circLH)  ## if significant shows non-uniformity of direction
 
 rayleigh.test(circDM)  
@@ -1409,7 +1414,7 @@ rayleigh.test(circDH)
 # Test whether LNN and LEN (etc) orient differently  
 
 ##  A Watson Test determines if two groups’ orientations are significantly different from each other. 
-watson.two.test(circLM, circLH, alpha = 0.05)
+watson.two.test(circDM, circDH, alpha = 0.05)
 
 ```
 
@@ -3040,7 +3045,7 @@ Tests against each other
 # Example used in Batschelet (1981) 
 
 
-data1 <- list(dahi = circular(DH$v.heading, units="degrees", template="geographics"), dame = circular(DM$v.heading, units="degrees", template="geographics"), lihi = circular(LH$v.heading, units="degrees", template="geographics"), lime = circular(LM$v.heading, units="degrees", template="geographics"))
+data1 <- list(dahi = circular(AGG_DH$turn.anglexysmooth, units="degrees", template="geographics"), dame = circular(AGG_DM$turn.anglexysmooth, units="degrees", template="geographics"))
            
 watson.williams.test(data1)
 

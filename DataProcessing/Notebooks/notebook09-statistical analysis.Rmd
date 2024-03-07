@@ -5,8 +5,15 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("~/Post-doc/Data/Total Merged Data File (Sep 20 2023).RData")
+load("~/Post-doc/Data/Total Merged Data File (March 6 2024).RData")
 ###str(CC.TotalData)
+
+AGG_Dark <- aggregate(FeedingDark, by = list(FeedingDark$D_V_T, FeedingDark$Chem, FeedingDark$Flow.rate), FUN = mean)
+head(AGG_Dark)
+AGG_Dark <- AGG_Dark[ -c(4:5, 9:18, 54:56)]
+colnames(AGG_Dark) <- c("D_V_T", "Chem", "Flow.rate", "X", "Y", "Z", "dx", "dy", "dz", "d", "vx", "vy", "vz", "v", "h.heading", "v.heading", "turn.anglexy", "turn.angleyz", "turn.angle", "vel.turn.angle", "vel", "vel.flow", "trim.X", "xsmooth", "ysmooth", "zsmooth", "smooth.dx", "smooth.dy", "smooth.dz", "smooth.d", "smooth.vx", "smooth.vy", "smooth.vz", "smooth.v", "smooth.h.heading", "heading.pi", "smooth.v.heading", "pitch.perfect", "turn.anglexysmooth", "turn.angleyzsmooth", "turn.angle.smooth")
+head(AGG_Dark)
+tail(AGG_Dark)
 ```
 
 Data for mean velocity, angular velocity, turn and heading angles each will be analyzed by a mixed model ANCOVA with chemical concentration, and light as fixed (treatment) effects, flow velocity as the co-variate and replicate as a random (blocking affect) with individual paths as the unit of analysis.
@@ -25,7 +32,7 @@ library(WRS2)
 Feeding <- rbind(LM, LH, DM, DH)
 str(AGG_Feed)
 Feeding$Chem <- as.factor(Feeding$Chem)
-levels(Feeding$Chem)
+levels(FeedingDark$Chem)
 ##If you are using lm or aov make sure that you set the contrasts using the "contrasts" function before doing either aov or lm. R uses non-orthogonal contrasts by default which can mess everything up in an ANCOVA. If you want to set orthogonal contrasts use:
 
 contrasts(dataname$factorvariable)=contr.poly()# of levels, i.e. 3) ##example
@@ -33,7 +40,7 @@ contrasts(Feeding$Chem)=contr.poly(3)
 ##then run your model as
 
 model.1=aov(dv~covariate+factorvariable, data=dataname) ## example
-mod1=aov(v~Flow.rate*Chem*Light, data=AGG_Feed)
+mod1=aov(v~Flow.rate*Chem, data=AGG_Dark)
 mod2 <- update(mod1, ~.-Chem:Flow.rate:Light)
 ##To view the model use:
 
@@ -41,11 +48,11 @@ Anova(model.1, type="III") ## example
 Anova(mod1, type="III")
 ##Make sure you use capital "A" Anova here and not anova. This will give results using type III SS.
 
-summary.lm(model.1) ##will give another summary and includes the R-sq. output. Example
+summary.lm(mod1) ##will give another summary and includes the R-sq. output. Example
 summary.lm(mod2)
 
 posth=glht(model.1, linfct=mcp(factorvariable="Tukey"))  ##gives the post-hoc Tukey analysis. Example
-posth=glht(mod1, linfct=mcp(Chem*Light*Flow.rate="Tukey"))
+posth=glht(mod1, linfct=mcp(Chem*Flow.rate="Tukey"))
 summary(posth) ##shows the output in a nice format.
 
 TukeyHSD(mod1, conf.level=.95) ## gives full Tukey post-hoc for all pairwise combinations
@@ -67,10 +74,10 @@ fit2 <- update(fit, ~.-Chem:Flow.rate:Light)# same thing minus 3-way interaction
 ##plot(fit) # diagnostic plots
 
 summary(fit2) # display Type I ANOVA table
-drop1(fit,~.,test="F") # type III SS and F Tests
+drop1(mod1,~.,test="F") # type III SS and F Tests
 
 # Tukey Honestly Significant Differences
-TukeyHSD(fit) 
+TukeyHSD(mod1) 
 
 ```
 
@@ -2019,14 +2026,16 @@ dvm <- circular:::DvonmisesRad
 stopifnot(all.equal(c(dvm(1,1,0.5,log=TRUE), dvm(2,3,0.5,log=TRUE)),
                     dvm(c(1,2), c(1,3), 0.5, log=TRUE)))
 
-m_null <- mle2(turn.anglexysmooth ~ dvm(exp(log_mu), exp(log_kappa)),
+range(AGG_Dark$pitch.perfect)
+
+m_null <- mle2(pitch.perfect ~ dvm(exp(log_mu), exp(log_kappa)),
            parameters = list(log_mu ~ 1),
-           data = AGG_Feed,
+           data = AGG_Dark,
            start = list(log_mu = 0, log_kappa = 0))
 
-m3_LFC <- update(m_null, parameters = list(log_mu ~ Light+Flow.rate+Chem))
-m3_LF  <- update(m_null, parameters = list(log_mu ~ Light+Flow.rate))
-m3_L   <- update(m_null, parameters = list(log_mu ~ Light))
+m3_FC <- update(m_null, parameters = list(log_mu ~ Flow.rate+Chem))
+m3_F  <- update(m_null, parameters = list(log_mu ~ Flow.rate))
 
-anova(m3_LFC, m3_LF, m3_L, m_null)
-````
+
+anova(m3_FC, m3_F, m_null)
+```

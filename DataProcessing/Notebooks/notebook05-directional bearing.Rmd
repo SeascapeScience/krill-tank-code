@@ -6,7 +6,7 @@ output: html_notebook
 ```{r}
 
 rm(list=ls(all=TRUE))
-load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (Sep 20 2023).Rdata")
+load("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Total Merged Data File (March 6 2024).Rdata")
 
 ## Need to use turn angles and a point of reference (e.g. inlet valve) to determine directional bearing
 
@@ -20,6 +20,11 @@ str(TotalData)
 
 ## head(CC.TotalData)  Flow and Chlorophyll are numeric - need to get back to factors with correct numbers
 ## str(CC.TotalData)
+levels(FeedingDark$D_V)
+FeedingDark <- subset(Feeding, Light=="Absent")
+FeedingLight <- subset(Feeding, Light=="Present")
+str(FeedingLight)
+plot(droplevels(FeedingDark$Chlorophyll), FeedingDark$vel)
 
 
 library(ggplot2)
@@ -80,17 +85,78 @@ control.circle=circle.control())
 ## redo with vertical headings, change range for turn angles?
 
 library(ggplot2)
+library(ggmulti)
 head(AGG_Feed)
-str(AGG_Feed)
-range(AGG_Feed$heading.pi)
-AGG_Feed$turn.anglexysmooth <- AGG_Feed$turn.anglexysmooth/(2*pi)*360
-f_mu <- mean(Feeding$turn.angle.smooth, by =c(Chem, Light, Flow.rate))
+str(Feeding)
+levels(FeedingDark$Chem) <- c("Ambient", "Guano", "Guano+CHL")
+range(Feeding$turn.anglexysmooth)
+FeedingLight$turn.anglexysmooth <- FeedingLight$turn.anglexysmooth/(2*pi)*360
+f_mu <- mean(Feeding$turn.anglexysmooth, by=c(Chem, Flow.rate))
 
-ggplot(AGG_Feed, aes(heading.pi, fill = Chem)) +
-  geom_histogram(binwidth = 10, boundary = 0, colour = "black", size = .25) +
-  coord_polar() +
-   ylim(0, 20)  +
-  scale_x_continuous(limits = c(-180,180),
+ggplot(mtcars, aes(disp, mpg)) +
+  geom_point() +
+  coord_radial(theta = 'x', start = 0, clip = 'on') ##,position =  position_dodge(0)
+
+ggplot(df, aes(x = variable, y = value, fill = factor(dvmph))) +
+  geom_col() +
+  coord_polar()
+##############################################################################
+library(forcats)
+library(ggplot2)
+library(dplyr)
+
+#Code
+Feeding %>%
+  filter(Chem %in% c("Ambient", "Guano", "Guano+CHL")) %>%
+  ggplot(aes(x = heading.pi, fill = Chem))+
+  geom_bar(stat = 'bin',  position = "fill", colour = "black", size = .25)+
+  coord_polar(theta = "x", start = 3.142, direction=1)+
+  theme_classic()+
+  scale_x_continuous(limits = c(-179.999,180), ## if -180 labels overlap and look funny
+                     breaks = seq(-180, 180, by = 45),
+                     minor_breaks = seq(-180, 180, by = 15))+
+  theme(text=element_text(size=20))+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=0,hjust=1,vjust=0.4))+
+  theme(axis.line = element_line(size = 0.5, linetype = "solid",
+                                   colour = "black"))+
+  theme(legend.key = element_rect(fill = "white"))+
+  labs(x = "Horizontal Heading (degrees)", y = "Frequency of Heading", title = "") +
+  scale_fill_manual(values=c("lightgray", "gray", "gray35"),name = "Chemical Cue",
+                    labels=c("Ambient", "Guano", "Guano+CHL"))+
+ facet_grid(facets = Light ~ Flow.rate, labeller = label_both)
+
+  ###########################################################
+Feeding %>%
+  filter(Chem %in% c("Ambient", "Guano", "Guano+CHL")) %>%
+  ggplot(aes(x = turn.angle, fill = Chem))+
+  stat_bin_(data = Feeding,  position = "stack", binwidth = 15, colour = "black", size = .25)+
+  coord_polar(theta = "x", start = 3.142, direction=1)+
+  #geom_vline(data = Data2, aes(xintercept = ta), size = 1)+
+  theme_classic()+
+  scale_x_continuous(limits = c(-181,180), ## if -180 labels overlap and look funny
+                     breaks = seq(-180, 180, by = 45),
+                     minor_breaks = seq(-180, 180, by = 15))+
+  theme(text=element_text(size=20))+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=0,hjust=1,vjust=0.4))+
+  theme(axis.line = element_line(size = 0.5, linetype = "solid",
+                                   colour = "black"))+
+  theme(legend.key = element_rect(fill = "white"))+
+  labs(x = "Turn Angle (degrees)", y = "Frequency of Turn Angle", title = "") +
+  scale_fill_manual(values=c("gray92", "gray", "gray35"),name = "Chemical Cue",
+                    labels=c("Ambient", "Guano", "Guano+CHL"))+
+ facet_grid(facets = Chem ~ Flow.rate, labeller = label_both)
+
+#########################################################################
+
+
+#ggplot(Feeding, aes(heading.pi-7.5, fill = Chem)) +
+  geom_histogram(binwidth = 15, boundary = 0, colour = "black", size = .25) +
+  #coord_radial(start = 0)+
+    coord_polar(start = 3.142, direction=1) + ### adjusts position of 0 in plot
+   ylim(-10, 25000)  +
+  scale_x_continuous(limits = c(-179.99,180), ## if -180 labels overlap and look funny
                      breaks = seq(-180, 180, by = 45),
                      minor_breaks = seq(-180, 180, by = 15))+
   theme(text=element_text(size=20))+
@@ -100,16 +166,36 @@ ggplot(AGG_Feed, aes(heading.pi, fill = Chem)) +
                                    colour = "black"))+
   theme(legend.key = element_rect(fill = "white"))+
   ##geom_vline(aes(heading.pi), xintercept = f_mu)+   ## adds mean angle line to plot
-  labs(x = "Horizontal Heading (degrees)", y = "Frequency of Heading", title = "") +
+  labs(x = "Horizontal Heading (degrees)", y = "Proportional Frequency of Heading (%)", title = "") +
   scale_fill_manual(values=c("white", "gray", "gray35"),name = "Chemical Cue",
                     labels=c("Ambient", "Guano", "Guano+CHL"))+
  facet_grid(facets = Light ~ Flow.rate, labeller = label_both)
 
+###############################################################################
+####     coefficient of dispersion plot
 
+CD <- read.csv(file = "~/Bigelow/Manuscripts/Feeding MS/CD.csv", sep = ',', header = TRUE)
 
-### need to subset data into variables to see if more manageable to make figures of
+CD %>%
+  filter(Chem %in% c("Ambient", "Guano", "Guano+CHL")) %>%
+  ggplot(aes(x = Data2$ta, y = 1))+
+  coord_polar(theta = "x", start = 3.142, direction=1)+
+  #geom_vline(data = Data2, aes(xintercept = ta), size = 1)+
+  geom_segment(aes(x=0, y=0, xend=Data2$ta, yend=cd+.4), arrow = arrow(length=unit(.5, 'cm'), type = "open"))+
+  theme_classic()+
+  scale_x_continuous(limits = c(-181,180), ## if -180 labels overlap and look funny
+                     breaks = seq(-180, 180, by = 45),
+                     minor_breaks = seq(-180, 180, by = 15))+
+  theme(text=element_text(size=20))+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=0,hjust=1,vjust=0.4))+
+  theme(axis.line = element_line(size = 0.5, linetype = "solid",
+                                   colour = "black"))+
+  labs(x = "Turn Angle (degrees)", y = "Coefficient of Dispersion (r)", title = "") +
+  facet_grid(facets = Chem ~ Flow.rate, labeller = label_both)
 
-## run dataframe subset code in notebook 06 to do this (SAVED IN RMD FILE)
+########################
+
 
 ```
 

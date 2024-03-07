@@ -381,8 +381,10 @@ watson.wheeler.test(data1)
 
 Binning Headings into 15 degree groups then doing a gtest
 ```{r}
+library(AMR)
 
 
+g.test(AGG_Dark$Chem, AGG_Dark$Flow.rate)
 
 
 
