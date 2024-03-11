@@ -1,6 +1,7 @@
 ---
 title: "Parameterization Model"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
 ---
@@ -29,7 +30,6 @@ library('matrixStats')
 
 source('../functions/parameters-source.R')
 
-rm(list=ls(all=TRUE))   
 #load("~/Post-doc/Data/Total Merged Data File (Oct 5 2023).RData")
 load('~/Work/Data/Antarctic/CC.TotalData.2023.09.20.RData')  # loads the most recent version of the data, after it has been cleaned, processed and transformed into a singular dataframe, that has then been saved as a .Rdata file.
 CC.TotalData$Chlorophyll <- as.numeric(as.character(CC.TotalData$Chlorophyll))  
@@ -55,7 +55,7 @@ Now we need to extract all of the swimming parameters for each experiment.
 
 ```{r echo=F}
 param.names <- NA
-parameters[1:dim(conditions)[1],1] <- NA
+parameters <- matrix(NA, nrow = dim(conditions)[1], ncol = 50)
 
 for (i in 1:dim(conditions)[1])  
 {
@@ -95,7 +95,7 @@ for (i in 1:dim(conditions)[1])
 
       ip <- ip+1
       param.names[ip] <- 'velocity st.dev.'
-      parameters[i,ip] <- sd(veloctiy)
+      parameters[i,ip] <- sd(velocity)
 
       params.out <- getautocorrparams(log10(velocity))
       ip <- ip+1
@@ -113,9 +113,9 @@ for (i in 1:dim(conditions)[1])
       ip <- ip+1
       param.names[ip] <- 'velocity dip test (p-value)'
       parameters[i,ip] <- params.out$dip
-      
+
       # Parameters for heading.h
-      ip <- 1
+      ip <- ip+1
       param.names[ip] <- 'heading.h mean'
       parameters[i,ip] <- mean(heading.h)
 
@@ -139,9 +139,9 @@ for (i in 1:dim(conditions)[1])
       ip <- ip+1
       param.names[ip] <- 'heading.h dip test (p-value)'
       parameters[i,ip] <- params.out$dip
-      
+
       # Parameters for heading.v
-      ip <- 1
+      ip <- ip+1
       param.names[ip] <- 'heading.v mean'
       parameters[i,ip] <- mean(heading.v)
 
@@ -165,8 +165,8 @@ for (i in 1:dim(conditions)[1])
       ip <- ip+1
       param.names[ip] <- 'heading.v dip test (p-value)'
       parameters[i,ip] <- params.out$dip
-      
-      
+
+
   }  
 }
 
