@@ -7,9 +7,9 @@ NGDR is the ratio of the net displacement (linear distance between starting poin
 
 ```{r}
 rm(list=ls(all=TRUE))   ## removes the previous workspace and environment so that we only have the data we need loaded in the session
-load("~/Post-doc/Data/Total Merged Data File (March 6 2024).RData")
+load("~/Bigelow/Manuscripts/Feeding MS/Feeding MS.RData")
 
-FeedingDark <- read.csv(file = "~/Bigelow/Manuscripts/Feeding MS/FeedingDark.csv", sep = ',', header = T)
+#FeedingDark <- read.csv(file = "~/Bigelow/Manuscripts/Feeding MS/FeedingDark.csv", sep = ',', header = T)
 AGG_Dark<- read.csv(file = "~/Bigelow/Manuscripts/Feeding MS/AGG_Dark.csv", sep = ',', header = T)
 
 ```

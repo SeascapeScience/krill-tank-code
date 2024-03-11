@@ -48,13 +48,13 @@ levels(Highflow$Chem) <- c("Ambient", "Guano", "Guano+CHL")
 Medflow$Chem <- ordered(Medflow$Chem, levels = c("Ambient", "Guano", "Guano+CHL"))
 
 
-a <- ggplot(data, aes(x = Flow.rate, y = log(v), fill= Chlorophyll))+
+a <- ggplot(AGG_Dark, aes(x = Flow.rate, y = log(v), fill= Chem))+
   geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
   theme(legend.key.size = unit(2, "cm"))+
   theme(text = element_text(size = 16))+
   ##stat_summary(fun=mean, geom="line", lty=2, lwd=1, col = "black", aes(group=1)) +
-  #stat_summary(fun = mean, geom = "errorbar", aes(ymax = ..y.., ymin = ..y..),
-                 #width = 0.25, linetype = "dashed")+
+  stat_summary(geom = "errorbar", fun.min = mean, fun = mean, fun.max = mean,
+               width = .75, linetype = "dashed", position = position_dodge())+
   ##stat_summary(fun=mean, colour="red", geom="point", size = 4) +
   theme(axis.text=element_text(color="black"))+
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
@@ -66,9 +66,9 @@ a <- ggplot(data, aes(x = Flow.rate, y = log(v), fill= Chlorophyll))+
                                    colour = "black"))+
   theme(legend.key = element_rect(fill = "white"))+
   labs(size = "", x = "Flow Rate (cm s-1)", y = "Ground Velocity (logged, cm s-1)", title = "") +
-  scale_fill_manual(values=c("white", "gray88", "gray", "gray48", "gray35", "slategray"),name = "Chlorophyll (ug L-1)",
-                    labels=c("No Chlorophyll (0)", "Low Chlorophyll (1-5)", "Medium Chlorophyll (6-10)", "High Chlorophyll (11-19)", "Filament"))
-  #facet_grid(~ Flow.rate, labeller = label_both, scales = "free_x", space = "free")
+  scale_fill_manual(values=c("white", "gray88", "slategray"),name = "Chemical Cue",
+                    labels=c("Ambient", "Guano", "Guano+CHL"))+
+  facet_grid(~ Flow.rate, labeller = label_both, scales = "free_x", space = "free")
 a
 
 b <- ggplot(Highflow,aes(x = Chem, y = turn.angle, fill= Chem))+
