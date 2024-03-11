@@ -373,7 +373,10 @@ watson.wheeler.test(data1)
 Binning Headings into 15 degree groups then doing a gtest
 ```{r}
 library(AMR)
-g.test(AGG_Dark$Chem, AGG_Dark$Flow.rate)
+## need to bin into 15 degree bins
+AGG_Dark$bins <- cut(AGG_Dark$turn.anglexysmooth, breaks=c(0,15,30,45,60,75,90), labels=c("0-15","15-30","30-45", "45-60", "60-75", "75-90"))
+str(AGG_Dark)
+g.test(AGG_Dark$bins, AGG_Dark$Chem)
 
 write.csv(FeedingDark, file = "~/Bigelow/Manuscripts/Feeding MS/FeedingDark.csv", row.names = FALSE)
 write.csv(AGG_Dark, file = "~/Bigelow/Manuscripts/Feeding MS/AGG_Dark.csv", row.names = FALSE)
