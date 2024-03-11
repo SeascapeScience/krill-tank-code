@@ -87,6 +87,8 @@ for (i in 1:dim(conditions)[1])
       heading.v <- binMeans(y= heading.v, x = idx, bx = bx)
       
       # Add parameters one by one
+      
+      # Parameters for velocity magnitude
       ip <- 1
       param.names[ip] <- 'velocity mean'
       parameters[i,ip] <- mean(velocity)
@@ -111,6 +113,60 @@ for (i in 1:dim(conditions)[1])
       ip <- ip+1
       param.names[ip] <- 'velocity dip test (p-value)'
       parameters[i,ip] <- params.out$dip
+      
+      # Parameters for heading.h
+      ip <- 1
+      param.names[ip] <- 'heading.h mean'
+      parameters[i,ip] <- mean(heading.h)
+
+      ip <- ip+1
+      param.names[ip] <- 'heading.h st.dev.'
+      parameters[i,ip] <- sd(heading.h)
+
+      params.out <- getautocorrparams(heading.h)
+      ip <- ip+1
+      param.names[ip] <- 'heading.h autocorr slope'
+      parameters[i,ip] <- params.out$slope
+      ip <- ip+2
+      param.names[ip] <- 'heading.h autocorr intercept'
+      parameters[i,ip] <- params.out$intercept
+      ip <- ip+1
+      param.names[ip] <- 'heading.h autocorr residuals'
+      parameters[i,ip] <- params.out$resid
+      ip <- ip+1
+      param.names[ip] <- 'heading.h autocorr coefficient (rho)'
+      parameters[i,ip] <- params.out$rho
+      ip <- ip+1
+      param.names[ip] <- 'heading.h dip test (p-value)'
+      parameters[i,ip] <- params.out$dip
+      
+      # Parameters for heading.v
+      ip <- 1
+      param.names[ip] <- 'heading.v mean'
+      parameters[i,ip] <- mean(heading.v)
+
+      ip <- ip+1
+      param.names[ip] <- 'heading.v st.dev.'
+      parameters[i,ip] <- sd(heading.v)
+
+      params.out <- getautocorrparams(heading.v)
+      ip <- ip+1
+      param.names[ip] <- 'heading.v autocorr slope'
+      parameters[i,ip] <- params.out$slope
+      ip <- ip+2
+      param.names[ip] <- 'heading.v autocorr intercept'
+      parameters[i,ip] <- params.out$intercept
+      ip <- ip+1
+      param.names[ip] <- 'heading.v autocorr residuals'
+      parameters[i,ip] <- params.out$resid
+      ip <- ip+1
+      param.names[ip] <- 'heading.v autocorr coefficient (rho)'
+      parameters[i,ip] <- params.out$rho
+      ip <- ip+1
+      param.names[ip] <- 'heading.v dip test (p-value)'
+      parameters[i,ip] <- params.out$dip
+      
+      
   }  
 }
 

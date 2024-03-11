@@ -27,7 +27,7 @@ getautocorrparams <- function(datain = c(NA,NA))
   # Run statistics
   fit <- lm(d1 ~ d0 + 1, data = df)
   c <- cor.test(d0,d1)
-  d <- dip.test(velocity)
+  d <- dip.test(datain)
   # Get parameters from statistical tests
   slope <- fit$coefficients[2]
   intercept <- fit$coefficients[1]
