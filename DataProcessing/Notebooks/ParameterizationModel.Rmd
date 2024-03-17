@@ -55,7 +55,7 @@ Now we need to extract all of the swimming parameters for each experiment.
 
 ```{r echo=F}
 param.names <- NA
-parameters <- matrix(NA, nrow = dim(conditions)[1], ncol = 50)
+parameters <- matrix(NA, nrow = dim(conditions)[1], ncol = 21)
 
 for (i in 1:dim(conditions)[1])  
 {
@@ -101,7 +101,7 @@ for (i in 1:dim(conditions)[1])
       ip <- ip+1
       param.names[ip] <- 'velocity autocorr slope'
       parameters[i,ip] <- params.out$slope
-      ip <- ip+2
+      ip <- ip+1
       param.names[ip] <- 'velocity autocorr intercept'
       parameters[i,ip] <- params.out$intercept
       ip <- ip+1
@@ -127,7 +127,7 @@ for (i in 1:dim(conditions)[1])
       ip <- ip+1
       param.names[ip] <- 'heading.h autocorr slope'
       parameters[i,ip] <- params.out$slope
-      ip <- ip+2
+      ip <- ip+1
       param.names[ip] <- 'heading.h autocorr intercept'
       parameters[i,ip] <- params.out$intercept
       ip <- ip+1
@@ -153,7 +153,7 @@ for (i in 1:dim(conditions)[1])
       ip <- ip+1
       param.names[ip] <- 'heading.v autocorr slope'
       parameters[i,ip] <- params.out$slope
-      ip <- ip+2
+      ip <- ip+1
       param.names[ip] <- 'heading.v autocorr intercept'
       parameters[i,ip] <- params.out$intercept
       ip <- ip+1
@@ -170,10 +170,7 @@ for (i in 1:dim(conditions)[1])
   }  
 }
 
-parameters <- setNames(parameters,param.names)
-
-## now we save the data frame for the full set of experimental conditions and label each column appropriately 
-
+colnames(parameters) <- param.names
 
 ```
 
