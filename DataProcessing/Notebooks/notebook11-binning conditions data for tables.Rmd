@@ -334,6 +334,8 @@ Total angles
 range(LML$heading.pi)
 library(circular)
 
+
+
 range(AGG_Dark$turn.anglexysmooth)
 AGG_Feed$turn.anglexysmooth <- AGG_Feed$turn.anglexysmooth/(2*pi)*360
 

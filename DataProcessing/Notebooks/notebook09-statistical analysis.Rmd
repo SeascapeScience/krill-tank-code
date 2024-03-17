@@ -40,7 +40,7 @@ contrasts(Feeding$Chem)=contr.poly(3)
 ##then run your model as
 
 model.1=aov(dv~covariate+factorvariable, data=dataname) ## example
-mod1=aov(v~Flow.rate*Chem, data=AGG_Dark)
+mod1=aov(v ~ Flow.rate*Chem, data=AGG_Dark)
 mod2 <- update(mod1, ~.-Chem:Flow.rate:Light)
 ##To view the model use:
 
@@ -51,7 +51,7 @@ Anova(mod1, type="III")
 summary.lm(mod1) ##will give another summary and includes the R-sq. output. Example
 summary.lm(mod2)
 
-posth=glht(model.1, linfct=mcp(factorvariable="Tukey"))  ##gives the post-hoc Tukey analysis. Example
+posth=glht(model.1, linfct=mcp(factorvariable="Tukey"))  ##gives the post-hoc Turkey analysis. Example
 posth=glht(mod1, linfct=mcp(Chem*Flow.rate="Tukey"))
 summary(posth) ##shows the output in a nice format.
 

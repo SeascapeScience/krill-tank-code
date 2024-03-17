@@ -83,13 +83,12 @@ control.circle=circle.control())
   ##ggplot2 approach
 
 ## redo with vertical headings, change range for turn angles?
+write.table(FeedingDark, file = "~/Bigelow/Manuscripts/Feeding MS/FeedingDark.csv", sep = ",", col.names = TRUE)
 
-library(ggplot2)
-library(ggmulti)
 head(AGG_Feed)
 str(Feeding)
 levels(FeedingDark$Chem) <- c("Ambient", "Guano", "Guano+CHL")
-range(Feeding$turn.anglexysmooth)
+range(FeedingDark$turn.anglexysmooth)
 FeedingLight$turn.anglexysmooth <- FeedingLight$turn.anglexysmooth/(2*pi)*360
 f_mu <- mean(Feeding$turn.anglexysmooth, by=c(Chem, Flow.rate))
 
@@ -104,6 +103,7 @@ ggplot(df, aes(x = variable, y = value, fill = factor(dvmph))) +
 library(forcats)
 library(ggplot2)
 library(dplyr)
+library(ggmulti)
 
 #Code
 Feeding %>%
@@ -127,10 +127,10 @@ Feeding %>%
  facet_grid(facets = Light ~ Flow.rate, labeller = label_both)
 
   ###########################################################
-Feeding %>%
+FeedingDark %>%
   filter(Chem %in% c("Ambient", "Guano", "Guano+CHL")) %>%
-  ggplot(aes(x = turn.angle, fill = Chem))+
-  stat_bin_(data = Feeding,  position = "stack", binwidth = 15, colour = "black", size = .25)+
+  ggplot(aes(x = turn.anglexysmooth, fill = Chem))+
+  stat_bin_(data = FeedingDark,  position = "stack", binwidth = 15, colour = "black", size = .25)+
   coord_polar(theta = "x", start = 3.142, direction=1)+
   #geom_vline(data = Data2, aes(xintercept = ta), size = 1)+
   theme_classic()+
@@ -149,7 +149,6 @@ Feeding %>%
  facet_grid(facets = Chem ~ Flow.rate, labeller = label_both)
 
 #########################################################################
-
 
 #ggplot(Feeding, aes(heading.pi-7.5, fill = Chem)) +
   geom_histogram(binwidth = 15, boundary = 0, colour = "black", size = .25) +
@@ -173,6 +172,9 @@ Feeding %>%
 
 ###############################################################################
 ####     coefficient of dispersion plot
+
+
+
 
 CD <- read.csv(file = "~/Bigelow/Manuscripts/Feeding MS/CD.csv", sep = ',', header = TRUE)
 
