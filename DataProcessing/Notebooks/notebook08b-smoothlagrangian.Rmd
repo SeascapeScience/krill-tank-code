@@ -1,0 +1,48 @@
+---
+title: "Notebook08b-smoothLagrangian"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+load('~/Work/Data/Antarctic/CC.TotalData.2023.09.20.RData')
+```
+
+```{r}
+CC.TotalData$ysmooth.displaced <- 
+  CC.TotalData$ysmooth - as.numeric(as.character(CC.TotalData$Flow.rate))/30
+
+smoothx1 <- CC.TotalData$xsmooth[1:(nrow(CC.TotalData)-1)]
+smoothx2 <- CC.TotalData$xsmooth[2:nrow(CC.TotalData)]
+CC.TotalData$smooth.dx[1:(nrow(CC.TotalData)-1)] <- smoothx2-smoothx1
+
+
+smoothy1 <- CC.TotalData$ysmooth.displaced[1:(nrow(CC.TotalData)-1)]
+smoothy2 <- CC.TotalData$ysmooth[2:nrow(CC.TotalData)] # Lagrangian distance swum in y
+CC.TotalData$smooth.displaced.dy <- NA # Make the new column
+CC.TotalData$smooth.displaced.dy[1:(nrow(CC.TotalData)-1)] <- smoothy2-smoothy1
+
+smoothz1 <- CC.TotalData$zsmooth[1:(nrow(CC.TotalData)-1)]
+smoothz2 <- CC.TotalData$zsmooth[2:nrow(CC.TotalData)]
+CC.TotalData$smooth.dz[1:(nrow(CC.TotalData)-1)] <- smoothz2-smoothz1
+
+CC.TotalData$smooth.d <- sqrt(CC.TotalData$smooth.dx^2 + CC.TotalData$smooth.dy^2 + CC.TotalData$smooth.dz^2) # Total Lagrangian distance swum
+
+# Velocities
+
+CC.TotalData$smooth.vx <- CC.TotalData$smooth.dx/(1/30)  ## velocity on the x axis
+CC.TotalData$smooth.displaced.vy <- CC.TotalData$smooth.displaced.dy/(1/30)  ## lagrangian velocity on the y axis
+CC.TotalData$smooth.vz <- CC.TotalData$smooth.dz/(1/30)  ## velocity on the z axis
+CC.TotalData$smooth.displaced.v <- CC.TotalData$smooth.d/(1/30) ## total velocity
+
+CC.TotalData$smooth.displaced.h.heading <- 
+  atan2(CC.TotalData$smooth.dx, CC.TotalData$smooth.displaced.dy)
+CC.TotalData$heading.displaced.pi <- CC.TotalData$smooth.displaced.h.heading/(2*pi)*360
+CC.TotalData$smooth.displaced.v.heading <- 
+  atan2(CC.TotalData$smooth.dz, 
+        (sqrt(CC.TotalData$smooth.dx^2 + CC.TotalData$smooth.displaced.dy^2)))
+CC.TotalData$displaced.pitch.perfect <- CC.TotalData$smooth.displaced.v.heading/(2*pi)*360
+
+
+```
+
