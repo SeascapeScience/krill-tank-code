@@ -1629,8 +1629,8 @@ different experimental conditions tested. Then a random forest model is
 built and saved so that someone downstream can pull the full set of
 parameters (or whatever they need) given an arbitrary set of
 environmental conditions.</p>
-<p>The experimental conditons are: flow rate, chlorophyll concentration,
-guano presence, and light presence.</p>
+<p>The experimental conditions are: flow rate, chlorophyll
+concentration, guano presence, and light presence.</p>
 <p>The swimming parameters are: - Mean velocity magnitude - Velocity
 magnitude variance - Velocity magnitude autocorrelation slope,
 intercept, residual - Velocity magnitude bimodal test significance -
@@ -1655,7 +1655,7 @@ intercept, residual - … (there will be more)</p>
 ## ✖ dplyr::filter()  masks stats::filter()
 ## ✖ dplyr::lag()     masks stats::lag()
 ## ✖ recipes::step()  masks stats::step()
-## • Use suppressPackageStartupMessages() to eliminate package startup messages</code></pre>
+## • Search for functions across packages at https://www.tidymodels.org/find/</code></pre>
 <pre><code>## randomForest 4.7-1.1</code></pre>
 <pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
 <pre><code>## 
@@ -1673,21 +1673,13 @@ intercept, residual - … (there will be more)</p>
 ##     count</code></pre>
 <pre><code>## Warning: NAs introduced by coercion</code></pre>
 <p>The experimental conditions tested were: - Flow rates: 0, 0.6, 3.0,
-5.9, 8.9 - Chlorophyll concentrations: 0.00, 1.01, 2.70, 2.80, 3.00,
-3.70, 4.30, 4.50, 4.60, 5.50, 5.70, 5.90, 6.00, 6.10, 7.60, 9.00, 13.50,
-16.00, 16.90, 19.00 - Guano presence: absent, present - Light presence:
-absent, present Of the possible combinations, 127 combinations were
-tested in an experimental setting.</p>
+5.9, 8.9 cm/s - Chlorophyll concentrations: 0.00, 1.01, 2.70, 2.80,
+3.00, 3.70, 4.30, 4.50, 4.60, 5.50, 5.70, 5.90, 6.00, 6.10, 7.60, 9.00,
+13.50, 16.00, 16.90, 19.00 µg/L - Guano presence: absent, present -
+Light presence: absent, present Of the possible combinations, 127
+combinations were tested in an experimental setting.</p>
 <p>Now we need to extract all of the swimming parameters for each
 experiment.</p>
-<pre><code>## Warning in regularize.values(x, y, ties, missing(ties), na.rm = na.rm):
-## collapsing to unique &#39;x&#39; values
-
-## Warning in regularize.values(x, y, ties, missing(ties), na.rm = na.rm):
-## collapsing to unique &#39;x&#39; values
-
-## Warning in regularize.values(x, y, ties, missing(ties), na.rm = na.rm):
-## collapsing to unique &#39;x&#39; values</code></pre>
 
 
 

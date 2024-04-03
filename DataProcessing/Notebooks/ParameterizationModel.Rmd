@@ -57,7 +57,7 @@ Now we need to extract all of the swimming parameters for each experiment.
 
 ```{r echo=F}
 param.names <- NA
-parameters <- matrix(NA, nrow = dim(conditions)[1], ncol = 22)
+parameters <- matrix(NA, nrow = dim(conditions)[1], ncol = 21)
 
 for (i in 1:dim(conditions)[1])  
 {
@@ -65,6 +65,7 @@ for (i in 1:dim(conditions)[1])
      CC.TotalData$Chlorophyll==conditions[i,2] &
      as.numeric(CC.TotalData$Guano)==conditions[i,3] &
      as.numeric(CC.TotalData$Light)==conditions[i,4])
+  
   velocity <- CC.TotalData$smooth.v[I]
   # Check whether combination was run as an experiment
   # ...and if not, set parameters to NA
@@ -86,19 +87,35 @@ for (i in 1:dim(conditions)[1])
       dz <- CC.TotalData$dz[I]
       dz <- binMeans(y=dz, x = idx, bx = bx)
       
+      # If we want to filter behavior near edges
+      x <- CC.TotalData$x[I]
+      x <- binMeans(y=x, x = idx, bx = bx)
+      y <- CC.TotalData$y[I]
+      y <- binMeans(y=y, x = idx, bx = bx)
+      z <- CC.TotalData$z[I]
+      z <- binMeans(y=z, x = idx, bx = bx)
+      J <- ((x > min(x, na.rm = T)+.05) & 
+              (x < max(x, na.rm = T)-.05) & 
+              (y > min(y, na.rm = T)+.05) & 
+              (y < max(y, na.rm = T)-.05) & 
+              (z > min(z, na.rm = T)+.00) & 
+              (z < max(z, na.rm = T)-.00))
+      #J <- 1:length(velocity)
+      
+      if (length(which(J))<20) {parameters[i,] <- NA } else {
       
       # Add parameters one by one
       
       # Parameters for velocity magnitude
       ip <- 1
       param.names[ip] <- 'velocity mean'
-      parameters[i,ip] <- mean(velocity)
+      parameters[i,ip] <- mean(velocity[J])
 
       ip <- ip+1
       param.names[ip] <- 'velocity st.dev.'
-      parameters[i,ip] <- sd(velocity)
+      parameters[i,ip] <- sd(velocity[J])
 
-      params.out <- getautocorrparams(log10(velocity))
+      params.out <- getautocorrparams(log10(velocity[J]))
       ip <- ip+1
       param.names[ip] <- 'velocity autocorr slope'
       parameters[i,ip] <- params.out$slope
@@ -118,13 +135,13 @@ for (i in 1:dim(conditions)[1])
       # Parameters for heading.h
       ip <- ip+1
       param.names[ip] <- 'heading.h mean'
-      parameters[i,ip] <- mean(heading.h)
+      parameters[i,ip] <- mean(heading.h[J])
 
       ip <- ip+1
       param.names[ip] <- 'heading.h st.dev.'
-      parameters[i,ip] <- sd(heading.h)
+      parameters[i,ip] <- sd(heading.h[J])
 
-      params.out <- getautocorrparams(heading.h)
+      params.out <- getautocorrparams(heading.h[J])
       ip <- ip+1
       param.names[ip] <- 'heading.h autocorr slope'
       parameters[i,ip] <- params.out$slope
@@ -144,13 +161,13 @@ for (i in 1:dim(conditions)[1])
       # Parameters for heading.v
       ip <- ip+1
       param.names[ip] <- 'heading.v mean'
-      parameters[i,ip] <- mean(heading.v)
+      parameters[i,ip] <- mean(heading.v[J])
 
       ip <- ip+1
       param.names[ip] <- 'heading.v st.dev.'
-      parameters[i,ip] <- sd(heading.v)
+      parameters[i,ip] <- sd(heading.v[J])
 
-      params.out <- getautocorrparams(heading.v)
+      params.out <- getautocorrparams(heading.v[J])
       ip <- ip+1
       param.names[ip] <- 'heading.v autocorr slope'
       parameters[i,ip] <- params.out$slope
@@ -175,11 +192,11 @@ for (i in 1:dim(conditions)[1])
       #param.names[ip] <- 'velocity displaced mean'
       #parameters[i,ip] <- mean(velocity.displaced)
 
-
+  }
   }  
 }
 
 colnames(parameters) <- param.names
-save(parameters,conditions,file='ParameterizationModel2024.04.03.Rdata')
+save(parameters,conditions,file='ParameterizationModel2024.04.03c.Rdata')
 ```
 
