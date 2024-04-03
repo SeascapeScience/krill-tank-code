@@ -1,21 +1,21 @@
 ---
 title: "Parameterization Model"
 output:
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
 ---
 This analysis extracts swimming parameters from each of the 127 different experimental conditions tested. Then a random forest model is built and saved so that someone downstream can pull the full set of parameters (or whatever they need) given an arbitrary set of environmental conditions.
 
-The experimental conditons are: flow rate, chlorophyll concentration, guano presence, and light presence.
+The experimental conditions are: flow rate, chlorophyll concentration, guano presence, and light presence.
 
 The swimming parameters are: 
  - Mean velocity magnitude
  - Velocity magnitude variance
  - Velocity magnitude autocorrelation slope, intercept, residual
  - Velocity magnitude bimodal test significance
- - Mean angle (horizontal/vertical)… plus same relative to flow direction
- - Angle coefficient of dispersion (horizontal/vertical) … plus same relative to flow direction
+ - Mean angle (horizontal/vertical)... plus same relative to flow direction
+ - Angle coefficient of dispersion (horizontal/vertical) ... plus same relative to flow direction
  - Heading (horizontal) autocorrelation slope, intercept, residual
  - ... (there will be more)
 
@@ -39,8 +39,8 @@ CC.TotalData$Flow.rate <- as.numeric(as.character(CC.TotalData$Flow.rate))
 ```
 
 The experimental conditions tested were:
- - Flow rates: 0, 0.6, 3.0, 5.9, 8.9
- - Chlorophyll concentrations: 0.00, 1.01, 2.70, 2.80, 3.00, 3.70, 4.30, 4.50, 4.60, 5.50, 5.70, 5.90, 6.00, 6.10, 7.60, 9.00, 13.50, 16.00, 16.90, 19.00
+ - Flow rates: 0, 0.6, 3.0, 5.9, 8.9 cm/s
+ - Chlorophyll concentrations: 0.00, 1.01, 2.70, 2.80, 3.00, 3.70, 4.30, 4.50, 4.60, 5.50, 5.70, 5.90, 6.00, 6.10, 7.60, 9.00, 13.50, 16.00, 16.90, 19.00 µg/L
  - Guano presence: absent, present
  - Light presence: absent, present
 Of the possible combinations, 127 combinations were tested in an experimental setting.
@@ -51,40 +51,41 @@ conditions <- setNames(conditions,c(
   "flow.rate","chlorophyll","guano","light"))
 ```
 
+
+
 Now we need to extract all of the swimming parameters for each experiment.
 
 ```{r echo=F}
 param.names <- NA
-parameters <- matrix(NA, nrow = dim(conditions)[1], ncol = 21)
+parameters <- matrix(NA, nrow = dim(conditions)[1], ncol = 22)
 
 for (i in 1:dim(conditions)[1])  
 {
-  velocity <- CC.TotalData$smooth.v[
-  (CC.TotalData$Flow.rate==conditions[i,1] &
+  I <- (CC.TotalData$Flow.rate==conditions[i,1] &
      CC.TotalData$Chlorophyll==conditions[i,2] &
      as.numeric(CC.TotalData$Guano)==conditions[i,3] &
-     as.numeric(CC.TotalData$Light)==conditions[i,4])]
+     as.numeric(CC.TotalData$Light)==conditions[i,4])
+  velocity <- CC.TotalData$smooth.v[I]
   # Check whether combination was run as an experiment
   # ...and if not, set parameters to NA
   if (length(velocity) <= 1 | length(velocity[!is.na(velocity)])==0) {
     parameters[i,] <- NA } else {
       
-      # Pull and bin velocity and heading time series for selcted experiment
+      # Pull and bin velocity and heading time series for selected experiment
       idx <- 1:length(velocity)
       bx <- seq(from=0.5, to=length(velocity), by=30)
       velocity <- binMeans(y = velocity, x = idx, bx = bx)
-      heading.h <- CC.TotalData$smooth.h.heading[
-        (CC.TotalData$Flow.rate==conditions[i,1] & 
-          CC.TotalData$Chlorophyll==conditions[i,2] & 
-          as.numeric(CC.TotalData$Guano)==conditions[i,3] &
-          as.numeric(CC.TotalData$Light)==conditions[i,4])]
+      heading.h <- CC.TotalData$smooth.h.heading[I]
       heading.h <- binMeans(y=heading.h, x = idx, bx = bx)
-      heading.v <- CC.TotalData$smooth.v.heading[
-        (CC.TotalData$Flow.rate==conditions[i,1] & 
-          CC.TotalData$Chlorophyll==conditions[i,2] & 
-          as.numeric(CC.TotalData$Guano)==conditions[i,3] &
-          as.numeric(CC.TotalData$Light)==conditions[i,4])]
+      heading.v <- CC.TotalData$smooth.v.heading[I]
       heading.v <- binMeans(y= heading.v, x = idx, bx = bx)
+      dx <- CC.TotalData$dx[I]
+      dx <- binMeans(y=dx, x = idx, bx = bx)
+      dy <- CC.TotalData$dy[I]
+      dy <- binMeans(y=dy, x = idx, bx = bx)
+      dz <- CC.TotalData$dz[I]
+      dz <- binMeans(y=dz, x = idx, bx = bx)
+      
       
       # Add parameters one by one
       
@@ -165,12 +166,20 @@ for (i in 1:dim(conditions)[1])
       ip <- ip+1
       param.names[ip] <- 'heading.v dip test (p-value)'
       parameters[i,ip] <- params.out$dip
+      
+      # Parameters adjusted for flow - not sure it makes sense to do these
+      
+      #velocity.displaced <- sqrt(dx^2 + (dy-conditions[i,1]/30)^2 + dz^2)
+      #
+      #ip <- ip+1
+      #param.names[ip] <- 'velocity displaced mean'
+      #parameters[i,ip] <- mean(velocity.displaced)
 
 
   }  
 }
 
 colnames(parameters) <- param.names
-
+save(parameters,conditions,file='ParameterizationModel2024.04.03.Rdata')
 ```
 
