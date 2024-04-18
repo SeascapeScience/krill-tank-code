@@ -1,0 +1,450 @@
+---
+title: "notebook16-tidymodels"
+output: html_notebook
+---
+
+Attempting to use tidymodels for processing our IBM krill data and selecting variables of importance for each swimming parameter
+
+
+```{r}
+library(tidymodels)  # for the parsnip package, along with the rest of tidymodels
+
+# Helper packages
+library(readr)       # for importing data
+library(broom.mixed) # for converting bayesian models to tidy tibbles
+library(dotwhisker)  # for visualizing regression results
+library(vip)         # for variable importance plots
+
+
+rm(list=ls(all=TRUE))   ## removes the previous workspace and environment so that we only have the data we need loaded in the session
+load("~/Post-doc/krill-tank-code/DataProcessing/Notebooks/ParameterizationModel.Rdata")
+
+
+dim(parameters)
+glimpse(parameters)
+
+dim(conditions)
+glimpse(conditions)
+
+df <- data.frame(conditions[,1],conditions[,2],conditions[,3],conditions[,4],parameters[,1])
+colnames(df) <- c("flow","chl", "guano", "light","ave.v")
+df
+df<-na.omit(df)
+
+
+ave.v ~ flow * chl * guano * light
+
+
+linear_reg()
+
+linear_reg() %>% 
+  set_engine("keras")
+
+lm_mod <- linear_reg()
+
+lm_fit <- 
+  lm_mod %>% 
+  fit(ave.v ~ flow * chl * guano * light, data = df)  ## creates a linear model (LM)
+lm_fit
+
+tidy(lm_fit)  ## summary of model
+
+
+tidy(lm_fit) %>% 
+  dwplot(dot_args = list(size = 2, color = "black"),
+         whisker_args = list(color = "black"),
+         vline = geom_vline(xintercept = 0, colour = "grey50", linetype = 2))
+
+new_points <- expand.grid(flow = 6.1,
+                          chl = 19,
+                          guano = 0,
+                          light = 0) ## create new points
+new_points
+
+mean_pred <- predict(lm_fit, new_data = new_points)  ## mean predicted body width
+mean_pred
+
+conf_int_pred <- predict(lm_fit, 
+                         new_data = new_points, 
+                         type = "conf_int")  ## confidence interval prediction
+conf_int_pred
+
+plot_data <- 
+  new_points %>% 
+  bind_cols(mean_pred) %>% 
+  bind_cols(conf_int_pred)
+
+# and plot:
+ggplot(plot_data, aes(x = flow)) + 
+  geom_point(aes(y = .pred)) + 
+  geom_errorbar(aes(ymin = .pred_lower, 
+                    ymax = .pred_upper),
+                width = .2) + 
+  labs(y = "ave v")
+
+# set the prior distribution
+prior_dist <- rstanarm::student_t(df = 1)
+
+set.seed(123)
+
+# make the parsnip model
+bayes_mod <-   
+  linear_reg() %>% 
+  set_engine("stan", 
+             prior_intercept = prior_dist, 
+             prior = prior_dist) 
+
+# train the model
+bayes_fit <- 
+  bayes_mod %>% 
+  fit(ave.v ~ flow * chl * guano * light, data = df)
+
+print(bayes_fit, digits = 5)
+
+tidy(bayes_fit, conf.int = TRUE)
+
+bayes_plot_data <- 
+  new_points %>% 
+  bind_cols(predict(bayes_fit, new_data = new_points)) %>% 
+  bind_cols(predict(bayes_fit, new_data = new_points, type = "conf_int"))
+
+ggplot(bayes_plot_data, aes(x = flow)) + 
+  geom_point(aes(y = .pred)) + 
+  geom_errorbar(aes(ymin = .pred_lower, ymax = .pred_upper), width = .2) + 
+  labs(y = "ave.v") + 
+  ggtitle("Bayesian model with t(1) prior distribution")
+
+### Tuning the model in sections
+
+df %>% 
+  group_by(light) %>% 
+  summarize(med_flow = median(flow))
+
+bayes_mod %>% 
+  fit(ave.v ~ flow * chl * guano * light, data = df)
+
+ggplot(df,
+       aes(flow, ave.v)) +      # returns a ggplot object 
+  geom_jitter() +                         # same
+  geom_smooth(method = lm, se = FALSE) +  # same                    
+  labs(x = "flow", y = "ave.v")         # etc
+```
+
+
+```{r}
+
+rf_mod <- ## creates random forest model
+  rand_forest(trees = 1000) %>% 
+  set_engine("ranger") %>% 
+  set_mode("regression")
+
+
+set.seed(234)  ## comment out to get random runs
+
+rf_fit <- ## fits random forest model to whole dataset
+  rf_mod %>% 
+  fit(ave.v ~ flow * chl * guano * light, data = df)
+rf_fit
+
+rf_pred <- predict(rf_fit, df)  
+plot(df$ave.v, rf_pred$.pred)  ## observed vs predicted
+cor.test(df$ave.v, rf_pred$.pred)  ## gives correlation coef
+
+rf_split <- initial_split(df %>% select(flow, chl, guano, light, ave.v), ## splits cases base on initial results
+                            strata = flow)  ## try with strata = NULL
+
+rf_train <- training(rf_split)  ##creates training and testing datasets
+rf_test  <- testing(rf_split)
+
+## comparisons to test data using ROC and accuracy to measure performance
+
+rf_fit2 <- ## fits random forest model to training dataset
+  rf_mod %>% 
+  fit(ave.v ~ flow * chl * guano * light, data = rf_train)
+rf_fit2
+
+rf_pred2 <- predict(rf_fit2, rf_test) ## compares to test data
+plot(rf_test$ave.v, rf_pred2$.pred)  ## observed vs predicted
+cor.test(rf_test$ave.v, rf_pred2$.pred)  ## gives correlation coef
+
+### can run with different seeds and splits, strata = NULL
+#### loop and run 10 times with diff seeds
+## look at consistency of results
+
+## look at things outside random forest
+
+
+rf_training_pred <- 
+  predict(rf_fit, rf_train) %>% 
+  bind_cols(predict(rf_fit, rf_train, type = "numeric")) %>% 
+  # Add the true outcome data back in
+  bind_cols(rf_train %>% 
+              select(flow, chl, guano, light))
+
+rf_training_pred$light <- as.factor(rf_training_pred$light)
+rf_training_pred$guano <- as.factor(rf_training_pred$guano)
+
+rf_training_pred %>%                # training set predictions
+  roc_auc(truth = light, .pred...1)
+
+rf_training_pred %>%                # training set predictions, only works for factors
+  accuracy(truth = ave.v, .pred...2)
+
+## now that the model has exceptional performance lets move to the test dataset
+
+rf_testing_pred <- 
+  predict(rf_fit, rf_test) %>% 
+  bind_cols(predict(rf_fit, rf_test, type = "numeric")) %>% 
+  bind_cols(rf_test %>% select(flow, chl, guano, light))
+
+rf_testing_pred$light <- as.factor(rf_testing_pred$light)
+rf_testing_pred$guano <- as.factor(rf_testing_pred$guano)
+
+rf_testing_pred %>%                   # test set predictions
+  roc_auc(truth = light, .pred...1)
+
+rf_testing_pred %>%                   # test set predictions
+  accuracy(truth = light, guano)
+
+## differences caused by training set error (bias) by model
+
+###### resampling to the rescue
+
+set.seed(345)
+folds <- vfold_cv(rf_train, v = 10)
+folds
+
+rf_wf <- ## bundles workflow and random forest model together without a recipe needed
+  workflow() %>%
+  add_model(rf_mod) %>%
+  add_formula(ave.v ~ .)
+
+set.seed(456)
+rf_fit_rs <- 
+  rf_wf %>% 
+  fit_resamples(folds)  ##fits resamples
+
+rf_fit_rs  ## .metrics column contains metrics on model performance
+
+collect_metrics(rf_fit_rs)  ##manually unnests meterics data
+
+rf_testing_pred %>%                   # test set predictions (AS ABOVE)
+  roc_auc(truth = light, .pred...1)
+
+rf_testing_pred %>%                   # test set predictions  (AS ABOVE)
+  accuracy(truth = light, guano)
+```
+Tuning the model
+
+```{r}
+library(glmnet)
+library(rpart.plot)  # for visualizing a decision tree
+library(vip)         # for variable importance plots
+
+tune_spec <- 
+  decision_tree(  ## this is the type of model
+    cost_complexity = tune(),
+    tree_depth = tune()
+  ) %>% 
+  set_engine("rpart") %>% 
+  set_mode("regression")
+
+tune_spec
+
+tree_grid <- grid_regular(cost_complexity(),
+                          tree_depth(),
+                          levels = 5)
+
+tree_grid
+
+tree_grid %>% ## shows each level we will tune the model at
+  count(tree_depth)
+
+set.seed(234) ## don't understand what these do??
+rf_folds <- vfold_cv(rf_train)  ## creates cross-validation folds for tuning
+
+set.seed(345)
+
+tree_wf <- workflow() %>%  ##creates the workflow
+  add_model(tune_spec) %>%
+  add_formula(ave.v ~ .)
+
+tree_res <- ## resamples and tunes model
+  tree_wf %>% 
+  tune_grid(
+    resamples = rf_folds,
+    grid = tree_grid
+    )
+
+tree_res  ## gives tuning results
+
+tree_res %>% 
+  collect_metrics()  ## collects metrics from tuned models
+
+
+tree_res %>%
+  collect_metrics() %>%
+  mutate(tree_depth = factor(tree_depth)) %>%
+  ggplot(aes(cost_complexity, mean, color = tree_depth)) +
+  geom_line(size = 1.5, alpha = 0.6) +
+  geom_point(size = 2) +
+  facet_wrap(~ .metric, scales = "free", nrow = 2) +
+  scale_x_log10(labels = scales::label_number()) +
+  scale_color_viridis_d(option = "plasma", begin = .9, end = 0)
+
+## stubbiest tree with a depth of 1 performed the worst
+## deepest tree with depth of 15 did better
+
+tree_res %>%
+  show_best(metric = "rmse")  ## shows best model fit
+
+best_tree <- tree_res %>%  ## pulls out data on the best fit
+  select_best(metric = "rmse")
+
+best_tree ## summary of best tree model
+
+final_wf <- ## create workflow from best tree model after tuning
+  tree_wf %>% 
+  finalize_workflow(best_tree)
+
+final_wf
+
+final_fit <- ## create final model from new fit
+  final_wf %>%
+  last_fit(rf_split) 
+
+final_fit %>%
+  collect_metrics()
+
+
+final_fit %>%  ## plot ROC and compare performance after tuning
+  collect_predictions() %>% 
+  roc_curve(flow, ave.v) %>% ### NOT WORKING
+  autoplot()
+
+final_tree <- extract_workflow(final_fit)  ## extract our final fit for future use
+final_tree
+
+final_tree %>%  ## creates workflow plot
+  extract_fit_engine() %>%
+  rpart.plot(roundint = FALSE)
+
+final_tree %>% ## shows which variables are most important to the model in a plot
+  extract_fit_parsnip() %>% 
+  vip()
+
+args(decision_tree)
+
+
+```
+Bigger RF Model
+
+```{r}
+cores <- parallel::detectCores() ## sees how many cores we have to process the data
+cores
+
+rf_mod <- ## random forest model generation, parallel processing of models
+  rand_forest(mtry = tune(), min_n = tune(), trees = 1000) %>% 
+  set_engine("ranger", num.threads = cores) %>% 
+  set_mode("regression")
+
+rf_recipe <- ## create random forest model recipe
+  recipe(ave.v ~ ., data = df) 
+  
+rf_workflow <- ## create random forest model workflow
+  workflow() %>% 
+  add_model(rf_mod) %>% 
+  add_recipe(rf_recipe)
+
+rf_mod
+
+val_set <- validation_split(df, 
+                            strata = flow, 
+                            prop = 0.80)
+val_set
+# show what will be tuned
+extract_parameter_set_dials(rf_mod)
+
+set.seed(345)
+rf_res <- 
+  rf_workflow %>% 
+  tune_grid(val_set,
+            grid = 25,
+            control = control_grid(save_pred = TRUE),
+            metrics = metric_set(rmse))
+
+rf_res %>% ## shows 5 best random forest models out of the 25 candidates
+  show_best(metric = "rmse")
+
+autoplot(rf_res)  ## plot results
+
+```
+
+
+
+```{r}
+rf_best <- ## creates model with best predictors
+  rf_res %>% 
+  select_best(metric = "rmse")
+rf_best
+
+rf_res %>% ## collects data for ROC curve plot
+  collect_predictions()
+
+rf_best$mtry <- as.integer(rf_best$mtry)
+
+
+##NOT WORKING
+rf_auc <- ## creates set of models with best model and model model for comparison
+  rf_res %>% 
+  collect_predictions(parameters = rf_best) %>% 
+  roc_curve(mtry, .pred) %>% 
+  mutate(model = "Random Forest")  
+
+##NOT WORKING
+bind_rows(rf_best, rf_res) %>% ## plots model comparisons on ROC curve
+  ggplot(aes(x = 1 - specificity, y = sensitivity, col = model)) + 
+  geom_path(lwd = 1.5, alpha = 0.8) +
+  geom_abline(lty = 3) + 
+  coord_equal() + 
+  scale_color_viridis_d(option = "plasma", end = .6)
+```
+
+
+```{r}
+################ last model after tuning 
+
+# the last model
+last_rf_mod <- 
+  rand_forest(mtry = 8, min_n = 7, trees = 1000) %>% 
+  set_engine("ranger", num.threads = cores, importance = "impurity") %>% 
+  set_mode("regression")
+
+# the last workflow
+last_rf_workflow <- 
+  rf_workflow %>% 
+  update_model(last_rf_mod)
+
+# the last fit
+set.seed(345)
+last_rf_fit <- 
+  last_rf_workflow %>% 
+  last_fit(rf_split)
+
+last_rf_fit
+
+last_rf_fit %>%  ## collect metrics from final model
+  collect_metrics()
+
+last_rf_fit %>% ## updates model fit
+  extract_fit_parsnip() %>% 
+  vip(num_features = 20)
+
+##NOT WORKING
+last_rf_fit %>% ## plots best ROC curve, with best set of hyperparameters as predictors
+  collect_predictions() %>% 
+  roc_curve(ave.v, .pred...1) %>% 
+  autoplot()
+
+```
+

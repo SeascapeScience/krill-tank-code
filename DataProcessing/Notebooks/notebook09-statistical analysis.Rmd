@@ -14,6 +14,10 @@ AGG_Dark <- AGG_Dark[ -c(4:5, 9:18, 54:56)]
 colnames(AGG_Dark) <- c("D_V_T", "Chem", "Flow.rate", "X", "Y", "Z", "dx", "dy", "dz", "d", "vx", "vy", "vz", "v", "h.heading", "v.heading", "turn.anglexy", "turn.angleyz", "turn.angle", "vel.turn.angle", "vel", "vel.flow", "trim.X", "xsmooth", "ysmooth", "zsmooth", "smooth.dx", "smooth.dy", "smooth.dz", "smooth.d", "smooth.vx", "smooth.vy", "smooth.vz", "smooth.v", "smooth.h.heading", "heading.pi", "smooth.v.heading", "pitch.perfect", "turn.anglexysmooth", "turn.angleyzsmooth", "turn.angle.smooth")
 head(AGG_Dark)
 tail(AGG_Dark)
+
+
+AGG_Dark$Flow.Rate <- as.factor(AGG_Dark$Flow.Rate)
+AGG_Dark$Chemical.Cue <- as.factor(AGG_Dark$Chemical.Cue)
 ```
 
 Data for mean velocity, angular velocity, turn and heading angles each will be analyzed by a mixed model ANCOVA with chemical concentration, and light as fixed (treatment) effects, flow velocity as the co-variate and replicate as a random (blocking affect) with individual paths as the unit of analysis.
@@ -39,20 +43,23 @@ contrasts(dataname$factorvariable)=contr.poly()# of levels, i.e. 3) ##example
 contrasts(Feeding$Chem)=contr.poly(3)
 ##then run your model as
 
+head(AGG_Dark)
+
 model.1=aov(dv~covariate+factorvariable, data=dataname) ## example
-mod1=aov(v ~ Flow.rate*Chem, data=AGG_Dark)
-mod2 <- update(mod1, ~.-Chem:Flow.rate:Light)
+mod1=aov(smooth.vel ~ Flow.Rate*Chemical.Cue, data=AGG_Dark)
+mod2 <- update(mod1, ~.-Chemical.Cue:Flow.Rate)
 ##To view the model use:
 
 Anova(model.1, type="III") ## example
 Anova(mod1, type="III")
+Anova(mod2, type="III")
 ##Make sure you use capital "A" Anova here and not anova. This will give results using type III SS.
 
 summary.lm(mod1) ##will give another summary and includes the R-sq. output. Example
 summary.lm(mod2)
 
 posth=glht(model.1, linfct=mcp(factorvariable="Tukey"))  ##gives the post-hoc Turkey analysis. Example
-posth=glht(mod1, linfct=mcp(Chem*Flow.rate="Tukey"))
+posth=glht(mod1, linfct=mcp(Chemical.Cue*Flow.Rate ="Tukey"))
 summary(posth) ##shows the output in a nice format.
 
 TukeyHSD(mod1, conf.level=.95) ## gives full Tukey post-hoc for all pairwise combinations
@@ -78,6 +85,30 @@ drop1(mod1,~.,test="F") # type III SS and F Tests
 
 # Tukey Honestly Significant Differences
 TukeyHSD(mod1) 
+
+######################################################################
+
+str(AGG_Dark)
+AGG_Dark$D_V_T <- as.factor(AGG_Dark$D_V_T)
+AGG_Dark$Chem <- as.factor(AGG_Dark$Chem)
+AGG_Dark$Flow.rate <- as.factor(AGG_Dark$Flow.rate)
+levels(AGG_Dark$Flow.rate)
+AGG_Dark$Flow.rate <- relevel(AGG_Dark$Flow.rate, "Medium Flow")
+
+## boxplots for velocity for each level of flow
+library(ggplot2)
+ggplot(AGG_Dark,aes(x=Flow.Rate, y=log10(smooth.vel), fill=Chemical.Cue))+
+  geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
+  stat_summary(geom = "errorbar", fun.min = mean, fun = mean, fun.max = mean, width = .75, linetype = "dashed", position = position_dodge())+
+  theme_classic()+
+  theme(axis.text=element_text(color="black"))+
+  theme(text=element_text(size=20))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
+  theme(panel.grid.minor=element_blank())+
+  labs(size= "",x = "Flow Rate (cm s-1)", y = "Ground Velocity (logged, cm s-1)", title = "") +
+  scale_fill_manual(values=c("white", "gray", "slategray"),name = "Chemical Cue",
+  labels=c("Ambient", "Guano", "Guano+CHL"))
+  
 
 ```
 

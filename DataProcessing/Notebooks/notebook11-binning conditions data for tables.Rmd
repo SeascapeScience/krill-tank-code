@@ -288,7 +288,7 @@ library(dplyr)
 
 AGG_Feed %>% group_by(Light, Flow.rate, Chem) %>% summarise_at(vars(heading.pi), lst(min, max, mean, sd))
 
-data %>% group_by(Light, Flow.rate, Chlorophyll, Guano) %>% summarise_at(vars(vel.flow), lst(min, max, mean, sd))
+AGG_Dark %>% group_by(Flow.Rate, Chemical.Cue) %>% summarise_at(vars(turn.angle.smooth.degrees), lst(min, max, mean, sd))
 
 ```
 
