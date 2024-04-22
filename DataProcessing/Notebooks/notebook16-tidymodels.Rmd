@@ -147,11 +147,13 @@ rf_fit <- ## fits random forest model to whole dataset
 rf_fit
 
 rf_pred <- predict(rf_fit, df)  
-plot(df$ave.v, rf_pred$.pred)  ## observed vs predicted
-cor.test(df$ave.v, rf_pred$.pred)  ## gives correlation coef
+plot(df$ave.v, rf_pred$.pred, main = "corr - 0.7294325")  ## observed vs predicted
+cor <- cor.test(df$ave.v, rf_pred$.pred)  ## gives correlation coef
 
 rf_split <- initial_split(df %>% select(flow, chl, guano, light, ave.v), ## splits cases base on initial results
-                            strata = flow)  ## try with strata = NULL
+                            strata = flow)  ## with strata = NULL splits 11/31, rf_test has all guano absent, 50/50 light split, uneven flow split (0, 3, 3, 5.9, 5.9, 5.9, 8.9 x5), and random chl values.
+                                            ## with strata = flow, splits 12/30, rf_test has 1 guano present, 50/50 light split, even flow splits (3x 0, 3, 4x 5.9 and 2x 8.9), and more even chl values.
+
 
 rf_train <- training(rf_split)  ##creates training and testing datasets
 rf_test  <- testing(rf_split)
@@ -164,12 +166,37 @@ rf_fit2 <- ## fits random forest model to training dataset
 rf_fit2
 
 rf_pred2 <- predict(rf_fit2, rf_test) ## compares to test data
-plot(rf_test$ave.v, rf_pred2$.pred)  ## observed vs predicted
-cor.test(rf_test$ave.v, rf_pred2$.pred)  ## gives correlation coef
-
+plot(rf_test$ave.v, rf_pred2$.pred, main = "corr - 0.2700745")  ## observed vs predicted, can add cor value from cor.test below
+cor2 <- cor.test(rf_test$ave.v, rf_pred2$.pred)  ## gives correlation coef
+cor2$estimate
 ### can run with different seeds and splits, strata = NULL
 #### loop and run 10 times with diff seeds
 ## look at consistency of results
+
+for (i in 1:length(10)){
+
+  rf_mod <- ## creates random forest model
+  rand_forest(trees = 1000) %>% 
+  set_engine("ranger") %>% 
+  set_mode("regression")
+  
+  rf_fit <- ## fits random forest model to whole dataset
+  rf_mod %>% 
+  fit(ave.v ~ flow * chl * guano * light, data = df)
+  rf_fit
+  
+  rf_pred <- predict(rf_fit, df)  
+  cor <- cor.test(df$ave.v, rf_pred$.pred)  ## gives correlation coef
+  c.e <- cor$estimate
+  c.v <- NULL
+  c.v <- rbind(c.v, c.e)
+  ### to save each plot as an individual graph
+  jpeg(filename= paste('~/Documents/Bigelow/Figures/tidymodels Outputs/', rf_wf[i],'.jpeg', sep = ''), width = 960, height = 780)
+  plot(df$ave.v, rf_pred$.pred, main = paste("corr = ", cor$estimate))  ## observed vs predicted
+  dev.off()
+  
+}
+
 
 ## look at things outside random forest
 
