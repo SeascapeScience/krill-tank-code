@@ -173,7 +173,7 @@ cor2$estimate
 #### loop and run 10 times with diff seeds
 ## look at consistency of results
 
-for (i in 1:length(10)){  ## working but not doing 10 loops
+for (i in 1:10){  ## working but not doing 10 loops
 
   rf_mod <- ## creates random forest model
   rand_forest(trees = 1000) %>% 
@@ -189,12 +189,13 @@ for (i in 1:length(10)){  ## working but not doing 10 loops
   cor <- cor.test(df$ave.v, rf_pred$.pred)  ## gives correlation coef
   c.e <- cor$estimate
   c.v <- NULL
-  c.v <- rbind(c.v, c.e)
+  c.v <- rbind(c.e, c.v)  ## not working??
+  
+  
   ### to save each plot as an individual graph
   jpeg(filename= paste('~/Bigelow/Figures/tidymodels Output/fit', i,'.jpeg', sep = ''),    width = 960, height = 780)
   plot(df$ave.v, rf_pred$.pred, main = paste("corr = ", cor$estimate))  ## observed vs predicted
   dev.off()
-  
 }
 
 
