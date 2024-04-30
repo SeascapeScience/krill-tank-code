@@ -173,6 +173,8 @@ cor2$estimate
 ### can run with different seeds and splits, strata = NULL
 #### loop and run 10 times with diff seeds
 ## look at consistency of results
+
+
 source("notebook16-functions.R")
 colnames(df) <- c("flow","chl", "guano", "light","response")
 c.v <- NULL
@@ -182,13 +184,14 @@ library(ggplot2)
 
 for (i in 1:10){  
 
-  c.e <- rf.skill(df = df, trees = 2000, prop = 0.8) ## try neural net vs random forest and other models, multiple parameter outputs 
+  c.e <- rf.skill(df = df, trees = 2000, prop = 0.8, strata = NULL) ## try neural net vs random forest and other models, multiple parameter outputs 
   c.v <- rbind(c.e, c.v)  
-  c.e.t <- rf.skill(df = df, trees = 2000, prop = 0.8) ## training data cor.test coef
+  c.e.t <- rf.skill(df = df, trees = 2000, prop = 0.8, strata = NULL) ## training data cor.test coef
   c.v_train <- rbind(c.e.t, c.v_train)
-  p
-  ggsave(filename=paste('~/Bigelow/Figures/tidymodels Output/rf_train/models/rf_train', i, '.jpeg', sep = ''), plot = p, width = 24 , height = 12)
- }
+  p ## working but blank
+  ggsave(filename=paste('~/Bigelow/Figures/tidymodels Output/rf_train models/rf_train', i, '.jpeg', sep = ''), plot = p, width = 24 , height = 12)
+
+    }
 ```
 
 

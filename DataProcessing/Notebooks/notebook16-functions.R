@@ -3,7 +3,8 @@
 rf.skill<- function(
     df = NA, ## df is dataframe that must have columns (flow, light, guano, chl, response)
     trees = 1000,
-    prop = 0.75
+    prop = 0.75,
+    strata = NULL
     )
 {
   rf_mod <- ## creates random forest model
@@ -21,9 +22,11 @@ rf.skill<- function(
   c.e <- cor$estimate
   return(c.e)
   
-  rf_split <- initial_split(df %>% select(flow, chl, guano, light, response), strata = NULL, prop = prop) 
-  rf_train <- training(rf_split)  ##creates training and testing datasets
+  rf_split <- initial_split(df %>% select(flow, chl, guano, light, response), strata = strata, prop = prop) 
+  rf_train <- training(rf_split)
+    ##creates training and testing datasets
   rf_test  <- testing(rf_split)
+  
   
   rf_fit_train <- ## fits random forest model to training dataset
     rf_mod %>% 
@@ -37,4 +40,5 @@ rf.skill<- function(
   
   p = ggplot(data = rf_test, aes(rf_test$response, rf_pred_train$.pred))+ggtitle(paste('correlation coef =', c.e.t, sep = ''))  ## observed vs predicted
   return(p)
+
   }
