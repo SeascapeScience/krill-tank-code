@@ -179,7 +179,6 @@ source("notebook16-functions.R")
 colnames(df) <- c("flow","chl", "guano", "light","response")
 c.v <- NULL
 c.v_train <- NULL
-p <- NULL
 library(ggplot2)
 
 for (i in 1:10){  
@@ -188,10 +187,9 @@ for (i in 1:10){
   c.v <- rbind(c.e, c.v)  
   c.e.t <- rf.skill(df = df, trees = 2000, prop = 0.8, strata = NULL) ## training data cor.test coef
   c.v_train <- rbind(c.e.t, c.v_train)
-  p ## working but blank
-  ggsave(filename=paste('~/Bigelow/Figures/tidymodels Output/rf_train models/rf_train', i, '.jpeg', sep = ''), plot = p, width = 24 , height = 12)
+  ggsave(filename=paste('~/Bigelow/Figures/tidymodels Output/rf_train models/rf_train', i, '.jpeg', sep = ''), plot = p, width = 24 , height = 12)  ## saving but not different for each loop
 
-    }
+  }
 ```
 
 

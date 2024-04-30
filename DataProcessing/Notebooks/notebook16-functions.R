@@ -34,11 +34,15 @@ rf.skill<- function(
   rf_fit_train
   
   rf_pred_train <- predict(rf_fit_train, rf_test) ## compares to test data
+  rf_test$pred <- rf_pred_train$.pred
   cor_train <- cor.test(rf_test$response, rf_pred_train$.pred)  ## gives correlation coef
   c.e.t <- cor_train$estimate
   return(c.e.t)
   
-  p = ggplot(data = rf_test, aes(rf_test$response, rf_pred_train$.pred))+ggtitle(paste('correlation coef =', c.e.t, sep = ''))  ## observed vs predicted
-  return(p)
-
+  p <- ggplot(rf_test, aes(rf_test$response, rf_test$pred)) +
+    geom_point() + 
+    ggtitle(paste('correlation coef = ', c.e.t, sep = ''))  ## observed vs predicted
+  p.list <- as.list(p)
+  p
+  return(p.list)
   }
