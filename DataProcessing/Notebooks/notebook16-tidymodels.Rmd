@@ -183,12 +183,19 @@ library(ggplot2)
 
 for (i in 1:10){  
 
-  c.e <- rf.skill(df = df, trees = 2000, prop = 0.8, strata = NULL) ## try neural net vs random forest and other models, multiple parameter outputs 
+  c.e <- rf.skill(df = df, trees = 2000) ## try neural net vs random forest and other models
   c.v <- rbind(c.e, c.v)  
-  c.e.t <- rf.skill(df = df, trees = 2000, prop = 0.8, strata = NULL) ## training data cor.test coef
+  c.e.t <- rf.skill.test(df = df, trees = 2000, prop = 0.5, strata = NULL, do.plot = TRUE) ## training data
   c.v_train <- rbind(c.e.t, c.v_train)
-  ggsave(filename=paste('~/Bigelow/Figures/tidymodels Output/rf_train models/rf_train', i, '.jpeg', sep = ''), plot = p, width = 24 , height = 12)  ## saving but not different for each loop
+  
+  ggsave(filename=paste('~/Bigelow/Figures/tidymodels Output/rf_train models/rf_train', i, '.jpeg', sep = ''), plot = p, width = 24 , height = 12)
 
+  ## multiple parameters instead of just ave.v next
+  
+  ## ranking covariates with node-purity etc in tidymodels
+  
+  ## ranking models in terms of best for predictors
+  
   }
 ```
 
