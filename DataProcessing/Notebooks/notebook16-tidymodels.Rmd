@@ -192,8 +192,6 @@ for (i in 1:10){
   
   ggsave(filename=paste('~/Bigelow/Figures/tidymodels Output/rf_train', i, '_2.jpeg', sep = ''), plot = p, width = 24 , height = 12)
 
-  ## multiple parameters instead of just ave.v next
-  
   ## ranking covariates with node-purity etc in tidymodels
   
   ## ranking models in terms of best for predictors
