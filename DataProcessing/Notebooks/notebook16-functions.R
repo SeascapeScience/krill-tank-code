@@ -74,8 +74,15 @@ rf.skill.test<- function(
     print(p)
   }
   
-  # Random forest package version - doing dip test
+    ## how to plot conditions and node purity from tidymodels rf and not R package rf??
+  
+  
+  
+  
+  
+    # Random forest package version - doing dip test
   conditions.rf <- randomForest(df[[col1]] ~ flow * chl * guano * light, data = df,
+                                ntree = 1000,
                                 importance=TRUE,
                                 proximity=TRUE)
   #print(conditions.rf)
@@ -83,7 +90,9 @@ rf.skill.test<- function(
   #sqrt(conditions.rf$mse[which.min(conditions.rf$mse)]) 
   plot(conditions.rf)
   varImpPlot(conditions.rf)
-    return(c.e.t)
+  reprtree:::plot.getTree(conditions.rf)
+  
+  return(c.e.t)
   }
 
 
