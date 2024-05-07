@@ -182,6 +182,11 @@ c.v <- NULL
 c.v_train <- NULL
 p <- NULL
 library(ggplot2)
+library(GGally)
+library(hexbin)
+library(diptest)
+library(randomForest)
+
 
 for (i in 1:10){  
 
@@ -191,10 +196,8 @@ for (i in 1:10){
   c.v_train <- rbind(c.e.t, c.v_train)
   
   ggsave(filename=paste('~/Bigelow/Figures/tidymodels Output/rf_train', i, '_2.jpeg', sep = ''), plot = p, width = 24 , height = 12)
-
-  ## ranking covariates with node-purity etc in tidymodels
   
-  ## ranking models in terms of best for predictors
+    ## ranking models in terms of best for predictors
   
   }
 ```

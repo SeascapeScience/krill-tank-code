@@ -73,7 +73,17 @@ rf.skill.test<- function(
     ggtitle(paste('correlation coef = ', c.e.t, sep = ''))  ## observed vs predicted
     print(p)
   }
-  return(c.e.t)
+  
+  # Random forest package version - doing dip test
+  conditions.rf <- randomForest(df[[col1]] ~ flow * chl * guano * light, data = df,
+                                importance=TRUE,
+                                proximity=TRUE)
+  #print(conditions.rf)
+  #round(importance(conditions.rf), 2)
+  #sqrt(conditions.rf$mse[which.min(conditions.rf$mse)]) 
+  plot(conditions.rf)
+  varImpPlot(conditions.rf)
+    return(c.e.t)
   }
 
 
