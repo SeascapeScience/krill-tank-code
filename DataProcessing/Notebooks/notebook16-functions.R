@@ -18,14 +18,10 @@ rf.skill<- function(
   fit(resp ~ flow * chl * guano * light, data = df)
   rf_fit
   
- return(rf_fit$fit$r.squared) ##???
-  ## pull P value and average over 10 runs??
-  ## pull node purity
-
   rf_pred <- predict(rf_fit, df)  
   cor <- cor.test(df$resp, rf_pred$.pred)  ## gives correlation coef
   c.e <- cor$estimate
-  ##return(c.e)
+  return(c.e)
   }
 
 rf.skill.test<- function(
@@ -92,7 +88,12 @@ rf.skill.test<- function(
     reprtree:::plot.getTree(conditions.rf)
   }
   
-return(c.e.t)
+  rmse(rf_test, truth = resp, estimate = pred)
+  rf_metrics <- metric_set(rmse, rsq, mae) ## random mean square error, r square value and mean absolute error
+  rf.metrics <- as.data.frame(rf_metrics(rf_test, truth = resp, estimate = pred))
+  
+  
+return(rf.metrics)
   
  ##rf_wf <- 
   ## workflow() %>%
@@ -145,19 +146,6 @@ return(c.e.t)
  
   ## how to plot conditions and node purity from tidymodels rf and not R package rf??
 
-  
-  ## Random forest package version - doing dip test
-  ##conditions.rf <- randomForest(resp ~ flow * chl * guano * light, data = df,
-                               ## ntree = 1000,
-                               ## importance=TRUE,
-                               ## proximity=TRUE)
-  #print(conditions.rf)
-  ##round(importance(conditions.rf), 2)
-  ##sqrt(conditions.rf$mse[which.min(conditions.rf$mse)]) 
- ## plot(conditions.rf)
- ## varImpPlot(conditions.rf)
- ## reprtree:::plot.getTree(conditions.rf)
-  
  ## return(c.e.t)
   }
 
@@ -179,5 +167,10 @@ rf.fit<- function(
     rf_mod %>% 
     fit(resp ~ flow * chl * guano * light, data = df)
   rf_fit
-  return(rf_fit)
+  
+  return(rf_fit$fit$r.squared)
+  
+  ##  rf_fit$fit$prediction.error  predicted error of total model, 1 per run same as r-squared
+  ## pull P value and average over 10 runs??
+  ## pull node purity
 }

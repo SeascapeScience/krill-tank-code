@@ -225,10 +225,12 @@ for (i in 1:10){
 
   c.e <- rf.skill(df = df, trees = 2000, col1 = "v.head dip test") ## try neural net vs random forest and other models
   c.v <- rbind(c.e, c.v)  
-  c.e.t <- rf.skill.test(df = df, trees = 2000, col1 = "v.head dip test", prop = 0.8, strata = NULL, do.plot = TRUE) ## training data
+  c.e.t <- rf.skill.test(df = df, trees = 2000, col1 = "v.head dip test", prop = 0.8, strata = NULL, do.plot = FALSE) ## training data
   c.v_train <- rbind(c.e.t, c.v_train)
-  rsq1 <- rf.skill(df = df, trees = 2000, col1 = "v.head dip test")
+  rsq1 <- rf.fit(df = df, trees = 2000, col1 = "v.head dip test")
   rsq2 <- rbind(rsq1, rsq2) 
+  
+  
   ## input average of p value, ce, cv, node purity and rsq into each column and row in matrix
   ## create function to filter edge effect out (.5 cm out, dist to edge)
   
