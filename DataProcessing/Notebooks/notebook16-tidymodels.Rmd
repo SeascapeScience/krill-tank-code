@@ -208,8 +208,10 @@ colnames(df) <- c("flow","chl", "guano", "light","v.head dip test")
 c.v <- NULL
 c.v_train <- NULL
 p <- NULL
-bt <- NULL
-fit.values <- NA ## matrix of 10 x 4
+rsq2 <- NULL
+node.purity <- data.frame(matrix (NA, nrow = 10, ncol = 5))
+colnames(node.purity) <- c( "c.e", "c.e.t", "r.squared", "p-value", "node purity")
+
 
 library(ggplot2)
 library(GGally)
@@ -223,14 +225,26 @@ for (i in 1:10){
 
   c.e <- rf.skill(df = df, trees = 2000, col1 = "v.head dip test") ## try neural net vs random forest and other models
   c.v <- rbind(c.e, c.v)  
-  c.e.t <- rf.skill.test(df = df, trees = 2000, col1 = "v.head dip test", prop = 0.8, strata = NULL, do.plot = FALSE) ## training data
+  c.e.t <- rf.skill.test(df = df, trees = 2000, col1 = "v.head dip test", prop = 0.8, strata = NULL, do.plot = TRUE) ## training data
   c.v_train <- rbind(c.e.t, c.v_train)
-  
+  rsq1 <- rf.skill(df = df, trees = 2000, col1 = "v.head dip test")
+  rsq2 <- rbind(rsq1, rsq2) 
   ## input average of p value, ce, cv, node purity and rsq into each column and row in matrix
   ## create function to filter edge effect out (.5 cm out, dist to edge)
   
   ##ggsave(filename=paste('~/Bigelow/Figures/tidymodels Output/v.head dip test/', i, '.tiff', sep = ''), plot = p, width = 24 , height = 12)
-  }
+}
+
+c.v <- as.data.frame(c.v)
+c.v_train <- as.data.frame(c.v_train)
+rsq2 <- as.data.frame(rsq2)
+
+node.purity$c.e <- c.v$V1
+node.purity$c.e.t <- c.v_train$cor
+node.purity$r.squared <- rsq2$V1
+
+
+
 ```
 
 

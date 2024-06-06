@@ -17,14 +17,15 @@ rf.skill<- function(
   rf_mod %>% 
   fit(resp ~ flow * chl * guano * light, data = df)
   rf_fit
-  ## return(rf_fit)
+  
+ return(rf_fit$fit$r.squared) ##???
   ## pull P value and average over 10 runs??
   ## pull node purity
 
   rf_pred <- predict(rf_fit, df)  
   cor <- cor.test(df$resp, rf_pred$.pred)  ## gives correlation coef
   c.e <- cor$estimate
-  return(c.e)
+  ##return(c.e)
   }
 
 rf.skill.test<- function(
@@ -161,3 +162,22 @@ return(c.e.t)
   }
 
 
+rf.fit<- function(
+    df = NA, ## df is data frame that must have columns (flow, light, guano, chl, response)
+    trees = 1000,
+    col1 = NA ## column 1 to input
+)
+{
+  names(df)[names(df)==col1] <- 'resp'
+  
+  rf_mod <- ## creates random forest model
+    rand_forest(trees = trees) %>% 
+    set_engine("ranger") %>% 
+    set_mode("regression")
+  
+  rf_fit <- ## fits random forest model to whole dataset
+    rf_mod %>% 
+    fit(resp ~ flow * chl * guano * light, data = df)
+  rf_fit
+  return(rf_fit)
+}
