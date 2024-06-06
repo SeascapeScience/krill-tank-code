@@ -54,11 +54,6 @@ rf.skill.test<- function(
   ##creates training and testing datasets
   rf_test  <- testing(rf_split)
   
-  
-  ##rf_rec <-
-    #recipe(response ~ flow * chl * guano * light, data = rf_train)
-    ##update_role(D_V_T, new_role = "ID") ## can be used to ID tracks/conditions with issues in full df
-    
   rf_fit_train <- ## fits random forest model to training dataset
     rf_mod %>% 
     fit(resp ~ flow * chl * guano * light, data = rf_train)
@@ -70,7 +65,7 @@ rf.skill.test<- function(
   c.e.t <- cor_train$estimate
   
   if (do.plot == TRUE){
-  p = ggplot(rf_test, aes(rf_test$resp, rf_test$pred)) +
+    p = ggplot(rf_test, aes(rf_test$resp, rf_test$pred)) +
     geom_point() + 
     ggtitle(paste('correlation coef = ', c.e.t, sep = ''))  ## observed vs predicted
     print(p)
@@ -93,40 +88,120 @@ rf.skill.test<- function(
   rf.metrics <- as.data.frame(rf_metrics(rf_test, truth = resp, estimate = pred))
   
   
-return(rf.metrics)
+## return(rf.metrics)
   
- ##rf_wf <- 
-  ## workflow() %>%
-  ## add_model(rf_mod) %>%
-  ##  add_formula(resp ~ flow * chl * guano * light)
+ rf_wf <- 
+   workflow() %>%
+   add_model(rf_mod) %>%
+    add_formula(resp ~ flow * chl * guano * light)
   
-  ##tune_spec <- 
-  ## decision_tree(
-  ##  cost_complexity = tune(),
-  ##  tree_depth = tune()
-  ## ) %>% 
-  ## set_engine("rpart") %>% 
-  ## set_mode("regression")
+  tune_spec <- 
+   decision_tree(
+    cost_complexity = tune(),
+    tree_depth = tune()
+   ) %>% 
+   set_engine("rpart") %>% 
+   set_mode("regression")
  
-  ## tree_grid <- grid_regular(cost_complexity(),
-  ##  tree_depth(),
-  ##    levels = 5)
-# tree_grid
+   tree_grid <- grid_regular(cost_complexity(),
+    tree_depth(),
+      levels = 5)
+ tree_grid
  
-## rf_folds <- vfold_cv(rf_train)
+ rf_folds <- vfold_cv(rf_train)
  
-## tune_wf <- workflow() %>%
-##  add_model(tune_spec) %>%
-##  add_formula(resp ~ flow * chl * guano * light)
+ normalized_rec <- 
+   recipe(resp ~ ., data = rf_train) %>% 
+   step_normalize(~ ., data = rf_train) 
  
-## tune_res <- 
-##  tune_wf %>% 
-## tune_grid(
-##   resamples = rf_folds,
-##   grid = tree_grid
-## )
+ library(rules)
+ library(baguette)
  
-## tune_res
+ linear_reg_spec <- 
+   linear_reg(penalty = tune(), mixture = tune()) %>% 
+   set_engine("glmnet")
+ 
+ cart_spec <- 
+   decision_tree(cost_complexity = tune(), min_n = tune()) %>% 
+   set_engine("rpart") %>% 
+   set_mode("regression")
+ 
+ bag_cart_spec <- 
+   bag_tree() %>% 
+   set_engine("rpart", times = 50L) %>% 
+   set_mode("regression")
+ 
+ rf_spec <- 
+   rand_forest(mtry = tune(), min_n = tune(), trees = 1000) %>% 
+   set_engine("ranger") %>% 
+   set_mode("regression")
+ 
+ cubist_spec <- 
+   cubist_rules(committees = tune(), neighbors = tune()) %>% 
+   set_engine("Cubist") 
+ 
+model_vars <- 
+    workflow_variables(outcomes = resp, 
+                       predictors = everything())
+  
+no_pre_proc <- 
+    workflow_set(
+      preproc = list(simple = model_vars), 
+      models = list(CART = cart_spec, CART_bagged = bag_cart_spec,
+                    RF = rf_spec, Cubist = cubist_spec)
+    )
+no_pre_proc
+
+with_features <- 
+    workflow_set(
+      preproc = list(simple = model_vars),
+      models = list(linear_reg = linear_reg_spec)
+    )
+  
+all_workflows <- 
+    bind_rows(no_pre_proc, with_features) %>% 
+    # Make the workflow ID's a little more simple: 
+    mutate(wflow_id = gsub("(simple_)", "", wflow_id))
+all_workflows
+  
+grid_ctrl <-
+    control_grid(
+      save_pred = TRUE,
+      parallel_over = "everything",
+      save_workflow = TRUE
+    )
+  
+grid_results <-
+    all_workflows %>%
+    workflow_map(
+      seed = 1503,
+      resamples = rf_folds,
+      grid = 25,
+      control = grid_ctrl
+    )
+ 
+grid_results
+  
+grid_results %>% 
+  rank_results() %>% 
+  filter(.metric == "rmse") %>% 
+  select(model, .config, rmse = mean, rank)
+  
+
+ ##tune_wf <- workflow() %>%
+  ##add_model(tune_spec) %>%
+  ##add_formula(resp ~ flow * chl * guano * light)
+ 
+  ##tune_res <- 
+  ##tune_wf %>% 
+  ## tune_grid(
+  ## resamples = rf_folds,
+  ## grid = tree_grid
+  ## )
+ 
+  ##tune_res
+  
+  autoplot(tune_res, rank_metric = "rmse", metric = "rmse", select_best = T)
  
  #tune_res %>% 
   ## collect_metrics()%>%
