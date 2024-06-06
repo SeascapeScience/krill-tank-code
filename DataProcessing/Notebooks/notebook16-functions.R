@@ -187,6 +187,16 @@ grid_results %>%
   filter(.metric == "rmse") %>% 
   select(model, .config, rmse = mean, rank)
   
+autoplot(
+  grid_results,
+  rank_metric = "rmse",  # <- how to order models
+  metric = "rmse",       # <- which metric to visualize
+  select_best = TRUE     # <- one point per workflow
+) +
+  geom_text(aes(y = mean - 1/2, label = wflow_id), angle = 90, hjust = 1) +
+  lims(y = c(0, 0.3)) +
+  theme(legend.position = "none")
+
 
  ##tune_wf <- workflow() %>%
   ##add_model(tune_spec) %>%
