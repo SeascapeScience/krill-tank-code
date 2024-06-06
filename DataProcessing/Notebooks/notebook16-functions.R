@@ -199,6 +199,60 @@ autoplot(
 
 autoplot(grid_results, id = "RF", metric = "rmse")
 
+library(finetune)
+
+race_ctrl <-
+  control_race(
+    save_pred = TRUE,
+    parallel_over = "everything",
+    save_workflow = TRUE
+  )
+
+race_results <-
+  all_workflows %>%
+  workflow_map(
+    "tune_race_anova",
+    seed = 1503,
+    resamples = rf_folds,
+    grid = 25,
+    control = race_ctrl
+  )
+
+race_results
+
+autoplot(
+  race_results,
+  rank_metric = "rmse",  
+  metric = "rmse",       
+  select_best = TRUE    
+) +
+  geom_text(aes(y = mean - 0.1, label = wflow_id), angle = 90, hjust = 1) +
+  lims(y = c(0, 0.3)) +
+  theme(legend.position = "none")
+
+
+matched_results <- 
+  rank_results(race_results, select_best = TRUE) %>% 
+  select(wflow_id, .metric, race = mean, config_race = .config) %>% 
+  inner_join(
+    rank_results(grid_results, select_best = TRUE) %>% 
+      select(wflow_id, .metric, complete = mean, 
+             config_complete = .config, model),
+    by = c("wflow_id", ".metric"),
+  ) %>%  
+  filter(.metric == "rmse")
+
+library(ggrepel)
+
+matched_results %>% 
+  ggplot(aes(x = complete, y = race)) + 
+  geom_abline(lty = 3) + 
+  geom_point() + 
+  geom_text_repel(aes(label = model)) +
+  coord_obs_pred() + 
+  labs(x = "Complete Grid RMSE", y = "Racing RMSE") 
+
+
 
 
 
