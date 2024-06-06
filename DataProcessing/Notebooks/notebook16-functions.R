@@ -87,15 +87,12 @@ rf.skill.test<- function(
   rf_metrics <- metric_set(rmse, rsq, mae) ## random mean square error, r square value and mean absolute error
   rf.metrics <- as.data.frame(rf_metrics(rf_test, truth = resp, estimate = pred))
   
-  
-## return(rf.metrics)
-  
- rf_wf <- 
+rf_wf <- 
    workflow() %>%
    add_model(rf_mod) %>%
     add_formula(resp ~ flow * chl * guano * light)
   
-  tune_spec <- 
+tune_spec <- 
    decision_tree(
     cost_complexity = tune(),
     tree_depth = tune()
@@ -252,46 +249,33 @@ matched_results %>%
   coord_obs_pred() + 
   labs(x = "Complete Grid RMSE", y = "Racing RMSE") 
 
+best_results <- 
+  race_results %>% 
+  extract_workflow_set_result("RF") %>% 
+  select_best(metric = "rmse")
+best_results
+
+RF_test_results <- 
+  race_results %>% 
+  extract_workflow("RF") %>% 
+  finalize_workflow(best_results) %>% 
+  last_fit(split = rf_split)
+
+collect_metrics(RF_test_results)
+
+RF_test_results %>% 
+  collect_predictions() %>% 
+  ggplot(aes(x = resp, y = .pred)) + 
+  geom_abline(color = "gray50", lty = 2) + 
+  geom_point(alpha = 0.5) +
+  theme_classic()+
+  coord_obs_pred() + 
+  labs(x = "observed", y = "predicted")
+return(c.e.t)
+}
 
 
 
-
-
- ##tune_wf <- workflow() %>%
-  ##add_model(tune_spec) %>%
-  ##add_formula(resp ~ flow * chl * guano * light)
- 
-  ##tune_res <- 
-  ##tune_wf %>% 
-  ## tune_grid(
-  ## resamples = rf_folds,
-  ## grid = tree_grid
-  ## )
- 
-  ##tune_res
-  
-  autoplot(tune_res, rank_metric = "rmse", metric = "rmse", select_best = T)
- 
- #tune_res %>% 
-  ## collect_metrics()%>%
-  ## mutate(tree_depth = factor(tree_depth)) %>%
-  ## ggplot(aes(cost_complexity, mean, color = tree_depth)) +
-  ## geom_line(size = 1.5, alpha = 0.6) +
-  ## geom_point(size = 2) +
-  ## facet_wrap(~ .metric, scales = "free", nrow = 2) +
-  ## scale_x_log10(labels = scales::label_number()) +
-  ## scale_color_viridis_d(option = "plasma", begin = .9, end = 0)
- 
- ##tune_res %>%
-   #show_best(metric = "rsq")
-    
- ##best_tree <- tune_res %>%
-   #select_best(metric = "rsq")
- 
-  ## how to plot conditions and node purity from tidymodels rf and not R package rf??
-
- ## return(c.e.t)
-  }
 
 
 rf.fit<- function(
