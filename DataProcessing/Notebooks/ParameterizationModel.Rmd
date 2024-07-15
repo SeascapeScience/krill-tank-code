@@ -197,6 +197,6 @@ for (i in 1:dim(conditions)[1])
 }
 
 colnames(parameters) <- param.names
-save(parameters,conditions,file='ParameterizationModel2024.04.03c.Rdata')
+save(parameters,conditions,file='~\\Bigelow\\Data\\ParameterizationModel.15.07.24.Rdata')
 ```
 
