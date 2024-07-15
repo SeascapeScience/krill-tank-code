@@ -10,13 +10,17 @@ Load data
 rm(list=ls(all=TRUE))
 #load("~/Post-doc/Data/Total Merged Data File (Sep 2 2022).RData")
 #load('~/Work/Data/Antarctic/CC.TotalData.2022.07.20.RData')
-load('~/Work/Data/Antarctic/TotalMergedDataFile.2023.04.12.RData')
+CC.TotalData <- read.csv('~/Bigelow/Data/CC.TotalData.July.15.2024.csv', header = T)
 library(ggplot2)
 library(GGally)
 library(hexbin)
 library(diptest)
 library(tidymodels)
 library(randomForest)
+
+str(CC.TotalData)
+CC.TotalData$Chlorophyll <- as.factor(CC.TotalData$Chlorophyll)
+levels(CC.TotalData$Chlorophyll)
 ```
 
 ```{r}
@@ -29,18 +33,25 @@ light <- 1 # Absent=1 Present=2
 # Vectors of all possible conditions combinations
 frs <- as.numeric(as.character(unique(CC.TotalData$Flow.rate)))
 chls <- as.numeric(as.character(unique(CC.TotalData$Chlorophyll)))
+chls <- na.omit(chls)
 guans <- c(1,2)
+CC.TotalData$Guano <- as.factor(CC.TotalData$Guano)
+levels(CC.TotalData$Guano)
+levels(CC.TotalData$Guano) <- c("1","2")
 lights <- c(1,2)
+CC.TotalData$Light <- as.factor(CC.TotalData$Light)
+levels(CC.TotalData$Light)
+levels(CC.TotalData$Light) <- c("1","2")
 conditions <- expand.grid(frs,chls,guans,lights)
 ```
 
 Autocorrelation looking at linear regression and residuals. Note that residuals are not normally distributed.
 ```{r}
 velocity <- CC.TotalData$v[
-  (CC.TotalData$Flow.rate==flow.rate & 
-     CC.TotalData$Chlorophyll==chlorophyll & 
-     as.numeric(CC.TotalData$Guano)==guano &
-     as.numeric(CC.TotalData$Light)==light)]
+  (CC.TotalData$Flow.rate== "0" & 
+     CC.TotalData$Chlorophyll== "0" & 
+     CC.TotalData$Guano== "Absent" &
+     CC.TotalData$Light== "Present")]
 
 x <- log10(velocity[1:length(velocity)-1])
 y <- log10(velocity[2:length(velocity)])

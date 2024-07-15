@@ -92,8 +92,8 @@ rf.skill.test<- function(
 
 rf.fit<- function(
     df = NA, ## df is data frame that must have columns (flow, light, guano, chl, response)
-    trees = 1000,
-    col1 = NA ## column 1 to input
+    trees = 2000,
+    col1 = colnames(df)[5] ## column 1 to input
 )
 {
   names(df)[names(df)==col1] <- 'resp'
@@ -273,20 +273,20 @@ model.test<- function(
   
   grid_results %>% 
     rank_results() %>% 
-    filter(.metric == "rmse") %>% 
+    filter(.metric == "rmse", ) %>% 
     select(model, .config, rmse = mean, rank)
   
   autoplot(
     grid_results,
-    rank_metric = "rmse",  # <- how to order models
-    metric = "rmse",       # <- which metric to visualize
+    rank_metric = "rsq",  # <- how to order models
+    metric = "rsq",       # <- which metric to visualize
     select_best = TRUE     # <- one point per workflow
   ) +
     geom_text(aes(y = mean - 0.1, label = wflow_id), angle = 90, hjust = 1) +
-    lims(y = c(0, 0.3)) +
+    lims(y = c(-0.1, 1)) +
     theme(legend.position = "none")
   
-  autoplot(grid_results, id = "Cubist", metric = "rmse")
+  autoplot(grid_results, id = "RF", metric = "rmse")
   
   library(finetune)
   
@@ -303,25 +303,28 @@ model.test<- function(
       "tune_race_anova",
       seed = 1503,
       resamples = rf_folds,
+      metrics = metric_set(rmse, rsq),
       grid = 25,
       control = race_ctrl
     )
   
   race_results
   
+  autoplot(race_results)
+  
   autoplot(
     race_results,
-    rank_metric = "rmse",  
-    metric = "rmse",       
+    rank_metric = "rsq",  
+    metric = "rsq",       
     select_best = TRUE    
   ) +
     geom_text(aes(y = mean - 0.1, label = wflow_id), angle = 90, hjust = 1) +
-    lims(y = c(-0.3, 0.3)) +
+    lims(y = c(-0.1, 1)) +
     theme(legend.position = "none")
   
   
   matched_results <- 
-    rank_results(race_results, select_best = TRUE) %>% 
+    rank_results(race_results, select_best = TRUE, rank_metric = "rmse") %>% 
     select(wflow_id, .metric, race = mean, config_race = .config) %>% 
     inner_join(
       rank_results(grid_results, select_best = TRUE) %>% 
@@ -333,19 +336,32 @@ model.test<- function(
   
   library(ggrepel)
   
+  autoplot(race_results, metric = "rmse") +
+    geom_text_repel(aes(label = wflow_id), nudge_x = 1/8, nudge_y = 1/100) +
+    theme(legend.position = "none")
+  
+  rsq_indiv_estimates <- 
+    collect_metrics(race_results, summarize = FALSE) %>% 
+    filter(.metric == "rsq") 
+  
+  rsq_indiv_estimates %>% drop_na()
+  
   matched_results %>% 
     ggplot(aes(x = complete, y = race)) + 
     geom_abline(lty = 3) + 
     geom_point() + 
     geom_text_repel(aes(label = model)) +
     coord_obs_pred() + 
+    ylim(0.1,.25)+
     labs(x = "Complete Grid RMSE", y = "Racing RMSE") 
-  
+
   best_results <- 
-    race_results %>% 
+    race_results %>%
     extract_workflow_set_result("RF") %>% 
-    select_best(metric = "rmse")
+    select_best(metric = "rsq")
   best_results
+  
+  rank_results(race_results, rank_metric = "rsq")
   
   RF_test_results <- 
     race_results %>% 

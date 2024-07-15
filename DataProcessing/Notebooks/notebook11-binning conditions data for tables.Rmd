@@ -6,7 +6,7 @@ output: html_notebook
 Load data
 ```{r}
 rm(list=ls(all=TRUE))
-load("~/Post-doc/Data/Total Merged Data File (Feb 6 2024).RData")
+load("~/Post-doc/Data/Total Merged Data File (March 6 2024).RData")
 
 range(CC.TotalData$turn.anglexysmooth)
 head(CC.TotalData)
@@ -3126,9 +3126,9 @@ Saving Data.frames as csv files
 ```{r}
 write.csv(Feeding, file = "~/Post-doc/Data/Feeding data Oct 3 2023.csv", row.names = FALSE)
 
-write.csv(CC.TotalData, file = "~/Post-doc/Data/CC.TotalData.Sep.5.2022.csv", row.names = FALSE)
+write.csv(CC.TotalData, file = "~/Bigelow/Data/CC.TotalData.July.15.2024.csv", row.names = FALSE)
 
-write.csv(data, file = "~/Post-doc/Data/data.Sep.5.2022.csv", row.names = FALSE)
+write.csv(data, file = "~/Bigelow/Data/data.July.15.2024.csv", row.names = FALSE)
 
 #### Dark conditions save files
 
