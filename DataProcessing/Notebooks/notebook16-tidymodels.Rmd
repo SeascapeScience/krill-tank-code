@@ -2,9 +2,7 @@
 title: "notebook16-tidymodels"
 output: html_notebook
 ---
-
 Attempting to use tidymodels for processing our IBM krill data and selecting variables of importance for each swimming parameter
-
 
 ```{r}
 library(tidymodels)  # for the parsnip package, along with the rest of tidymodels
@@ -129,7 +127,7 @@ ggplot(df,
   geom_smooth(method = lm, se = FALSE) +  # same                    
   labs(x = "flow", y = "ave.v")         # etc
 ```
-
+Inputs
 
 ```{r}
 
@@ -175,8 +173,9 @@ cor2$estimate
 ## look at consistency of results
 ```
 
-
+Models
 ```{r}
+##### Example models
 library(tidymodels)  # for the parsnip package, along with the rest of tidymodels
 
 # Helper packages
@@ -187,9 +186,11 @@ library(vip)         # for variable importance plots
 
 
 rm(list=ls(all=TRUE))   ## removes the previous workspace and environment so that we only have the data we need loaded in the session
-load("~/Post-doc/krill-tank-code/DataProcessing/Notebooks/ParameterizationModel.Rdata")
+load("~/Bigelow/Data/ParameterizationModel.15.07.24.Rdata")
+```
 
-
+seeing if this fixes error
+```{r}
 dim(parameters)
 glimpse(parameters)
 
@@ -281,19 +282,60 @@ node.purity$r.squared <- rsq2$V1
 
 ```
 
-
-
 Node Purity heat map
 ```{r}
+##### Example data
+set.seed(123)                                                     # Set seed for reproducibility
+data<- matrix(rnorm(100, 0, 10), nrow = 10, ncol = 10)           # Create example data                                                   # Apply heatmap function
 
+colnames(data)<- paste0("col", 1:10)                             # Column names
+rownames(data)<- paste0("row", 1:10)                             # Row names
+head(data,5)
 
+node <- read.csv("C:\\Users\\Nicole Hellessey\\Documents\\Bigelow\\Data\\Node Purity Values - Overall Predictors.csv", header = T)
+head(node)
+node2 <- data.matrix(node)
 
+#####node##### Example 1
+heatmap(node2)  
 
+##### Example 2
+heatmap(node2, Rowv = NA, Colv = NA)                               # Remove dendogram
 
+##### Example 3
+my_colors<- colorRampPalette(c("cyan", "deeppink3"))             # Manual color range
+heatmap(node2, col = my_colors(100))                               # Heatmap with manual colors
+
+##### Example 4                                # Install reshape package
+library(reshape)                                                # Load reshape package
+
+node_melt <- melt(node)                                           # Reorder data
+library(ggplot2)                                                # Load ggplot2 package
+
+ggp <- ggplot(node_melt, aes(Factor, variable)) +                           # Create heatmap with ggplot2
+  geom_tile(aes(fill = value))
+ggp                                                               # Print heatmap
+
+#########################################################
+library(ggplot2)
+library(reshape2)
+
+attach(node_melt)
+
+ggplot(node_melt, aes(x = Factor, y = variable, fill = value)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "red") +
+  labs(x = "Environmental Condition", y = "Swimming Parameter", title = "Node Purity Heatmap - Overall Predictors")
+
+#########################################################
+# load required packages
+library(plotly)
+library(reshape2)
+
+# create heatmap using plotly
+plot_ly(node_melt, x = Factor, y = variable, z = value, type = "heatmap") %>%
+  layout(title = "Heatmap", xaxis = list(title = "Column"), yaxis = list(title = "Row"))
 ```
-
-
-
 
 
 ```{r}
@@ -370,7 +412,6 @@ rf_testing_pred %>%                   # test set predictions  (AS ABOVE)
   accuracy(truth = light, guano)
 ```
 Tuning the model
-
 ```{r}
 library(glmnet)
 library(rpart.plot)  # for visualizing a decision tree
@@ -473,7 +514,6 @@ args(decision_tree)
 
 ```
 Bigger RF Model
-
 ```{r}
 cores <- parallel::detectCores() ## sees how many cores we have to process the data
 cores
@@ -515,8 +555,6 @@ autoplot(rf_res)  ## plot results
 
 ```
 
-
-
 ```{r}
 rf_best <- ## creates model with best predictors
   rf_res %>% 
@@ -544,7 +582,6 @@ bind_rows(rf_best, rf_res) %>% ## plots model comparisons on ROC curve
   coord_equal() + 
   scale_color_viridis_d(option = "plasma", end = .6)
 ```
-
 
 ```{r}
 ################ last model after tuning 
