@@ -280,6 +280,8 @@ node.purity$c.e <- c.v$V1
 node.purity$c.e.t <- c.v_train$cor
 node.purity$r.squared <- rsq2$V1
 
+## save each parameter model individually or as single file (single RData file - individual objects therein) - include readme.doc for what each object in environment is
+
 ```
 
 Node Purity heat map
@@ -323,10 +325,14 @@ library(ggplot2)                                                # Load ggplot2 p
 
 ggp <- ggplot(node, aes(Swimming.Parameter, Swimming.Factor)) +                           # Create heatmap with ggplot2
   geom_tile(aes(fill = Value)) + 
-  scale_fill_gradient(low = "white", high = "red") +
+  scale_fill_gradient(low = "white", high = "black") +
+  theme_classic()+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
-  facet_grid(~Environmental.Input, scales = "free_x", space = "free")# Print heatmap
-ggp + labs(x = "Swimming Parameter", y = "Swimming Factor", title = "Node Purity Heatmap", fill = "Node Purity Value")
+  facet_grid(~Environmental.Input, scales = "free_x", space = "free") + 
+  labs(x = "Swimming Parameter", y = "Swimming Factor", title = "Node Purity Heatmap", fill = "Node Purity Value")
+
+library(plotly)
+ggplotly(ggp)
 
 #########################################################
 library(ggplot2)
@@ -345,10 +351,8 @@ library(plotly)
 library(reshape2)
 
 # create heatmap using plotly
-plot_ly(node_melt, x = Factor, y = variable, z = value, type = "heatmap") %>%
-  layout(title = "Heatmap", xaxis = list(title = "Column"), yaxis = list(title = "Row"))
-
-## save each parameter model individually or as single file (single RData file - individual objects therein) - include readme.doc for what each object in environment is
+plot_ly(node, x = node$Swimming.Factor, y = node$Swimming.Parameter, z = node$Value, type = "heatmap") %>%
+  layout(title = "Heatmap", xaxis = list(title = ""), yaxis = list(title = ""))
 
 ```
 
