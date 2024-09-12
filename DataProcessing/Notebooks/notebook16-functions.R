@@ -119,7 +119,7 @@ rf.fit<- function(
 model.test<- function(
     df = NA, ## df is data frame that must have columns (flow, light, guano, chl, response)
     trees = 1000,
-    col1 = NA, ## column 1 to input
+    col1 = "velocity mean", ## column 1 to input
     prop = 0.75,
     strata = NULL,
     do.plot = FALSE
@@ -352,16 +352,16 @@ model.test<- function(
     geom_point() + 
     geom_text_repel(aes(label = model)) +
     coord_obs_pred() + 
-    ylim(0.1,.25)+
+    ylim(0,0.03)+
     labs(x = "Complete Grid RMSE", y = "Racing RMSE") 
 
   best_results <- 
     race_results %>%
     extract_workflow_set_result("RF") %>% 
-    select_best(metric = "rsq")
+    select_best(metric = "rmse")
   best_results
   
-  rank_results(race_results, rank_metric = "rsq")
+  rank_results(race_results, rank_metric = "rmse")
   
   RF_test_results <- 
     race_results %>% 

@@ -197,14 +197,14 @@ glimpse(parameters)
 dim(conditions)
 glimpse(conditions)
 
-df <- data.frame(conditions[,1],conditions[,2],conditions[,3],conditions[,4],parameters[,12])
-colnames(df) <- c("flow","chl", "guano", "light",colnames(parameters)[12])
+df <- data.frame(conditions[,1],conditions[,2],conditions[,3],conditions[,4],parameters[,1])
+colnames(df) <- c("flow","chl", "guano", "light",colnames(parameters)[1])
 df
 df<-na.omit(df)
 
 source("notebook16-functions.R")
 ## fix to pull col name or number into model??
-colnames(df) <- c("flow","chl", "guano", "light", colnames(parameters)[12])
+colnames(df) <- c("flow","chl", "guano", "light", colnames(parameters)[1])
 c.v <- NULL
 c.v_train <- NULL
 p <- NULL
@@ -282,13 +282,19 @@ node.purity$r.squared <- rsq2$V1
 
 ## save each parameter model individually or as single file (single RData file - individual objects therein) - include readme.doc for what each object in environment is
 
+saveRDS(RF_test_results, file = "~/Bigelow/Data/Swimming Parameter Models/mean velocity.rds")
+saveRDS(best_results, file = "~/Bigelow/Data/Swimming Parameter Models/mean velocity - best.rds")
+
+mean.vel.model <- readRDS("~/Bigelow/Data/Swimming Parameter Models/mean velocity.rds")  ##can name models as they are loaded in unlike with regular save () and load () functions
+
+
 ```
 
 Node Purity heat map
 ```{r}
 ##### Example data
 set.seed(123)                                                     # Set seed for reproducibility
-data<- matrix(rnorm(100, 0, 10), nrow = 10, ncol = 10)           # Create example data                                                   # Apply heatmap function
+data<- matrix(rnorm(100, 0, 10), nrow = 10, ncol = 10)           # Create example data                      # Apply heatmap function
 
 colnames(data)<- paste0("col", 1:10)                             # Column names
 rownames(data)<- paste0("row", 1:10)                             # Row names
