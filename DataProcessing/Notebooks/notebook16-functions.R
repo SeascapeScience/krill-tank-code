@@ -1,12 +1,40 @@
 ##notebook16-functions
-
+#' merge parameters and conditions
+#' @param X chr file name of previously saved data
+#' @param keep_cond chr names of conditions to keep
+#' @param keep_param chr names of parameters to keep
+#' @return tibble
+merge_data = function(X = "~/Bigelow/Data/ParameterizationModel.15.07.24.Rdata", 
+                      keep_cond = c("flow.rate", "chlorophyll", "guano", "light"), 
+                      keep_param = c("velocity mean")){
+  load(X)
+  parameters = as_tibble(parameters) %>%
+    select(all_of(keep_param))
+  df = conditions %>% 
+    as_tibble() %>%
+    select(all_of(keep_cond)) %>%
+     bind_cols(parameters)
+  df = df %>%
+    mutate(version = make_version(X = "v1", n = n()), .before = 1)
+  df<-na.omit(df)
+  attr(df, "parameters") = keep_param
+  attr(df, "conditions") = keep_cond
+  return(df)
+}
+  
+  
+  
 rf.skill<- function(
     df = NA, ## df is data frame that must have columns (flow, light, guano, chl, response)
     trees = 1000,
     col1 = NA ## column 1 to input
     )
 {
-  names(df)[names(df)==col1] <- 'resp'
+  ##names(df)[names(df)==col1] <- 'resp'
+  df = df %>%
+    rename(resp := !!col1)
+  cond = attr(df, "conditions")
+  df_cond = select(df, all_of(c('resp', cond)))
   
   rf_mod <- ## creates random forest model
   rand_forest(trees = trees) %>% 
@@ -15,8 +43,8 @@ rf.skill<- function(
 
   rf_fit <- ## fits random forest model to whole dataset
   rf_mod %>% 
-  fit(resp ~ flow * chl * guano * light, data = df)
-  rf_fit
+  fit(resp ~ ., data = df_cond)
+  #rf_fit
   
   rf_pred <- predict(rf_fit, df)  
   cor <- cor.test(df$resp, rf_pred$.pred)  ## gives correlation coef
@@ -28,35 +56,40 @@ rf.skill.test<- function(
     df = NA, ## df is data frame that must have columns (flow, light, guano, chl, response)
     trees = 1000,
     col1 = NA, ## column 1 to input
-    prop = 0.75,
-    strata = NULL,
+    prop = PROP,
+    strata = STRATA,
     do.plot = FALSE
 )
 {
-  names(df)[names(df)==col1] <- 'resp'
+  ##names(df)[names(df)==col1] <- 'resp'
   
-   rf_mod <- ## creates random forest model
+  df = df %>%
+    rename(resp := !!col1)
+  cond = attr(df, "conditions")
+  df_cond = select(df, all_of(c('resp', cond)))
+  
+  rf_mod <- ## creates random forest model
     rand_forest(trees = trees) %>% 
     set_engine("ranger") %>% 
     set_mode("regression")
   
   rf_fit <- ## fits random forest model to whole dataset
     rf_mod %>% 
-    fit(resp ~ flow * chl * guano * light, data = df)
-  rf_fit
+    fit(resp ~ ., data = df_cond)
+  #rf_fit
   
   rf_pred <- predict(rf_fit, df)  
-  cor <- cor.test(df$resp, rf_pred$.pred)    ## gives correlation coef
+  cor <- cor.test(df$resp, rf_pred$.pred)  ## gives correlation coef
   c.e <- cor$estimate
  
-  rf_split <- initial_split(df %>% select(flow, chl, guano, light, resp), strata = strata, prop = prop) 
+  rf_split <- initial_split(df_cond %>% select(all_of(c('resp','flow.rate', 'chlorophyll', 'light', 'guano'))), strata = strata, prop = prop) 
   rf_train <- training(rf_split)
   ##creates training and testing datasets
   rf_test  <- testing(rf_split)
   
   rf_fit_train <- ## fits random forest model to training dataset
     rf_mod %>% 
-    fit(resp ~ flow * chl * guano * light, data = rf_train)
+    fit(resp ~ ., data = rf_train)
   rf_fit_train
   
   rf_pred_train <- predict(rf_fit_train, rf_test) ## compares to test data
@@ -71,8 +104,8 @@ rf.skill.test<- function(
     print(p)
     
     ## Random forest package version - doing dip test
-    conditions.rf <- randomForest(resp ~ flow * chl * guano * light, data = df,
-                                  ntree = 1000,
+    conditions.rf <- randomForest(resp ~ ., data = df,
+                                  ntree = trees,
                                   importance=TRUE,
                                   proximity=TRUE)
     #print(conditions.rf)
@@ -96,7 +129,14 @@ rf.fit<- function(
     col1 = colnames(df)[5] ## column 1 to input
 )
 {
-  names(df)[names(df)==col1] <- 'resp'
+  ##names(df)[names(df)==col1] <- 'resp'
+  
+  
+  df = df %>%
+    rename(resp := !!col1)
+  cond = attr(df, "conditions")
+  df_cond = select(df, all_of(c('resp', cond)))
+  
   
   rf_mod <- ## creates random forest model
     rand_forest(trees = trees) %>% 
@@ -105,7 +145,7 @@ rf.fit<- function(
   
   rf_fit <- ## fits random forest model to whole dataset
     rf_mod %>% 
-    fit(resp ~ flow * chl * guano * light, data = df)
+    fit(resp ~ ., data = df_cond)
   rf_fit
   
   return(rf_fit$fit$r.squared)
@@ -125,7 +165,12 @@ model.test<- function(
     do.plot = FALSE
 )
 {
-  names(df)[names(df)==col1] <- 'resp'
+  ##names(df)[names(df)==col1] <- 'resp'
+  
+  df = df %>%
+    rename(resp := !!col1)
+  cond = attr(df, "conditions")
+  df_cond = select(df, all_of(c('resp', cond)))
   
   rf_mod <- ## creates random forest model
     rand_forest(trees = trees) %>% 
@@ -134,21 +179,21 @@ model.test<- function(
   
   rf_fit <- ## fits random forest model to whole dataset
     rf_mod %>% 
-    fit(resp ~ flow * chl * guano * light, data = df)
+    fit(resp ~ ., data = df_cond)
   rf_fit
   
   rf_pred <- predict(rf_fit, df)  
   cor <- cor.test(df$resp, rf_pred$.pred)    ## gives correlation coef
   c.e <- cor$estimate
   
-  rf_split <- initial_split(df %>% select(flow, chl, guano, light, resp), strata = strata, prop = prop) 
+  rf_split <- initial_split(df_cond %>% select(all_of(c('flow.rate', 'chlorophyll', 'guano', 'light', 'resp'))), strata = STRATA, prop = PROP) 
   rf_train <- training(rf_split)
   ##creates training and testing datasets
   rf_test  <- testing(rf_split)
   
   rf_fit_train <- ## fits random forest model to training dataset
     rf_mod %>% 
-    fit(resp ~ flow * chl * guano * light, data = rf_train)
+    fit(resp ~ ., data = rf_train)
   rf_fit_train
   
   rf_pred_train <- predict(rf_fit_train, rf_test) ## compares to test data
@@ -163,7 +208,7 @@ model.test<- function(
     print(p)
     
     ## Random forest package version - doing dip test
-    conditions.rf <- randomForest(resp ~ flow * chl * guano * light, data = df,
+    conditions.rf <- randomForest(resp ~ ., data = df,
                                   ntree = 1000,
                                   importance=TRUE,
                                   proximity=TRUE)
@@ -182,7 +227,7 @@ model.test<- function(
   rf_wf <- 
     workflow() %>%
     add_model(rf_mod) %>%
-    add_formula(resp ~ flow * chl * guano * light)
+    add_formula(resp ~ .)
   
   tune_spec <- 
     decision_tree(
@@ -273,8 +318,8 @@ model.test<- function(
   
   grid_results %>% 
     rank_results() %>% 
-    filter(.metric == "rmse", ) %>% 
-    select(model, .config, rmse = mean, rank)
+    filter(.metric == "rsq", ) %>% 
+    select(model, .config, rsq = mean, rank)
   
   autoplot(
     grid_results,
@@ -286,7 +331,7 @@ model.test<- function(
     lims(y = c(-0.1, 1)) +
     theme(legend.position = "none")
   
-  autoplot(grid_results, id = "RF", metric = "rmse")
+  autoplot(grid_results, id = "RF", metric = "rsq")
   
   library(finetune)
   
@@ -303,12 +348,19 @@ model.test<- function(
       "tune_race_anova",
       seed = 1503,
       resamples = rf_folds,
-      metrics = metric_set(rmse, rsq),
+      metrics = metric_set(rsq, rmse),
       grid = 25,
       control = race_ctrl
-    )
+    )%>%
+    charlier::write_RDS("mean vel model.rds") ##add col1 name here
   
   race_results
+  
+  ##how to produce complete output from dataframe model
+  ##how to package them so we can iterate over them
+  ##configuration file (txt)
+  
+  
   
   autoplot(race_results)
   
@@ -324,7 +376,7 @@ model.test<- function(
   
   
   matched_results <- 
-    rank_results(race_results, select_best = TRUE, rank_metric = "rmse") %>% 
+    rank_results(race_results, select_best = TRUE, rank_metric = "rsq") %>% 
     select(wflow_id, .metric, race = mean, config_race = .config) %>% 
     inner_join(
       rank_results(grid_results, select_best = TRUE) %>% 
@@ -332,11 +384,11 @@ model.test<- function(
                config_complete = .config, model),
       by = c("wflow_id", ".metric"),
     ) %>%  
-    filter(.metric == "rmse")
+    filter(.metric == "rsq")
   
   library(ggrepel)
   
-  autoplot(race_results, metric = "rmse") +
+  autoplot(race_results, metric = "rsq") +
     geom_text_repel(aes(label = wflow_id), nudge_x = 1/8, nudge_y = 1/100) +
     theme(legend.position = "none")
   
@@ -352,21 +404,20 @@ model.test<- function(
     geom_point() + 
     geom_text_repel(aes(label = model)) +
     coord_obs_pred() + 
-    ylim(0,0.03)+
-    labs(x = "Complete Grid RMSE", y = "Racing RMSE") 
+    labs(x = "Complete Grid RSQ", y = "Racing RSQ") 
 
   best_results <- 
     race_results %>%
     extract_workflow_set_result("RF") %>% 
-    select_best(metric = "rmse")
+    select_best(metric = "rsq")
   best_results
   
-  rank_results(race_results, rank_metric = "rmse")
+  rank_results(race_results, rank_metric = "rsq")
   
   RF_test_results <- 
     race_results %>% 
     extract_workflow("RF") %>% 
-    finalize_workflow(best_results) %>% 
+    finalize_workflow(best_results)%>% ## see if we can fix this, if not 
     last_fit(split = rf_split)
   
   collect_metrics(RF_test_results)
@@ -380,5 +431,9 @@ model.test<- function(
     coord_obs_pred() + 
     labs(x = "observed", y = "predicted")
   
+ ## tune random forest model with full data set
+  
   return()
 }
+
+

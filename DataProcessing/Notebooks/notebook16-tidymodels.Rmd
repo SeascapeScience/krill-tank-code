@@ -176,35 +176,56 @@ cor2$estimate
 Models
 ```{r}
 ##### Example models
+suppressPackageStartupMessages({
+  
 library(tidymodels)  # for the parsnip package, along with the rest of tidymodels
-
 # Helper packages
 library(readr)       # for importing data
 library(broom.mixed) # for converting bayesian models to tidy tibbles
 library(dotwhisker)  # for visualizing regression results
 library(vip)         # for variable importance plots
+library(ggplot2)
+library(GGally)
+library(hexbin)
+library(diptest)
+library(randomForest)
+library(reprtree)
+library(charlier)
+})
 
 
-rm(list=ls(all=TRUE))   ## removes the previous workspace and environment so that we only have the data we need loaded in the session
-load("~/Bigelow/Data/ParameterizationModel.15.07.24.Rdata")
+##rm(list=ls(all=TRUE))   ## removes the previous workspace and environment so that we only have the data we need loaded in the session
+
+source("misc.R")
+source("notebook16-functions.R")
+
+##load("~/Bigelow/Data/ParameterizationModel.15.07.24.Rdata")
 ```
 
-seeing if this fixes error
+loading in data
 ```{r}
-dim(parameters)
-glimpse(parameters)
+##dim(parameters)
+##glimpse(parameters)
 
-dim(conditions)
-glimpse(conditions)
+##dim(conditions)
+##glimpse(conditions)
 
-df <- data.frame(conditions[,1],conditions[,2],conditions[,3],conditions[,4],parameters[,1])
-colnames(df) <- c("flow","chl", "guano", "light",colnames(parameters)[1])
-df
-df<-na.omit(df)
+##df <- data.frame(conditions[,1],conditions[,2],conditions[,3],conditions[,4],parameters[,1])
+##colnames(df) <- c("flow","chl", "guano", "light",colnames(parameters)[1])
+##df
+##df<-na.omit(df)
+df = merge_data(X = "~/Bigelow/Data/ParameterizationModel.15.07.24.Rdata")
+parameters = attr(df, "parameters")
+conditions = attr(df, "conditions")
+```
 
-source("notebook16-functions.R")
+Preparation of outputs
+```{r}
 ## fix to pull col name or number into model??
-colnames(df) <- c("flow","chl", "guano", "light", colnames(parameters)[1])
+N_RUNS = 10
+N_TREES = 2000
+STRATA = NULL
+PROP = 0.8
 c.v <- NULL
 c.v_train <- NULL
 p <- NULL
@@ -212,44 +233,30 @@ rsq2 <- NULL
 mod1 <- NULL
 mod2 <- NULL
 mod3 <- NULL
-node.purity <- data.frame(matrix (NA, nrow = 10, ncol = 5))
-colnames(node.purity) <- c( "c.e", "c.e.t", "r.squared", "p-value", "node purity")
+m = matrix (NA_real_, nrow = N_RUNS, ncol = 5)
+colnames(m) <- c( "c_e", "c_e_t", "r_squared", "p_value", "node_purity")
+node.purity <- as_tibble(m)
+```
 
 
-library(ggplot2)
-library(GGally)
-library(hexbin)
-library(diptest)
-library(randomForest)
-library(reprtree)
+
+```{r}
 
 ## loop through different swimming parameters contain this loop within the bigger loop
-colnames(parameters)
 
-
-for (j in colnames(parameters)){
-    df <- data.frame(conditions[,1],conditions[,2],conditions[,3],conditions[,4], parameters[,j])
-    colnames(df) <- c("flow","chl", "guano", "light", j)
-    df
-    df<-na.omit(df)
-    source("notebook16-functions.R")
-    print(colnames(df))
-
-      for (i in 1:10){  
-
-        c.e <- rf.skill(df = df, trees = 2000, col1 = colnames(df)[5]) 
+for (j in parameters){
+    
+      for (i in 1:N_RUNS){  
+        c.e <- rf.skill(df = df, trees = N_TREES, col1 = parameters) 
         c.v <- rbind(c.e, c.v)  
-        c.e.t <- rf.skill.test(df = df, trees = 2000, col1 = colnames(df)[5], prop = 0.8, strata = NULL, do.plot = FALSE)   ## training data
+        c.e.t <- rf.skill.test(df = df, trees = N_TREES, col1 = parameters, prop = PROP, strata = STRATA, do.plot = FALSE)   ## training data
         c.v_train <- rbind(c.e.t, c.v_train)
-        rsq1 <- rf.fit(df = df, trees = 2000, col1 = colnames(df)[5])
+        rsq1 <- rf.fit(df = df, trees = N_TREES, col1 = parameters)
         rsq2 <- rbind(rsq1, rsq2)
-  
-        output.test <- model.test(df = df, trees = 2000, col1 = colnames(df)[5], prop = 0.8, strata = NULL, do.plot = TRUE)
+        output.test <- model.test(df = df, trees = N_TREES, col1 = parameters, prop = PROP, strata = STRATA, do.plot = TRUE)
         
         ## output node purity
-  
         ## create function to filter edge effect out (.5 cm out, dist to edge)
-  
         ##ggsave(filename=paste('~/Bigelow/Figures/tidymodels Output/ave v/', i, '.tiff', sep = ''), plot = p,     width = 24 , height = 12)
       }
     mod1 <- rbind(mod1, c.v)  ## add identifier for each parameter into data frame
@@ -262,6 +269,9 @@ for (j in colnames(parameters)){
     ## table for report of stats on models
     
 }
+```
+
+```{r}
 
 ## take best model for each pararmeter into simulation
 ## try vel mean and sd, and turn mean and sd 
@@ -270,7 +280,7 @@ rf_pred_train <- predict(rf_fit_train, rf_test) ## need to predict each paramete
 
 ## environmental input to swimming, eg. node purity
 
-
+rm(col1)
 
 c.v <- as.data.frame(c.v)
 c.v_train <- as.data.frame(c.v_train)
@@ -282,10 +292,13 @@ node.purity$r.squared <- rsq2$V1
 
 ## save each parameter model individually or as single file (single RData file - individual objects therein) - include readme.doc for what each object in environment is
 
-saveRDS(RF_test_results, file = "~/Bigelow/Data/Swimming Parameter Models/mean velocity.rds")
-saveRDS(best_results, file = "~/Bigelow/Data/Swimming Parameter Models/mean velocity - best.rds")
+saveRDS(race_results, file = "~/Bigelow/Data/Swimming Parameter Models/race seults.rds")
+saveRDS(best_results, file = "~/Bigelow/Data/Swimming Parameter Models/st.dev velocity - best.rds")
 
 mean.vel.model <- readRDS("~/Bigelow/Data/Swimming Parameter Models/mean velocity.rds")  ##can name models as they are loaded in unlike with regular save () and load () functions
+RF=slice(race_results, 3)
+
+
 
 
 ```
