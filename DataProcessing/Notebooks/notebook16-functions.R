@@ -162,7 +162,7 @@ model.test<- function(
     col1 = "velocity mean", ## column 1 to input
     prop = 0.75,
     strata = NULL,
-    do.plot = FALSE
+    do.plot = TRUE
 )
 {
   ##names(df)[names(df)==col1] <- 'resp'
@@ -248,9 +248,6 @@ model.test<- function(
     recipe(resp ~ ., data = rf_train) %>% 
     step_normalize(~ ., data = rf_train) 
   
-  library(rules)
-  library(baguette)
-  
   linear_reg_spec <- 
     linear_reg(penalty = tune(), mixture = tune()) %>% 
     set_engine("glmnet")
@@ -284,7 +281,7 @@ model.test<- function(
       models = list(CART = cart_spec, CART_bagged = bag_cart_spec,
                     RF = rf_spec, Cubist = cubist_spec)
     )
-  no_pre_proc
+  #no_pre_proc
   
   with_features <- 
     workflow_set(
@@ -296,7 +293,7 @@ model.test<- function(
     bind_rows(no_pre_proc, with_features) %>% 
     # Make the workflow ID's a little more simple: 
     mutate(wflow_id = gsub("(simple_)", "", wflow_id))
-  all_workflows
+  #all_workflows
   
   grid_ctrl <-
     control_grid(
@@ -314,7 +311,7 @@ model.test<- function(
       control = grid_ctrl
     )
   
-  grid_results
+  #grid_results
   
   grid_results %>% 
     rank_results() %>% 
@@ -332,8 +329,6 @@ model.test<- function(
     theme(legend.position = "none")
   
   autoplot(grid_results, id = "RF", metric = "rsq")
-  
-  library(finetune)
   
   race_ctrl <-
     control_race(
@@ -360,8 +355,6 @@ model.test<- function(
   ##how to package them so we can iterate over them
   ##configuration file (txt)
   
-  
-  
   autoplot(race_results)
   
   autoplot(
@@ -385,8 +378,6 @@ model.test<- function(
       by = c("wflow_id", ".metric"),
     ) %>%  
     filter(.metric == "rsq")
-  
-  library(ggrepel)
   
   autoplot(race_results, metric = "rsq") +
     geom_text_repel(aes(label = wflow_id), nudge_x = 1/8, nudge_y = 1/100) +
@@ -433,7 +424,39 @@ model.test<- function(
   
  ## tune random forest model with full data set
   
-  return()
+  return(conditions.rf)
 }
 
+
+
+model_metrics = function(p_name = 'velocity mean', df = NULL, trees = 1000, prop = 0.8, strata = NULL, n_runs = 10, verbose = FALSE){
+  if(FALSE){
+    p_name = 'velocity mean'
+    df = df
+    trees = N_TREES
+    prop = PROP
+    strata = STRATA
+    n_runs = N_RUNS
+  }
+  rr = lapply(seq_len(n_runs), 
+              function(i, data = NULL){
+                if(verbose)cat("interation =", i, 
+                               "\n")
+                data = select(data, -all_of("version"))
+                c.e <- rf.skill(df = data, trees = trees, col1 = p_name) 
+                c.e.t <- rf.skill.test(df = data, trees = trees, col1 = p_name,
+                                       prop = prop, strata = strata, do.plot = TRUE)   ## training data
+                rsq1 <- rf.fit(df = data, trees = trees, col1 = p_name)
+                output.test <- model.test(df = data, trees = trees, col1 = p_name,
+                                          prop = prop, strata = strata, do.plot = TRUE)
+                return(tibble(parameter = p_name, 
+                              corr.est = c.e,
+                              corr.est.train = c.e.t,
+                              rsq = rsq1,
+                              conditions.rf = list(output.test$importance)
+                ))
+              }, data = df) %>% 
+    bind_rows()
+  return(rr)
+}
 

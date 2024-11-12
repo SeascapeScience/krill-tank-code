@@ -9,8 +9,8 @@ Add the Date and View of the trail to seperate columns using the character strin
 
 ```{r}
 rm(list=ls(all=TRUE))
-setwd("~/Post-doc/Data/Processed MatLab Files/Horizontal")
-path <- "C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Processed MatLab Files\\Horizontal\\"
+setwd("~/Post-doc/Data/Processed MatLab Files/Vertical")
+path <- "C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Processed MatLab Files\\Vertical\\"
 files <- list.files(path=path, pattern="*.csv")
 
 
@@ -39,7 +39,7 @@ df$Track <- as.factor(df$Track)
 df$Date <- as.factor(df$Date)
 df$View <- as.factor(df$View)
 df$File.name <- as.factor(df$File.name)
-
+levels(df$File.name)
 
 head(df)
 tail(df)
@@ -52,6 +52,16 @@ Add columns of metadata based on the D_V of each row
 metadata <- read.csv("C:\\Users\\Nicole Hellessey\\Documents\\Post-doc\\Data\\Metadata flat file 20230623.csv", header = T)
 head(metadata)
 tail(metadata)
+metadata$File.name <- as.factor(metadata$File.name)
+metadata$Date <- as.factor(metadata$Date)
+metadata$Flow.rate <- as.factor(metadata$Flow.rate)
+metadata$Chlorophyll <- as.factor(metadata$Chlorophyll)
+metadata$Guano <- as.factor(metadata$Guano)
+metadata$Light <- as.factor(metadata$Light)
+metadata$Flume <- as.factor(metadata$Flume)
+metadata$Flow.Direction <- as.factor(metadata$Flow.Direction)
+
+str(metadata)
 
 alldata <- merge(df, metadata)
 
@@ -67,12 +77,12 @@ TotalData <- delete.na(alldata, 2)
 head(TotalData)
 tail(TotalData)
 
-TotalData$Flow.rate <- as.factor(TotalData$Flow.rate)
-TotalData$Chlorophyll <- as.factor(TotalData$Chlorophyll)
-TotalData$Guano <- as.factor(TotalData$Guano)
-TotalData$Light <- as.factor(TotalData$Light)
-TotalData$Flume <- as.factor(TotalData$Flume)
-TotalData$Flow.Direction <- as.factor(TotalData$Flow.Direction)
+##TotalData$Flow.rate <- as.factor(TotalData$Flow.rate)
+##TotalData$Chlorophyll <- as.factor(TotalData$Chlorophyll)
+##TotalData$Guano <- as.factor(TotalData$Guano)
+##TotalData$Light <- as.factor(TotalData$Light)
+##TotalData$Flume <- as.factor(TotalData$Flume)
+##TotalData$Flow.Direction <- as.factor(TotalData$Flow.Direction)
 
 str(TotalData)
 
@@ -117,7 +127,7 @@ hist(TotalData$dx[abs(TotalData$dx)<.01],breaks = 100)
 ```
 
 ```{r}
-save.image("~/Post-doc/Data/Total Merged Data File (Sep 20 2023).RData")
+save.image("~/Post-doc/Data/Vertical Data File (Nov 12 2024).RData")
 ```
 
 

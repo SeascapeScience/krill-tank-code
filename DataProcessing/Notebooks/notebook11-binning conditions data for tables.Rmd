@@ -16,13 +16,19 @@ head(CC.TotalData)
 Change factor levels to N, L M H E, etc
 ```{r}
 ##CC.TD <- na.omit(CC.TotalData)
-data <- CC.TotalData
+data <- TotalData
 str(data)
-levels(data$Flow.rate) <- c("No Flow","Low Flow (0.6)","Medium Flow (3)", "High Flow (5.9)","Extreme Flow (8.9)")
+levels(data$Flow.rate) <- c("No Flow","Low Flow (0.6)","Low Flow (1.5)", "Medium Flow (3)", "High Flow (3.4)", "High Flow (5.9)","Extreme Flow (8.9)")
 plot(data$Flow.rate, data$v, xlab = "Flow rate (cm s-1)", ylab = "Velocity (cm s-1)", ylim = c(0, 25))
 levels(data$Chlorophyll)
-levels(data$Chlorophyll) <- c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll", "High Chlorophyll","High Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll",  "Medium Chlorophyll",  "Medium Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll",  "Filament")
+levels(data$Chlorophyll) <- c("No Chlorophyll", "Low Chlorophyll", "Low Chlorophyll","Low Chlorophyll","Low Chlorophyll", "Extreme Chlorophyll", "High Chlorophyll", "High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "High Chlorophyll", "High Chlorophyll",  "Low Chlorophyll",  "Low Chlorophyll", "Low Chlorophyll","Low Chlorophyll",  "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll", "Filament")
 plot(data$Chlorophyll, data$v, xlab = "Chlorophyll (mg L-1)", ylab = "Velocity (cm s-1)")
+
+### order flow rate levels
+levels(data$Flow.rate)
+#### order flow direction order
+levels(data$Flow.Direction)
+data$Flow.Direction <- ordered(data$Flow.Direction, levels = c("No Flow", "Upwelling", "Downwelling", "Horizontal"))
 
 library(ggplot2)
 str(data)
@@ -47,8 +53,10 @@ levels(Highflow$Chem) <- c("Ambient", "Guano", "Guano+CHL")
 
 Medflow$Chem <- ordered(Medflow$Chem, levels = c("Ambient", "Guano", "Guano+CHL"))
 
+```
 
-a <- ggplot(AGG_Dark, aes(x = Flow.rate, y = log(v), fill= Chem))+
+```{r}
+a <- ggplot(data, aes(x = Flow.rate, y = log(v), fill= Chlorophyll))+
   geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
   theme(legend.key.size = unit(2, "cm"))+
   theme(text = element_text(size = 16))+
@@ -65,13 +73,13 @@ a <- ggplot(AGG_Dark, aes(x = Flow.rate, y = log(v), fill= Chem))+
   theme(axis.line = element_line(linewidth = 0.5, linetype = "solid",
                                    colour = "black"))+
   theme(legend.key = element_rect(fill = "white"))+
-  labs(size = "", x = "Flow Rate (cm s-1)", y = "Ground Velocity (logged, cm s-1)", title = "") +
+  labs(size = "", x = "Flow Rate (mm s-1)", y = "Ground Velocity (logged, cm s-1)", title = "") +
   scale_fill_manual(values=c("white", "gray88", "slategray"),name = "Chemical Cue",
-                    labels=c("Ambient", "Guano", "Guano+CHL"))+
-  facet_grid(~ Flow.rate, labeller = label_both, scales = "free_x", space = "free")
+                    labels=c("No Chlorophyll", "Low Chlorophyll", "High Chlorophyll"))+
+  facet_grid(Flow.Direction ~ Flow.rate, labeller = label_both, scales = "free_x", space = "free")
 a
 
-b <- ggplot(Highflow,aes(x = Chem, y = turn.angle, fill= Chem))+
+b <- ggplot(data,aes(x = Flow.rate, y = h.heading.pi, fill= Chlorophyll))+
   geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
   theme(legend.key.size = unit(2, "cm"))+
   theme(text = element_text(size = 16))+
@@ -88,10 +96,10 @@ b <- ggplot(Highflow,aes(x = Chem, y = turn.angle, fill= Chem))+
   theme(axis.line = element_line(size = 0.5, linetype = "solid",
                                    colour = "black"))+
   theme(legend.key = element_rect(fill = "white"))+
-  labs(size = "", x = "Chemical Cue", y = "Turn Angles (degrees)", title = "High Flow (5.9 cm s-1)") +
+  labs(size = "", x = "Chemical Cue", y = "Horizontal Heading (degrees)", title = "") +
   scale_fill_manual(values=c("white", "gray", "gray35"),name = "Chemical Cue",
-                    labels=c("Ambient", "Guano", "Guano+CHL"))+
-  facet_grid(~ Light, labeller = label_both, scales = "free_x", space = "free")
+                    labels=c("No Chlorophyll", "Low Chlorophyll", "High Chlorophyll"))+
+  facet_grid(Flow.Direction ~ Light, labeller = label_both, scales = "free_x", space = "free")
 b
 
 c <- ggplot(Highflow,aes(x = Chem, y = pitch.perfect, fill= Chem))+
@@ -147,9 +155,11 @@ b
 c
 d
 
-##################
+```
 
 
+
+```{r}
 ########  Guano
 
 ggplot(data,aes(x=Flow.rate, y=pitch.perfect, fill=Guano))+
@@ -163,7 +173,7 @@ ggplot(data,aes(x=Flow.rate, y=pitch.perfect, fill=Guano))+
   facet_grid(~Light, scales = "free_x", space = "free")
 
 
-ggplot(data,aes(x=Flow.rate, y=heading.pi, fill=Guano))+
+ggplot(data,aes(x=Flow.rate, y=h.heading.pi, fill=Guano))+
   geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
   theme(axis.text=element_text(color="black"))+
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
@@ -195,9 +205,10 @@ ggplot(data,aes(x=Flow.rate, y=vel.turn.angle.smooth, fill=Guano))+
                     labels=c("Guano Absent", "Guano Present"))+
   facet_grid(~Light, scales = "free_x", space = "free")
 
+```
 
-
-save.image("~/Post-doc/Data/Total Merged Data File (Sep 14 2023).RData")
+```{r}
+save.image("~/Post-doc/Data/Vertical Data File (Nov 12 2024).RData")
 ```
 
 

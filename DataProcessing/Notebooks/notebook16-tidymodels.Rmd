@@ -191,6 +191,10 @@ library(diptest)
 library(randomForest)
 library(reprtree)
 library(charlier)
+library(ggrepel)
+library(finetune)
+library(rules)
+library(baguette)
 })
 
 
@@ -222,8 +226,8 @@ conditions = attr(df, "conditions")
 Preparation of outputs
 ```{r}
 ## fix to pull col name or number into model??
-N_RUNS = 10
-N_TREES = 2000
+N_RUNS = 1
+N_TREES = 100
 STRATA = NULL
 PROP = 0.8
 c.v <- NULL
@@ -237,6 +241,32 @@ m = matrix (NA_real_, nrow = N_RUNS, ncol = 5)
 colnames(m) <- c( "c_e", "c_e_t", "r_squared", "p_value", "node_purity")
 node.purity <- as_tibble(m)
 ```
+
+```{r}
+#' assess the output metrics of the model runs
+
+metrics2 = model_metrics(p_name = 'velocity mean', df = df, trees = N_TREES, prop = PROP, strata = STRATA, n_runs = N_RUNS, verbose = TRUE)
+metrics2$conditions.rf[[1]]
+# document parameters in functions sheet
+
+##how to run through all swimming behaviour parameters?
+p_names = c('velocity mean', 'velocity sd', 'turn angle mean')
+metrics = sapply(p_names, 
+                 function(p_name){
+                   model_metrics(p_name = p_name, df = df, trees = N_TREES, prop = PROP, strata = STRATA, n_runs = N_RUNS)
+                   }, simplify = FALSE)%>%
+  readr::write_rds("model outputs.rds")
+
+#' study VarImpPLot to find IncNodPurity to output to tibble from model_metrics
+#' look in model.test function
+#' 
+
+metrics = readr::read_rds("~/Post-doc/krill-tank-code/DataProcessing/Notebooks/models with ben.rds")
+
+
+```
+
+
 
 
 
@@ -269,6 +299,9 @@ for (j in parameters){
     ## table for report of stats on models
     
 }
+
+
+## how to use function model_metrics in this chunk?
 ```
 
 ```{r}

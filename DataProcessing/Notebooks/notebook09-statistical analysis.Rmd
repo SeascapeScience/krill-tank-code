@@ -5,7 +5,7 @@ output: html_notebook
 
 ```{r}
 rm(list=ls(all=TRUE))
-load("~/Post-doc/Data/Total Merged Data File (March 6 2024).RData")
+load("~/Post-doc/Data/Vertical Flume Data Analaysis.RData")
 ###str(CC.TotalData)
 
 AGG_Dark <- aggregate(FeedingDark, by = list(FeedingDark$D_V_T, FeedingDark$Chem, FeedingDark$Flow.rate), FUN = mean)

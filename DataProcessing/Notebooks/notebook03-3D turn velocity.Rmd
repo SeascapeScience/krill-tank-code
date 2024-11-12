@@ -31,16 +31,16 @@ head(CC.TotalData) ##only complete cases of Total Data
 ##TotalData$turn.angleyz <- atan2(TotalData$Y
 
 
-lth <- dim(CC.TotalData)[1]
+lth <- dim(TotalData)[1]
 
-vx1 <- CC.TotalData$vx[1:(lth-1)]
-vy1 <- CC.TotalData$vy[1:(lth-1)]
-vz1 <- CC.TotalData$vz[1:(lth-1)]
+vx1 <- TotalData$vx[1:(lth-1)]
+vy1 <- TotalData$vy[1:(lth-1)]
+vz1 <- TotalData$vz[1:(lth-1)]
 
 
-vx2 <- CC.TotalData$vx[2:lth]
-vy2 <- CC.TotalData$vy[2:lth]
-vz2 <- CC.TotalData$vz[2:lth]
+vx2 <- TotalData$vx[2:lth]
+vy2 <- TotalData$vy[2:lth]
+vz2 <- TotalData$vz[2:lth]
 
 v1 <- sqrt((vx1^2)+(vy1^2)+(vz1^2))  ##velocity magnitude (one time step above)
 
@@ -60,13 +60,13 @@ list2 <- ((acos(dd)/pi)*180)
 list3 <- (v1+v2)/2
 list4 <- c(l, list2)
 list5 <- c(l, list3)
-CC.TotalData$vel.turn.angle <- list4  ##should be derivative of each other
-CC.TotalData$vel <- list5   
+TotalData$vel.turn.angle <- list4  ##should be derivative of each other
+TotalData$vel <- list5   
 
 ## can we get the derivative of the theta.angle
 
 ## save before doing vel.flow, just incase factor conversion doesn't work properly
 
-save.image("~/Post-doc/Data/Total Merged Data File (Sep 20 2023).RData")
+save.image("~/Post-doc/Data/Vertical Data File (Nov 12 2024).RData")
 
 ```
