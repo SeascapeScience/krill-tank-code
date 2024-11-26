@@ -454,6 +454,9 @@ model_metrics = function(p_name = 'velocity mean', df = NULL, trees = 1000, prop
                               corr.est.train = c.e.t,
                               rsq = rsq1,
                               conditions.rf = list(output.test$importance)
+                              ## need to order variables when they output
+                              ## need 4 new variable for node purity and MSE
+                              
                 ))
               }, data = df) %>% 
     bind_rows()

@@ -6,7 +6,22 @@ output: html_notebook
 Load data
 ```{r}
 rm(list=ls(all=TRUE))
-load("~/Post-doc/Data/Total Merged Data File (March 6 2024).RData")
+load("~/Post-doc/Data/Vertical Data File (Nov 12 2024).RData")
+
+data <- read.csv("~/Bigelow/Data/ALL Pathwise Means.csv", header = TRUE, sep = ",")
+str(data)
+head(data)
+
+data$Date <- as.factor(data$Date)
+data$Trial <- as.factor(data$Trial)
+data$Replicate <- as.factor(data$Replicate)
+data$Chlorophyll <- as.factor(data$Chlorophyll)
+data$Flow <- as.factor(data$Flow)
+data$Light <- as.factor(data$Light)
+data$Guano <- as.factor(data$Guano)
+data$Flume <- as.factor(data$Flume)
+data$Flow.Direction <- as.factor(data$Flow.Direction)
+
 
 range(CC.TotalData$turn.anglexysmooth)
 head(CC.TotalData)
@@ -18,17 +33,18 @@ Change factor levels to N, L M H E, etc
 ##CC.TD <- na.omit(CC.TotalData)
 data <- TotalData
 str(data)
-levels(data$Flow.rate) <- c("No Flow","Low Flow (0.6)","Low Flow (1.5)", "Medium Flow (3)", "High Flow (3.4)", "High Flow (5.9)","Extreme Flow (8.9)")
+levels(data$Flow) <- c("No Flow","Low Flow (0.6)","Low Flow (1.5)", "Medium Flow (3)", "High Flow (3.5)", "High Flow (5.9)","Extreme Flow (8.9)")
 plot(data$Flow.rate, data$v, xlab = "Flow rate (cm s-1)", ylab = "Velocity (cm s-1)", ylim = c(0, 25))
 levels(data$Chlorophyll)
 levels(data$Chlorophyll) <- c("No Chlorophyll", "Low Chlorophyll", "Low Chlorophyll","Low Chlorophyll","Low Chlorophyll", "Extreme Chlorophyll", "High Chlorophyll", "High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll","High Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "High Chlorophyll", "High Chlorophyll",  "Low Chlorophyll",  "Low Chlorophyll", "Low Chlorophyll","Low Chlorophyll",  "Low Chlorophyll", "Low Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll", "Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll","Medium Chlorophyll", "Filament")
+data$Chlorophyll <- ordered(data$Chlorophyll, levels = c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll", "Extreme Chlorophyll", "Filament"))
 plot(data$Chlorophyll, data$v, xlab = "Chlorophyll (mg L-1)", ylab = "Velocity (cm s-1)")
 
 ### order flow rate levels
 levels(data$Flow.rate)
 #### order flow direction order
 levels(data$Flow.Direction)
-data$Flow.Direction <- ordered(data$Flow.Direction, levels = c("No Flow", "Upwelling", "Downwelling", "Horizontal"))
+data$Flow.Direction <- ordered(data$Flow.Direction, levels = c("No Flow", "Horizontal", "Upwelling", "Downwelling"))
 
 library(ggplot2)
 str(data)
@@ -56,7 +72,7 @@ Medflow$Chem <- ordered(Medflow$Chem, levels = c("Ambient", "Guano", "Guano+CHL"
 ```
 
 ```{r}
-a <- ggplot(data, aes(x = Flow.rate, y = log(v), fill= Chlorophyll))+
+a <- ggplot(data, aes(x = Flow, y = v, fill= Chlorophyll))+
   geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
   theme(legend.key.size = unit(2, "cm"))+
   theme(text = element_text(size = 16))+
@@ -73,19 +89,19 @@ a <- ggplot(data, aes(x = Flow.rate, y = log(v), fill= Chlorophyll))+
   theme(axis.line = element_line(linewidth = 0.5, linetype = "solid",
                                    colour = "black"))+
   theme(legend.key = element_rect(fill = "white"))+
-  labs(size = "", x = "Flow Rate (mm s-1)", y = "Ground Velocity (logged, cm s-1)", title = "") +
-  scale_fill_manual(values=c("white", "gray88", "slategray"),name = "Chemical Cue",
-                    labels=c("No Chlorophyll", "Low Chlorophyll", "High Chlorophyll"))+
-  facet_grid(Flow.Direction ~ Flow.rate, labeller = label_both, scales = "free_x", space = "free")
+  labs(size = "", x = "Flow Rate (cm s-1 (Horizontal), mm s-1 (Vertical))", y = "Ground Velocity (cm s-1)", title = "") +
+  scale_fill_manual(values=c("white", "gray90", "gray75","gray60","grey45", "grey30", "slategray"),name = "Chemical Cue",
+                    labels=c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll", "Extreme Chlorophyll", "Filament"))+
+  facet_grid(Flume*Flow.Direction ~ Light, labeller = label_both, scales = "free_x", space = "free")
 a
 
-b <- ggplot(data,aes(x = Flow.rate, y = h.heading.pi, fill= Chlorophyll))+
+b <- ggplot(data,aes(x = Flow, y = heading.pi, fill= Chlorophyll))+
   geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
   theme(legend.key.size = unit(2, "cm"))+
   theme(text = element_text(size = 16))+
   ##stat_summary(fun=mean, geom="line", lty=2, lwd=1, col = "black", aes(group=1)) +
-  stat_summary(fun.y = mean, geom = "errorbar", aes(ymax = ..y.., ymin = ..y..),
-                 width = 0.75, linetype = "dashed")+
+  stat_summary(geom = "errorbar", fun.min = mean, fun = mean, fun.max = mean,
+               width = .75, linetype = "dashed", position = position_dodge())+
   ##stat_summary(fun=mean, colour="red", geom="point", size = 4) +
   theme(axis.text=element_text(color="black"))+
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
@@ -96,19 +112,19 @@ b <- ggplot(data,aes(x = Flow.rate, y = h.heading.pi, fill= Chlorophyll))+
   theme(axis.line = element_line(size = 0.5, linetype = "solid",
                                    colour = "black"))+
   theme(legend.key = element_rect(fill = "white"))+
-  labs(size = "", x = "Chemical Cue", y = "Horizontal Heading (degrees)", title = "") +
-  scale_fill_manual(values=c("white", "gray", "gray35"),name = "Chemical Cue",
-                    labels=c("No Chlorophyll", "Low Chlorophyll", "High Chlorophyll"))+
-  facet_grid(Flow.Direction ~ Light, labeller = label_both, scales = "free_x", space = "free")
+  labs(size = "", x = "Flow Rate (cm s-1 (Horizontal), mm s-1 (Vertical))", y = "Horizontal Heading (degrees)", title = "") +
+  scale_fill_manual(values=c("white", "gray90", "gray75","gray60","grey45", "grey30", "slategray"),name = "Chemical Cue",
+                    labels=c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll", "Extreme Chlorophyll", "Filament"))+
+  facet_grid(Flume*Flow.Direction ~ Light, labeller = label_both, scales = "free_x", space = "free")
 b
 
-c <- ggplot(Highflow,aes(x = Chem, y = pitch.perfect, fill= Chem))+
+c <- ggplot(data ,aes(x = Flow, y = v.heading/(2*pi)*360, fill= Guano))+
   geom_boxplot(notch=F, notchwidth=0.3,outlier.shape=1,outlier.size=2, coef=1.5)+
   theme(legend.key.size = unit(2, "cm"))+
   theme(text = element_text(size = 16))+
   ##stat_summary(fun=mean, geom="line", lty=2, lwd=1, col = "black", aes(group=1)) +
-  stat_summary(fun.y = mean, geom = "errorbar", aes(ymax = ..y.., ymin = ..y..),
-                 width = 0.75, linetype = "dashed")+
+  stat_summary(geom = "errorbar", fun.min = mean, fun = mean, fun.max = mean,
+               width = .75, linetype = "dashed", position = position_dodge())+
   ##stat_summary(fun=mean, colour="red", geom="point", size = 4) +
   theme(axis.text=element_text(color="black"))+
   theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.4))+
@@ -119,10 +135,10 @@ c <- ggplot(Highflow,aes(x = Chem, y = pitch.perfect, fill= Chem))+
   theme(axis.line = element_line(size = 0.5, linetype = "solid",
                                    colour = "black"))+
   theme(legend.key = element_rect(fill = "white"))+
-  labs(size = "", x = "Chemical Cue", y = "Vertical Heading (degrees)", title = "High Flow (5.9 cm s-1)") +
-  scale_fill_manual(values=c("white", "gray", "gray35"),name = "Chemical Cue",
-                    labels=c("Ambient", "Guano", "Guano+CHL"))+
-  facet_grid(~ Light, labeller = label_both, scales = "free_x", space = "free")
+  labs(size = "", x = "Flow Rate (cm s-1 (Horizontal), mm s-1 (Vertical))" , y = "Vertical Heading (degrees)", title = "") +
+  scale_fill_manual(values=c("white",  "slategray"),name = "Guano Cue",
+                    labels=c("Absent", "Present"))+
+  facet_grid(Flume*Flow.Direction ~ Light, labeller = label_both, scales = "free_x", space = "free")
 c
 
 
@@ -155,6 +171,68 @@ b
 c
 d
 
+```
+
+
+
+```{r}
+##############################################################################
+library(forcats)
+library(ggplot2)
+library(dplyr)
+library(ggmulti)
+
+agg = aggregate(data,
+                by = list(data$Flow.Direction, data$Flume, data$Guano, data$Light, data$Flow, data$Chlorophyll),
+                FUN = mean)
+agg <- agg[ -c(7:15)]
+colnames(agg) <- c('Flow.Direction', 'Flume', 'Guano', 'Light', 'Flow', 'Chlorophyll', 'X', 'Y', 'Z', 'dx', 'dy', 'dz', 'd', 'vx', 'vy', 'vz', 'v', 'h.heading', 'v,heading', 'turn.anglexy', 'turn.angleyz', 'turn.angle', 'vel.turn.angle', 'vel', 'vel.flow', 'trim.X', 'xsmooth', 'ysmooth', 'zsmooth', 'smooth.dx', 'smooth.dy', 'smooth.dz', 'smooth.d', 'smooth.vx', 'smooth.vy', 'smooth.vz', 'smooth.v', 'smooth.h.heading', 'heading.pi', 'smooth.v.heading', 'smooth.pitch', 'turn.anglexysmooth', 'turn.angleyzsmooth', 'turn.angle.smooth')
+str(agg)
+
+
+
+a <- ggplot(agg, aes(x = turn.angle, y = frequency(turn.angle), color = Chlorophyll)) + coord_polar(theta = "x", start = 3.142, direction=1)
+
+a
+a + theme_classic()+
+  scale_x_continuous(limits = c(-179.999,180), ## if -180 labels overlap and look funny
+                     breaks = seq(-180, 180, by = 45),
+                     minor_breaks = seq(-180, 180, by = 15))+
+  theme(text=element_text(size=20))+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=0,hjust=1,vjust=0.4))+
+  theme(axis.line = element_line(size = 0.5, linetype = "solid",
+                                   colour = "black")) + 
+  geom_segment(aes(y = 0, xend = turn.angle, yend = 1)) +
+  labs(x = "Horizontal Heading (degrees)", y = "Frequency of Heading", title = "") +
+  scale_colour_manual(values=c("gray90", "gray80", "gray75","gray60","grey45", "grey30", "slategray"),name = "Chemical Cue",
+                    labels=c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll", "Extreme Chlorophyll", "Filament"))+
+  geom_point(aes(shape = Flow, size = 4)) +
+  #scale_shape_identity() +
+  facet_grid(facets = Light ~ Flow.Direction*Flume, labeller = label_both)
+
+
+
+#Code
+data %>%
+  filter(Chlorophyll %in% c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll", "Extreme Chlorophyll", "Filament")) %>%
+  ggplot(aes(x = heading.pi, fill = Chlorophyll))+
+  geom_bar(stat = 'bin',  position = "fill", colour = "black", size = .25)+
+  coord_polar(theta = "x", start = 3.142, direction=1)+
+  theme_classic()+
+  scale_x_continuous(limits = c(-179.999,180), ## if -180 labels overlap and look funny
+                     breaks = seq(-180, 180, by = 45),
+                     minor_breaks = seq(-180, 180, by = 15))+
+  theme(text=element_text(size=20))+
+  theme(axis.text=element_text(color="black"))+
+  theme(axis.text.x=element_text(angle=0,hjust=1,vjust=0.4))+
+  theme(axis.line = element_line(size = 0.5, linetype = "solid",
+                                   colour = "black"))+
+  theme(legend.key = element_rect(fill = "white"))+
+  labs(x = "Horizontal Heading (degrees)", y = "Frequency of Heading", title = "") +
+  scale_fill_manual(values=c("white", "gray90", "gray75","gray60","grey45", "grey30", "slategray"),name = "Chemical Cue",
+                    labels=c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll", "Extreme Chlorophyll", "Filament"))+
+ facet_grid(facets = Light ~ Flow.Direction*Flume, labeller = label_both)
 ```
 
 
@@ -350,7 +428,7 @@ library(circular)
 range(AGG_Dark$turn.anglexysmooth)
 AGG_Feed$turn.anglexysmooth <- AGG_Feed$turn.anglexysmooth/(2*pi)*360
 
-circ.turn <- circular(AGG_Dark$turn.anglexysmooth, type = c("angles"),
+circ.turn <- circular(data$turn.angle, type = c("angles"),
           units = c("degrees"),
           template = c("geographics"))
 
@@ -365,7 +443,7 @@ print(circ, info=TRUE)
 range(circ)
 
 ## S3 method for class 'circular'
-plot(circ, pch = 16, cex = 1, stack = TRUE,
+plot(circ.turn, pch = 16, cex = 1, stack = TRUE,
 axes = TRUE, start.sep=0, sep = 0.025, shrink = 3.5,   ### larger stack number = more zoomed out
 bins = 120, ticks = FALSE, tcl = 0.025, tcl.text = 0.125,
 col = NULL, tol = 0.04, uin = NULL,
@@ -388,7 +466,12 @@ meandeviation(circ.turn)
 summary(circ.turn) 
 
 ## ANOVA using circular stats
-aov.circular(circ.turn, AGG_Dark$Flow.rate) ## working but unsure
+aov.circular(circ.turn, data$Flow) ## working but unsure
+
+circ.mean <- mean(circ.turn, na.rm = TRUE)
+
+plot.circular(circ.turn, stack = T, pch = 20, sep = 0.08, shrink = 1.6)  ### larger stack number = more zoomed out
+arrows.circular(circ.mean) #add mean to plot
 
 ```
 
@@ -817,10 +900,10 @@ mean(LNN, na.rm = TRUE) #remove NAs from dataset, then find mean
 var(LNN, na.rm = TRUE)
 meandeviation(LNN, na.rm=TRUE)
 summary(LNN, na.rm=TRUE) 
-LNN.mean <- mean(LNN, na.rm = TRUE) #assigns to the 'LNN.mean' object
+circ.mean <- mean(circ.turn, na.rm = TRUE) #assigns to the 'LNN.mean' object
 
-plot.circular(LNN, stack = T, pch = 20, sep = 0.08, shrink = 1.6)  ### larger stack number = more zoomed out
-arrows.circular(LNN.mean) #add mean to plot
+plot.circular(circ.turn, stack = T, pch = 20, sep = 0.08, shrink = 1.6)  ### larger stack number = more zoomed out
+arrows.circular(circ.mean) #add mean to plot
 ###########################################################################
 
 mean(LNL, na.rm = TRUE) #remove NAs from dataset, then find mean 
@@ -966,10 +1049,10 @@ mean(LMG, na.rm = TRUE) #remove NAs from dataset, then find mean
 var(LMG, na.rm = TRUE)
 meandeviation(LMG, na.rm=TRUE)
 summary(LMG, na.rm=TRUE)
-LMG.mean <- mean(LMG, na.rm = TRUE) #assigns to the 'LNN.mean' object
+circ.mean <- mean(circ.turn, na.rm = TRUE) #assigns to the 'LNN.mean' object
 
-plot.circular(LMG, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
-arrows.circular(LMG.mean) #add mean to plot
+plot.circular(circ.turn, stack = T, pch = 20, sep = 0.08, shrink = 1.6)
+arrows.circular(circ.mean) #add mean to plot
 ###########################################################################
 
 

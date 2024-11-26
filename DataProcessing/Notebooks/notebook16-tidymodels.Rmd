@@ -246,7 +246,7 @@ node.purity <- as_tibble(m)
 #' assess the output metrics of the model runs
 
 metrics2 = model_metrics(p_name = 'velocity mean', df = df, trees = N_TREES, prop = PROP, strata = STRATA, n_runs = N_RUNS, verbose = TRUE)
-metrics2$conditions.rf[[1]]
+np <- as.numeric(metrics2$conditions.rf[[1]])
 # document parameters in functions sheet
 
 ##how to run through all swimming behaviour parameters?

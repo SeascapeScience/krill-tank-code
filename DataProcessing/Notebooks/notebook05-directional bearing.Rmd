@@ -106,9 +106,9 @@ library(dplyr)
 library(ggmulti)
 
 #Code
-Feeding %>%
-  filter(Chem %in% c("Ambient", "Guano", "Guano+CHL")) %>%
-  ggplot(aes(x = heading.pi, fill = Chem))+
+data %>%
+  filter(Chlorophyll %in% c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll", "Extreme Chlorophyll", "Filament")) %>%
+  ggplot(aes(x = heading.pi, fill = Chlorophyll))+
   geom_bar(stat = 'bin',  position = "fill", colour = "black", size = .25)+
   coord_polar(theta = "x", start = 3.142, direction=1)+
   theme_classic()+
@@ -122,9 +122,9 @@ Feeding %>%
                                    colour = "black"))+
   theme(legend.key = element_rect(fill = "white"))+
   labs(x = "Horizontal Heading (degrees)", y = "Frequency of Heading", title = "") +
-  scale_fill_manual(values=c("lightgray", "gray", "gray35"),name = "Chemical Cue",
-                    labels=c("Ambient", "Guano", "Guano+CHL"))+
- facet_grid(facets = Light ~ Flow.rate, labeller = label_both)
+  scale_fill_manual(values=c("white", "gray90", "gray75","gray60","grey45", "grey30", "slategray"),name = "Chemical Cue",
+                    labels=c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll", "Extreme Chlorophyll", "Filament"))+
+ facet_grid(facets = Light ~ Flow.Direction*Flume, labeller = label_both)
 
   ###########################################################
 FeedingDark %>%
