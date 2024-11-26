@@ -186,13 +186,16 @@ agg = aggregate(data,
                 by = list(data$Flow.Direction, data$Flume, data$Guano, data$Light, data$Flow, data$Chlorophyll),
                 FUN = mean)
 agg <- agg[ -c(7:15)]
-colnames(agg) <- c('Flow.Direction', 'Flume', 'Guano', 'Light', 'Flow', 'Chlorophyll', 'X', 'Y', 'Z', 'dx', 'dy', 'dz', 'd', 'vx', 'vy', 'vz', 'v', 'h.heading', 'v,heading', 'turn.anglexy', 'turn.angleyz', 'turn.angle', 'vel.turn.angle', 'vel', 'vel.flow', 'trim.X', 'xsmooth', 'ysmooth', 'zsmooth', 'smooth.dx', 'smooth.dy', 'smooth.dz', 'smooth.d', 'smooth.vx', 'smooth.vy', 'smooth.vz', 'smooth.v', 'smooth.h.heading', 'heading.pi', 'smooth.v.heading', 'smooth.pitch', 'turn.anglexysmooth', 'turn.angleyzsmooth', 'turn.angle.smooth')
+colnames(agg) <- c('Flow.Direction', 'Flume', 'Guano', 'Light', 'Flow', 'Chlorophyll', 'X', 'Y', 'Z', 'dx', 'dy', 'dz', 'd', 'vx', 'vy', 'vz', 'v', 'h.heading', 'v.heading', 'turn.anglexy', 'turn.angleyz', 'turn.angle', 'vel.turn.angle', 'vel', 'vel.flow', 'trim.X', 'xsmooth', 'ysmooth', 'zsmooth', 'smooth.dx', 'smooth.dy', 'smooth.dz', 'smooth.d', 'smooth.vx', 'smooth.vy', 'smooth.vz', 'smooth.v', 'smooth.h.heading', 'heading.pi', 'smooth.v.heading', 'smooth.pitch', 'turn.anglexysmooth', 'turn.angleyzsmooth', 'turn.angle.smooth')
 str(agg)
 
 vert <- subset(agg, Flume == "Vertical")
+str(vert)
+vert$smooth.pitch <- vert$v.heading/(2*pi)*360
 
-a <- ggplot(vert, aes(x = turn.angle, y = frequency(turn.angle), color = Guano)) + coord_polar(theta = "x", start = 3.142, direction=1)
+#################### Polar plot for vertical MS #########################################
 
+a <- ggplot(vert, aes(x = smooth.pitch, y = frequency(smooth.pitch), color = Guano)) + coord_polar(theta = "x", start = 3.142, direction=1)
 a
 a + theme_classic()+
   scale_x_continuous(limits = c(-179.999,180), ## if -180 labels overlap and look funny
@@ -203,13 +206,14 @@ a + theme_classic()+
   theme(axis.text.x=element_text(angle=0,hjust=1,vjust=0.4))+
   theme(axis.line = element_line(size = 0.5, linetype = "solid",
                                    colour = "black")) + 
-  geom_segment(aes(y = 0, xend = turn.angle, yend = 1)) +
-  labs(x = "Horizontal Heading (degrees)", y = "Frequency of Heading", title = "") +
+  geom_segment(aes(y = 0, xend = smooth.pitch, yend = 1)) +
+  labs(x = "Vertical Heading (degrees)", y = "Frequency of Heading", title = "") +
   scale_colour_manual(values=c("gray85", "grey35"),name = "Guano",
                     labels=c("Absent", "Present"))+
   geom_point(aes(shape = Chlorophyll), size = 4, alpha = 0.8, position = position_dodge(width = 1)) +
   facet_grid(facets = Light ~ Flow.Direction*Flow , labeller = label_both)
 
+###################################################################################
 
 
 #Code
