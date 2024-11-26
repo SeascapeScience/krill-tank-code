@@ -173,7 +173,7 @@ d
 
 ```
 
-
+Aggregating data and making POlar Plots with lines and Points
 
 ```{r}
 ##############################################################################
@@ -191,7 +191,7 @@ str(agg)
 
 
 
-a <- ggplot(agg, aes(x = turn.angle, y = frequency(turn.angle), color = Chlorophyll)) + coord_polar(theta = "x", start = 3.142, direction=1)
+a <- ggplot(agg, aes(x = turn.angle, y = frequency(turn.angle), color = Light)) + coord_polar(theta = "x", start = 3.142, direction=1)
 
 a
 a + theme_classic()+
@@ -205,11 +205,10 @@ a + theme_classic()+
                                    colour = "black")) + 
   geom_segment(aes(y = 0, xend = turn.angle, yend = 1)) +
   labs(x = "Horizontal Heading (degrees)", y = "Frequency of Heading", title = "") +
-  scale_colour_manual(values=c("gray90", "gray80", "gray75","gray60","grey45", "grey30", "slategray"),name = "Chemical Cue",
-                    labels=c("No Chlorophyll", "Low Chlorophyll", "Medium Chlorophyll", "High Chlorophyll", "Extreme Chlorophyll", "Filament"))+
-  geom_point(aes(shape = Flow, size = 4)) +
-  #scale_shape_identity() +
-  facet_grid(facets = Light ~ Flow.Direction*Flume, labeller = label_both)
+  scale_colour_manual(values=c("gray75", "grey30"),name = "Light",
+                    labels=c("Absent", "Present"))+
+  geom_point(aes(shape = Chlorophyll), size = 4) +
+  facet_grid(facets = Flow.Direction*Flume ~ Flow, labeller = label_both)
 
 
 
